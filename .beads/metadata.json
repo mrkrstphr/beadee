@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "rosary",
+  "project_id": "76cdf56c-c909-4547-8801-5520b49a2993"
+}
