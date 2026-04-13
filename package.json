@@ -12,10 +12,10 @@
     "server/"
   ],
   "scripts": {
-    "dev": "concurrently \"node server/index.js\" \"vite\"",
+    "dev": "concurrently \"node bin/beadee.js --port 3001 --dev\" \"vite\"",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/index.js"
+    "start": "node bin/beadee.js"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",
