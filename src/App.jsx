@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const THEMES = ['dark', 'light', 'dracula', 'synthwave', 'hacker', 'auto']
+import Header from './components/Header.jsx'
 
 function setTheme(theme) {
   localStorage.setItem('beadee-theme', theme)
@@ -30,45 +29,22 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="header">
-        <div className="header-left">
-          <span className="logo">beadee</span>
-          <nav className="tabs">
-            <button
-              className={`tab ${activeTab === 'list' ? 'active' : ''}`}
-              onClick={() => setActiveTab('list')}
-            >
-              List
-            </button>
-            <button
-              className={`tab ${activeTab === 'kanban' ? 'active' : ''}`}
-              onClick={() => setActiveTab('kanban')}
-            >
-              Kanban
-            </button>
-          </nav>
-        </div>
-        <div className="header-right">
-          <select
-            className="theme-select"
-            value={theme}
-            onChange={e => handleThemeChange(e.target.value)}
-          >
-            {THEMES.map(t => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            + New Issue
-          </button>
-        </div>
-      </header>
+      <Header
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        search={search}
+        onSearchChange={setSearch}
+        onNewIssue={() => { setEditingIssue(null); setShowModal(true) }}
+        theme={theme}
+        onThemeChange={handleThemeChange}
+      />
 
       <main className="main">
         <div className="placeholder">
           <p className="placeholder-title">beadee is running</p>
           <p className="placeholder-sub">
             Views coming soon — active tab: <strong>{activeTab}</strong>
+            {search && <> · search: <strong>{search}</strong></>}
           </p>
         </div>
       </main>
