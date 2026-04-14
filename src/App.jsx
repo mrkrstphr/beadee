@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Header from './components/Header.jsx'
+import IssueDetail from './components/IssueDetail.jsx'
 import ListView from './views/ListView.jsx'
 
 function setTheme(theme) {
@@ -12,17 +13,6 @@ function setTheme(theme) {
   }
 }
 
-function DetailPlaceholder({ issueId, onClose }) {
-  return (
-    <div style={{ padding: '24px' }}>
-      <button className="btn btn-secondary" onClick={onClose} style={{ marginBottom: 16 }}>← Back</button>
-      <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-        Detail panel coming soon for <strong>{issueId}</strong>
-      </p>
-    </div>
-  )
-}
-
 export default function App() {
   const [theme, setThemeState] = useState(
     () => localStorage.getItem('beadee-theme') || 'dark'
@@ -32,6 +22,9 @@ export default function App() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingIssue, setEditingIssue] = useState(null)
+  const [detailKey, setDetailKey] = useState(0)
+
+  const handleRefresh = useCallback(() => setDetailKey(k => k + 1), [])
 
   function handleThemeChange(t) {
     setThemeState(t)
@@ -56,7 +49,16 @@ export default function App() {
             search={search}
             selectedIssueId={selectedIssueId}
             onSelectIssue={setSelectedIssueId}
-            DetailPanel={DetailPlaceholder}
+            DetailPanel={({ issueId, onClose }) => (
+              <IssueDetail
+                key={`${issueId}-${detailKey}`}
+                issueId={issueId}
+                onClose={onClose}
+                onSelectIssue={setSelectedIssueId}
+                onEdit={issue => { setEditingIssue(issue); setShowModal(true) }}
+                onRefresh={handleRefresh}
+              />
+            )}
           />
         )}
         {activeTab === 'kanban' && (
