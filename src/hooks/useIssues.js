@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
 const API = '/api'
-const POLL_INTERVAL = 5000
+const FALLBACK_POLL_INTERVAL = 30000
 
 async function apiFetch(path, options = {}) {
   const res = await fetch(`${API}${path}`, {
@@ -59,13 +59,39 @@ export function useIssues(filters = {}, { onRefreshed } = {}) {
     setLoading(true)
     fetchIssues()
 
-    const schedule = () => {
-      timerRef.current = setTimeout(() => {
+    let es = null
+    let fallbackTimer = null
+    let reconnectTimer = null
+
+    function startFallbackPoll() {
+      clearInterval(fallbackTimer)
+      fallbackTimer = setInterval(() => {
         if (document.visibilityState === 'visible') fetchIssues(true)
-        schedule()
-      }, POLL_INTERVAL)
+      }, FALLBACK_POLL_INTERVAL)
     }
-    schedule()
+
+    function connectSSE() {
+      if (es) { es.close(); es = null }
+      es = new EventSource('/api/events')
+
+      es.onopen = () => {
+        clearTimeout(reconnectTimer)
+      }
+
+      es.onmessage = () => {
+        if (document.visibilityState === 'visible') fetchIssues(true)
+      }
+
+      es.onerror = () => {
+        es.close()
+        es = null
+        // Retry SSE after 5s; fallback poll keeps data fresh in the meantime
+        reconnectTimer = setTimeout(connectSSE, 5000)
+      }
+    }
+
+    connectSSE()
+    startFallbackPoll()
 
     const onVisibility = () => {
       if (document.visibilityState === 'visible') fetchIssues(true)
@@ -73,7 +99,9 @@ export function useIssues(filters = {}, { onRefreshed } = {}) {
     document.addEventListener('visibilitychange', onVisibility)
 
     return () => {
-      clearTimeout(timerRef.current)
+      es?.close()
+      clearInterval(fallbackTimer)
+      clearTimeout(reconnectTimer)
       document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [fetchIssues])

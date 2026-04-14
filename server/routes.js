@@ -1,3 +1,5 @@
+import { watch } from 'node:fs'
+import { join } from 'node:path'
 import { bdRun, bdCheck } from './bd.js'
 
 /**
@@ -23,6 +25,61 @@ function bdHandler(fn) {
  * @param {{ cwd: string }} opts
  */
 export async function registerRoutes(fastify, { cwd }) {
+  // ── SSE EVENTS ───────────────────────────────────────────────────────────
+
+  // GET /api/events — Server-Sent Events; fires on any .beads/ file change
+  {
+    const clients = new Set()
+    let watcher = null
+    let debounceTimer = null
+
+    function broadcast() {
+      for (const res of clients) {
+        try { res.raw.write('data: {"type":"change"}\n\n') } catch { clients.delete(res) }
+      }
+    }
+
+    function startWatcher() {
+      const beadsDir = join(cwd, '.beads')
+      try {
+        watcher = watch(beadsDir, { recursive: true }, (_event, filename) => {
+          // Ignore lock files and non-data files
+          if (!filename || filename.includes('lock') || filename.endsWith('.log')) return
+          clearTimeout(debounceTimer)
+          debounceTimer = setTimeout(broadcast, 200)
+        })
+        watcher.on('error', () => { /* silently ignore watch errors */ })
+      } catch {
+        // .beads/ not accessible — SSE still works, just no push notifications
+      }
+    }
+
+    startWatcher()
+
+    fastify.get('/api/events', (req, reply) => {
+      reply.raw.setHeader('Content-Type', 'text/event-stream')
+      reply.raw.setHeader('Cache-Control', 'no-cache')
+      reply.raw.setHeader('Connection', 'keep-alive')
+      reply.raw.setHeader('X-Accel-Buffering', 'no')
+      reply.raw.flushHeaders()
+
+      // Initial ping so client knows connection is established
+      reply.raw.write(': connected\n\n')
+
+      clients.add(reply)
+
+      // Keepalive comment every 30s to survive proxy timeouts
+      const keepalive = setInterval(() => {
+        try { reply.raw.write(': ping\n\n') } catch { clients.delete(reply); clearInterval(keepalive) }
+      }, 30000)
+
+      req.raw.on('close', () => {
+        clients.delete(reply)
+        clearInterval(keepalive)
+      })
+    })
+  }
+
   // ── READ ROUTES ──────────────────────────────────────────────────────────
 
   // GET /api/health
