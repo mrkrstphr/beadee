@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useIssue, updateIssue, closeIssue } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
+import CommentThread from './CommentThread.jsx'
 
 const STATUS_ICON = {
   open:        '○',
@@ -223,6 +224,8 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
           )}
         </div>
       )}
+
+      <CommentThread issueId={issueId} />
     </div>
   )
 }
