@@ -896,6 +896,298 @@ input::placeholder, textarea::placeholder {
 }
 
 /* ============================================================
+   MODAL
+   ============================================================ */
+
+.modal-backdrop {
+  align-items: center;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 200;
+}
+
+.modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  width: 520px;
+}
+
+.modal-header {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal-close {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal-error {
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  color: var(--danger);
+  font-size: 13px;
+  padding: 10px 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.field-half { flex: 1; }
+
+.field-label {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.required { color: var(--danger); }
+
+.field-input {
+  width: 100%;
+}
+
+textarea.field-input {
+  resize: vertical;
+}
+
+/* Priority segmented control */
+.priority-segmented {
+  display: flex;
+  gap: 4px;
+}
+
+.priority-seg-btn {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.4;
+  padding: 5px 0;
+  text-align: center;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.priority-seg-btn.active {
+  border-color: currentColor;
+  opacity: 1;
+}
+
+.priority-seg-btn:hover { opacity: 0.8; }
+
+.priority-seg-btn.p0 { background: var(--danger);  color: #fff; }
+.priority-seg-btn.p1 { background: var(--warning); color: #000; }
+.priority-seg-btn.p2 { background: var(--accent);  color: #fff; }
+.priority-seg-btn.p3 { background: var(--bg-elevated); color: var(--text); border: 1px solid var(--border); }
+.priority-seg-btn.p4 { background: var(--bg-elevated); color: var(--text); border: 1px solid var(--border); }
+
+.modal-footer {
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+  padding-top: 16px;
+}
+
+/* ============================================================
+   KANBAN VIEW
+   ============================================================ */
+
+.kanban-view {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.kanban-board {
+  display: flex;
+  flex: 1;
+  gap: 0;
+  overflow-x: auto;
+  padding: 16px;
+  gap: 12px;
+}
+
+.kanban-state {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 32px;
+}
+
+.kanban-error { color: var(--danger); }
+
+.kanban-col {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  width: 260px;
+}
+
+.kanban-col-open        { border-top: 3px solid var(--text-muted); }
+.kanban-col-in_progress { border-top: 3px solid var(--accent); }
+.kanban-col-blocked     { border-top: 3px solid var(--danger); }
+.kanban-col-done        { border-top: 3px solid var(--success); }
+
+.kanban-col-header {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.kanban-col-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.kanban-col-count {
+  background: var(--bg-elevated);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 20px;
+  padding: 1px 7px;
+  text-align: center;
+}
+
+.kanban-col-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.kanban-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: italic;
+  padding: 12px 6px;
+  text-align: center;
+}
+
+/* Issue card */
+.issue-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.issue-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.issue-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.issue-card-top {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.card-avatar {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  height: 20px;
+  line-height: 20px;
+  margin-left: auto;
+  text-align: center;
+  width: 20px;
+}
+
+.issue-card-title {
+  color: var(--text);
+  display: -webkit-box;
+  font-size: 13px;
+  font-weight: 500;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.4;
+  overflow: hidden;
+}
+
+.issue-card-id {
+  color: var(--text-muted);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 11px;
+}
+
+/* Kanban detail slide-in */
+.kanban-detail {
+  border-left: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-y: auto;
+  width: 360px;
+}
+
+/* ============================================================
    PLACEHOLDER (until views are built)
    ============================================================ */
 
