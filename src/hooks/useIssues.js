@@ -17,12 +17,15 @@ async function apiFetch(path, options = {}) {
 
 // ── useIssues ────────────────────────────────────────────────────────────────
 
-export function useIssues(filters = {}) {
+export function useIssues(filters = {}, { onRefreshed } = {}) {
   const [issues, setIssues] = useState([])
   const [loading, setLoading] = useState(true)
+  const [polling, setPolling] = useState(false)
   const [error, setError] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(null)
   const timerRef = useRef(null)
+  const onRefreshedRef = useRef(onRefreshed)
+  onRefreshedRef.current = onRefreshed
 
   const buildUrl = useCallback(() => {
     const params = new URLSearchParams()
@@ -33,16 +36,20 @@ export function useIssues(filters = {}) {
     return qs ? `/issues?${qs}` : '/issues'
   }, [filters.status, filters.type, filters.search])
 
-  const fetchIssues = useCallback(async () => {
+  const fetchIssues = useCallback(async (isPoll = false) => {
+    if (isPoll) setPolling(true)
     try {
       const data = await apiFetch(buildUrl())
       setIssues(data)
-      setLastUpdated(new Date())
+      const now = new Date()
+      setLastUpdated(now)
+      onRefreshedRef.current?.(now)
       setError(null)
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
+      setPolling(false)
     }
   }, [buildUrl])
 
@@ -54,14 +61,14 @@ export function useIssues(filters = {}) {
 
     const schedule = () => {
       timerRef.current = setTimeout(() => {
-        if (document.visibilityState === 'visible') fetchIssues()
+        if (document.visibilityState === 'visible') fetchIssues(true)
         schedule()
       }, POLL_INTERVAL)
     }
     schedule()
 
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') fetchIssues()
+      if (document.visibilityState === 'visible') fetchIssues(true)
     }
     document.addEventListener('visibilitychange', onVisibility)
 
@@ -71,7 +78,7 @@ export function useIssues(filters = {}) {
     }
   }, [fetchIssues])
 
-  return { issues, loading, error, refetch, lastUpdated }
+  return { issues, loading, polling, error, refetch, lastUpdated }
 }
 
 // ── useIssue ─────────────────────────────────────────────────────────────────
