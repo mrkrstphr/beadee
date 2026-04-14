@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useIssues } from '../hooks/useIssues.js'
+import { useKeyboard } from '../hooks/useKeyboard.js'
 
 const STATUS_FILTERS = [
   { label: 'All',         value: '' },
@@ -92,6 +93,25 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
     type: typeFilter,
     search,
   }, { onRefreshed })
+
+  const selectedIdx = useMemo(
+    () => issues.findIndex(i => i.id === selectedIssueId),
+    [issues, selectedIssueId]
+  )
+
+  const navigate = useCallback((dir) => {
+    if (!issues.length) return
+    const next = selectedIdx === -1
+      ? (dir > 0 ? 0 : issues.length - 1)
+      : Math.max(0, Math.min(issues.length - 1, selectedIdx + dir))
+    onSelectIssue(issues[next].id)
+  }, [issues, selectedIdx, onSelectIssue])
+
+  useKeyboard({
+    j:      () => navigate(1),
+    k:      () => navigate(-1),
+    Enter:  () => { if (selectedIdx !== -1) onSelectIssue(issues[selectedIdx].id) },
+  })
 
   return (
     <div className="list-view">
