@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { createIssue, updateIssue } from '../hooks/useIssues.js'
+import { toast } from '../hooks/useToast.js'
 
 const TYPES = ['task', 'bug', 'feature', 'chore', 'epic', 'decision', 'spike', 'story', 'milestone']
 const PRIORITIES = [
@@ -52,10 +53,12 @@ export default function IssueModal({ issue, onClose, onSaved }) {
       const saved = isEdit
         ? await updateIssue(issue.id, data)
         : await createIssue(data)
+      toast(isEdit ? 'Issue updated' : 'Issue created', 'success')
       onSaved?.(saved)
       onClose()
     } catch (err) {
       setError(err.message)
+      toast(err.message, 'error')
     } finally {
       setSaving(false)
     }

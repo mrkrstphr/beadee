@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useIssue, updateIssue, closeIssue } from '../hooks/useIssues.js'
+import { toast } from '../hooks/useToast.js'
 
 const STATUS_ICON = {
   open:        '○',
@@ -34,11 +35,14 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
   const [closeReason, setCloseReason] = useState('')
   const [actionPending, setActionPending] = useState(false)
 
-  async function handleAction(fn) {
+  async function handleAction(fn, successMsg) {
     setActionPending(true)
     try {
       await fn()
       onRefresh?.()
+      if (successMsg) toast(successMsg, 'success')
+    } catch (err) {
+      toast(err.message, 'error')
     } finally {
       setActionPending(false)
     }
@@ -46,7 +50,10 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
 
   async function handleClose() {
     if (!closing) { setClosing(true); return }
-    await handleAction(() => closeIssue(issueId, closeReason || undefined))
+    await handleAction(
+      () => closeIssue(issueId, closeReason || undefined),
+      'Issue closed'
+    )
     setClosing(false)
     setCloseReason('')
   }
@@ -162,7 +169,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
               <button
                 className="btn btn-secondary"
                 disabled={actionPending}
-                onClick={() => handleAction(() => updateIssue(issueId, { claim: true }))}
+                onClick={() => handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed')}
               >
                 Claim
               </button>
@@ -171,7 +178,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
               <button
                 className="btn btn-secondary"
                 disabled={actionPending}
-                onClick={() => handleAction(() => updateIssue(issueId, { status: 'in_progress' }))}
+                onClick={() => handleAction(() => updateIssue(issueId, { status: 'in_progress' }), 'Marked in progress')}
               >
                 Mark In Progress
               </button>
@@ -180,7 +187,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
               <button
                 className="btn btn-secondary"
                 disabled={actionPending}
-                onClick={() => handleAction(() => updateIssue(issueId, { status: 'blocked' }))}
+                onClick={() => handleAction(() => updateIssue(issueId, { status: 'blocked' }), 'Marked blocked')}
               >
                 Mark Blocked
               </button>

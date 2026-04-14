@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useHealth } from '../hooks/useIssues.js'
+import RefreshIndicator from './RefreshIndicator.jsx'
 
 const THEMES = [
   { id: 'dark',      label: 'Dark',      swatch: '#0d1117' },
@@ -19,7 +20,7 @@ function useDebounce(value, delay) {
   return debounced
 }
 
-export default function Header({ activeTab, onTabChange, search, onSearchChange, onNewIssue, theme, onThemeChange }) {
+export default function Header({ activeTab, onTabChange, search, onSearchChange, onNewIssue, theme, onThemeChange, lastUpdated, polling }) {
   const { health } = useHealth()
   const [localSearch, setLocalSearch] = useState(search)
   const [themeOpen, setThemeOpen] = useState(false)
@@ -108,6 +109,8 @@ export default function Header({ activeTab, onTabChange, search, onSearchChange,
             </div>
           )}
         </div>
+
+        <RefreshIndicator lastUpdated={lastUpdated} polling={polling} />
 
         <button className="btn btn-primary" onClick={onNewIssue}>
           + New
