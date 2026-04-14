@@ -153,4 +153,22 @@ export async function registerRoutes(fastify, { cwd }) {
     await bdRun(['dep', 'remove', issue, dependsOn], cwd)
     return { ok: true }
   }))
+
+  // ── COMMENT ROUTES ───────────────────────────────────────────────────────
+
+  // GET /api/issues/:id/comments
+  fastify.get('/api/issues/:id/comments', bdHandler(async (req, reply) => {
+    const { id } = req.params
+    const result = await bdRun(['comments', id], cwd)
+    return Array.isArray(result) ? result : []
+  }))
+
+  // POST /api/issues/:id/comments
+  fastify.post('/api/issues/:id/comments', bdHandler(async (req, reply) => {
+    const { id } = req.params
+    const { text } = req.body ?? {}
+    if (!text?.trim()) return reply.code(400).send({ error: 'text is required' })
+    const result = await bdRun(['comment', id, text.trim()], cwd)
+    return Array.isArray(result) ? result[result.length - 1] : result
+  }))
 }
