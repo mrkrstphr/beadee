@@ -502,6 +502,220 @@ input::placeholder, textarea::placeholder {
 }
 
 /* ============================================================
+   LIST VIEW
+   ============================================================ */
+
+.list-view {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Left panel */
+.list-panel {
+  width: 320px;
+  min-width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.list-panel-toolbar {
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pill {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+
+.pill:hover {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.pill.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.list-panel-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.type-select {
+  font-size: 12px;
+  padding: 3px 6px;
+}
+
+.issue-count {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Issue list */
+.issue-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.list-state {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.list-error { color: var(--danger); }
+.list-empty { color: var(--text-muted); font-style: italic; }
+
+/* Issue row */
+.issue-row {
+  align-items: flex-start;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  text-align: left;
+  transition: background 0.1s;
+  width: 100%;
+}
+
+.issue-row:last-child { border-bottom: none; }
+
+.issue-row:hover { background: var(--bg-elevated); }
+
+.issue-row.selected {
+  background: var(--bg-elevated);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.issue-row-icon {
+  flex-shrink: 0;
+  font-size: 13px;
+  margin-top: 1px;
+  width: 14px;
+}
+
+.status-icon-open        { color: var(--text-muted); }
+.status-icon-in_progress { color: var(--accent); }
+.status-icon-blocked     { color: var(--danger); }
+.status-icon-closed      { color: var(--success); }
+.status-icon-deferred    { color: var(--text-muted); }
+
+.issue-row-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+}
+
+.issue-row-title {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.issue-row-meta {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.issue-row-id {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+}
+
+.badge-type {
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+}
+
+.type-bug      { background: #5c0a0a; color: #ff8080; }
+.type-feature  { background: #0a2c5c; color: #80b8ff; }
+.type-task     { background: var(--bg-elevated); color: var(--text-muted); }
+.type-chore    { background: var(--bg-elevated); color: var(--text-muted); }
+.type-epic     { background: #3c0a5c; color: #d080ff; }
+.type-spike    { background: #2c3c0a; color: #b0d080; }
+.type-story    { background: #0a3c3c; color: #80d0d0; }
+.type-decision { background: var(--bg-elevated); color: var(--text-muted); }
+
+.priority-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-top: 1px;
+}
+
+.p0 { background: var(--danger);   color: #fff; }
+.p1 { background: var(--warning);  color: #000; }
+.p2 { background: var(--accent);   color: #fff; }
+.p3 { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+.p4 { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+
+/* Right detail panel */
+.detail-panel {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+.detail-empty {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  gap: 8px;
+  height: 100%;
+  justify-content: center;
+}
+
+.detail-empty-icon {
+  font-size: 32px;
+  opacity: 0.3;
+}
+
+/* ============================================================
    PLACEHOLDER (until views are built)
    ============================================================ */
 
