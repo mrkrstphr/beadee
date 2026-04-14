@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Header from './components/Header.jsx'
+import ListView from './views/ListView.jsx'
 
 function setTheme(theme) {
   localStorage.setItem('beadee-theme', theme)
@@ -11,6 +12,17 @@ function setTheme(theme) {
   }
 }
 
+function DetailPlaceholder({ issueId, onClose }) {
+  return (
+    <div style={{ padding: '24px' }}>
+      <button className="btn btn-secondary" onClick={onClose} style={{ marginBottom: 16 }}>← Back</button>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
+        Detail panel coming soon for <strong>{issueId}</strong>
+      </p>
+    </div>
+  )
+}
+
 export default function App() {
   const [theme, setThemeState] = useState(
     () => localStorage.getItem('beadee-theme') || 'dark'
@@ -18,7 +30,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('list')
   const [selectedIssueId, setSelectedIssueId] = useState(null)
   const [search, setSearch] = useState('')
-  const [filters, setFilters] = useState({ status: '', type: '' })
   const [showModal, setShowModal] = useState(false)
   const [editingIssue, setEditingIssue] = useState(null)
 
@@ -40,13 +51,19 @@ export default function App() {
       />
 
       <main className="main">
-        <div className="placeholder">
-          <p className="placeholder-title">beadee is running</p>
-          <p className="placeholder-sub">
-            Views coming soon — active tab: <strong>{activeTab}</strong>
-            {search && <> · search: <strong>{search}</strong></>}
-          </p>
-        </div>
+        {activeTab === 'list' && (
+          <ListView
+            search={search}
+            selectedIssueId={selectedIssueId}
+            onSelectIssue={setSelectedIssueId}
+            DetailPanel={DetailPlaceholder}
+          />
+        )}
+        {activeTab === 'kanban' && (
+          <div className="placeholder">
+            <p className="placeholder-title">Board view coming soon</p>
+          </div>
+        )}
       </main>
     </div>
   )
