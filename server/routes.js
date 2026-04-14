@@ -1,6 +1,6 @@
 import { watch } from 'node:fs'
-import { join } from 'node:path'
-import { bdRun, bdCheck } from './bd.js'
+import { basename, join } from 'node:path'
+import { bdRun, bdCheck, bdVersion } from './bd.js'
 
 /**
  * Wrap a route handler so bd unavailability returns 503 instead of 500.
@@ -25,83 +25,80 @@ function bdHandler(fn) {
  * @param {{ cwd: string }} opts
  */
 export async function registerRoutes(fastify, { cwd }) {
-  // ── SSE EVENTS ───────────────────────────────────────────────────────────
+  // ── SSE / broadcast ──────────────────────────────────────────────────────
 
-  // GET /api/events — Server-Sent Events; fires on any .beads/ file change
-  {
-    const clients = new Set()
-    let watcher = null
-    let debounceTimer = null
+  const clients = new Set()
+  let debounceTimer = null
+  // Timestamp: suppress watch-triggered broadcasts before this time.
+  // Set by read routes to avoid the feedback loop:
+  //   bd list → interactions.jsonl written → watch fires → client refetches → repeat
+  let suppressWatchUntil = 0
 
-    function broadcast() {
-      for (const res of clients) {
-        try { res.raw.write('data: {"type":"change"}\n\n') } catch { clients.delete(res) }
-      }
+  function broadcast() {
+    for (const res of clients) {
+      try { res.raw.write('data: {"type":"change"}\n\n') } catch { clients.delete(res) }
     }
-
-    function startWatcher() {
-      const beadsDir = join(cwd, '.beads')
-      try {
-        watcher = watch(beadsDir, { recursive: true }, (_event, filename) => {
-          // Ignore lock files and non-data files
-          if (!filename || filename.includes('lock') || filename.endsWith('.log')) return
-          clearTimeout(debounceTimer)
-          debounceTimer = setTimeout(broadcast, 200)
-        })
-        watcher.on('error', () => { /* silently ignore watch errors */ })
-      } catch {
-        // .beads/ not accessible — SSE still works, just no push notifications
-      }
-    }
-
-    startWatcher()
-
-    fastify.get('/api/events', (req, reply) => {
-      reply.raw.setHeader('Content-Type', 'text/event-stream')
-      reply.raw.setHeader('Cache-Control', 'no-cache')
-      reply.raw.setHeader('Connection', 'keep-alive')
-      reply.raw.setHeader('X-Accel-Buffering', 'no')
-      reply.raw.flushHeaders()
-
-      // Initial ping so client knows connection is established
-      reply.raw.write(': connected\n\n')
-
-      clients.add(reply)
-
-      // Keepalive comment every 30s to survive proxy timeouts
-      const keepalive = setInterval(() => {
-        try { reply.raw.write(': ping\n\n') } catch { clients.delete(reply); clearInterval(keepalive) }
-      }, 30000)
-
-      req.raw.on('close', () => {
-        clients.delete(reply)
-        clearInterval(keepalive)
-      })
-    })
   }
+
+  // Call after any bd invocation (read or write) to prevent the file-watch
+  // feedback loop: bd writes interactions.jsonl → watch fires → client fetches
+  // → bd writes interactions.jsonl → repeat.
+  function suppressWatch() {
+    suppressWatchUntil = Date.now() + 2000
+  }
+
+  // Watch .beads/ for changes made by external processes (agents, CLI).
+  // Mutation routes also call broadcast() directly for immediate feedback.
+  try {
+    const watcher = watch(join(cwd, '.beads'), { recursive: true }, (_event, filename) => {
+      if (!filename) return
+      if (filename.includes('lock') || filename.endsWith('.log')) return
+      // Ignore file changes triggered by our own bd read operations
+      if (Date.now() < suppressWatchUntil) return
+      clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(broadcast, 200)
+    })
+    watcher.on('error', () => {})
+  } catch {
+    // .beads/ not accessible — SSE still works via mutation broadcasts
+  }
+
+  // GET /api/events — Server-Sent Events
+  fastify.get('/api/events', (req, reply) => {
+    reply.raw.setHeader('Content-Type', 'text/event-stream')
+    reply.raw.setHeader('Cache-Control', 'no-cache')
+    reply.raw.setHeader('Connection', 'keep-alive')
+    reply.raw.setHeader('X-Accel-Buffering', 'no')
+    reply.raw.flushHeaders()
+
+    // Initial ping so client knows connection is established
+    reply.raw.write(': connected\n\n')
+
+    clients.add(reply)
+
+    // Keepalive comment every 30s to survive proxy timeouts
+    const keepalive = setInterval(() => {
+      try { reply.raw.write(': ping\n\n') } catch { clients.delete(reply); clearInterval(keepalive) }
+    }, 30000)
+
+    req.raw.on('close', () => {
+      clients.delete(reply)
+      clearInterval(keepalive)
+    })
+  })
 
   // ── READ ROUTES ──────────────────────────────────────────────────────────
 
   // GET /api/health
   fastify.get('/api/health', bdHandler(async (_req, _reply) => {
-    const { bd } = await bdCheck(cwd)
-    const projectName = cwd.split('/').pop()
-    // bd version line: "bd version 1.0.0 (abc1234)"
-    let bdVersion = 'unknown'
-    try {
-      const { execFile } = await import('node:child_process')
-      const { promisify } = await import('node:util')
-      const exec = promisify(execFile)
-      const { stdout } = await exec('bd', ['version'])
-      bdVersion = stdout.trim()
-    } catch { /* leave as unknown */ }
-
-    return { ok: true, projectName, bdVersion, cwd, bd }
+    const [{ bd }, version] = await Promise.all([bdCheck(cwd), bdVersion()])
+    return { ok: true, projectName: basename(cwd), bdVersion: version, cwd, bd }
   }))
 
   // GET /api/issues[?status=&type=&search=]
   fastify.get('/api/issues', bdHandler(async (req, _reply) => {
     const { status, type, search } = req.query
+    suppressWatch()
     const issues = await bdRun(['list', '--all'], cwd)
 
     let result = issues
@@ -121,6 +118,7 @@ export async function registerRoutes(fastify, { cwd }) {
   // GET /api/issues/:id
   fastify.get('/api/issues/:id', bdHandler(async (req, reply) => {
     const { id } = req.params
+    suppressWatch()
     const result = await bdRun(['show', id, '--long'], cwd)
     const issue = Array.isArray(result) ? result[0] : result
     if (!issue) return reply.code(404).send({ error: `Issue ${id} not found` })
@@ -129,12 +127,14 @@ export async function registerRoutes(fastify, { cwd }) {
 
   // GET /api/ready
   fastify.get('/api/ready', bdHandler(async (_req, _reply) => {
-    return await bdRun(['ready'], cwd)
+    suppressWatch()
+    return bdRun(['ready'], cwd)
   }))
 
   // GET /api/stats
   fastify.get('/api/stats', bdHandler(async (_req, _reply) => {
-    return await bdRun(['status'], cwd)
+    suppressWatch()
+    return bdRun(['status'], cwd)
   }))
 
   // ── WRITE ROUTES ─────────────────────────────────────────────────────────
@@ -153,6 +153,7 @@ export async function registerRoutes(fastify, { cwd }) {
     if (description) args.push(`--description=${description}`)
 
     const result = await bdRun(args, cwd)
+    suppressWatch(); broadcast()
     return Array.isArray(result) ? result[0] : result
   }))
 
@@ -178,6 +179,7 @@ export async function registerRoutes(fastify, { cwd }) {
     }
 
     const result = await bdRun(args, cwd)
+    suppressWatch(); broadcast()
     return Array.isArray(result) ? result[0] : result
   }))
 
@@ -188,6 +190,7 @@ export async function registerRoutes(fastify, { cwd }) {
     const args = ['close', id]
     if (reason) args.push(`--reason=${reason}`)
     const result = await bdRun(args, cwd)
+    suppressWatch(); broadcast()
     return Array.isArray(result) ? result[0] : (result ?? { ok: true })
   }))
 
@@ -198,6 +201,7 @@ export async function registerRoutes(fastify, { cwd }) {
       return reply.code(400).send({ error: 'issue and dependsOn are required' })
     }
     await bdRun(['dep', 'add', issue, dependsOn], cwd)
+    suppressWatch(); broadcast()
     return { ok: true }
   }))
 
@@ -208,14 +212,16 @@ export async function registerRoutes(fastify, { cwd }) {
       return reply.code(400).send({ error: 'issue and dependsOn are required' })
     }
     await bdRun(['dep', 'remove', issue, dependsOn], cwd)
+    suppressWatch(); broadcast()
     return { ok: true }
   }))
 
   // ── COMMENT ROUTES ───────────────────────────────────────────────────────
 
   // GET /api/issues/:id/comments
-  fastify.get('/api/issues/:id/comments', bdHandler(async (req, reply) => {
+  fastify.get('/api/issues/:id/comments', bdHandler(async (req, _reply) => {
     const { id } = req.params
+    suppressWatch()
     const result = await bdRun(['comments', id], cwd)
     return Array.isArray(result) ? result : []
   }))
@@ -226,6 +232,7 @@ export async function registerRoutes(fastify, { cwd }) {
     const { text } = req.body ?? {}
     if (!text?.trim()) return reply.code(400).send({ error: 'text is required' })
     const result = await bdRun(['comment', id, text.trim()], cwd)
+    suppressWatch(); broadcast()
     return Array.isArray(result) ? result[result.length - 1] : result
   }))
 }
