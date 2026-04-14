@@ -716,6 +716,186 @@ input::placeholder, textarea::placeholder {
 }
 
 /* ============================================================
+   ISSUE DETAIL
+   ============================================================ */
+
+.issue-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px 24px 32px;
+}
+
+.detail-loading,
+.detail-error {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 32px 24px;
+}
+
+.detail-error { color: var(--danger); }
+
+.detail-header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+}
+
+.detail-header-top {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.detail-id {
+  color: var(--text-muted);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12px;
+}
+
+.detail-actions-top {
+  display: flex;
+  gap: 6px;
+}
+
+.detail-close-btn {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.detail-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.detail-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.detail-type {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+.detail-assignee,
+.detail-date {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.detail-section {
+  border-top: 1px solid var(--border);
+  padding: 14px 0;
+}
+
+.detail-section-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.detail-description {
+  background: var(--bg-surface);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 12px 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Dependencies */
+.dep-group {
+  margin-bottom: 10px;
+}
+
+.dep-group-label {
+  color: var(--text-muted);
+  display: block;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.dep-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dep-chip {
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  padding: 6px 10px;
+  text-align: left;
+  transition: background 0.1s, border-color 0.1s;
+  width: 100%;
+}
+
+.dep-chip:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+}
+
+.dep-chip-icon { flex-shrink: 0; }
+
+.dep-chip-id {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+}
+
+.dep-chip-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Action buttons */
+.detail-actions-bottom { }
+
+.detail-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.close-reason-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.close-reason-input {
+  flex: 1;
+}
+
+/* ============================================================
    PLACEHOLDER (until views are built)
    ============================================================ */
 
