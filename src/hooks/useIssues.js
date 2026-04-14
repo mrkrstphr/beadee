@@ -3,6 +3,46 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 const API = '/api'
 const FALLBACK_POLL_INTERVAL = 30000
 
+// ── SSE singleton ─────────────────────────────────────────────────────────────
+// One EventSource for the whole app lifetime. Subscribers register callbacks;
+// on each change event all are notified. Falls back to a 30s interval poll.
+
+const sseSubscribers = new Set()
+
+function notifyAll() {
+  for (const fn of sseSubscribers) fn()
+}
+
+let sseInstance = null
+let fallbackInterval = null
+let sseReconnectTimer = null
+
+function ensureSSE() {
+  if (sseInstance) return
+
+  function connect() {
+    sseInstance = new EventSource(`${API}/events`)
+    sseInstance.onmessage = () => notifyAll()
+    sseInstance.onerror = () => {
+      sseInstance.close()
+      sseInstance = null
+      sseReconnectTimer = setTimeout(connect, 5000)
+    }
+  }
+
+  connect()
+
+  fallbackInterval = setInterval(() => {
+    if (document.visibilityState === 'visible') notifyAll()
+  }, FALLBACK_POLL_INTERVAL)
+}
+
+function subscribeTick(fn) {
+  sseSubscribers.add(fn)
+  ensureSSE()
+  return () => sseSubscribers.delete(fn)
+}
+
 async function apiFetch(path, options = {}) {
   const res = await fetch(`${API}${path}`, {
     headers: { 'Content-Type': 'application/json' },
@@ -59,39 +99,10 @@ export function useIssues(filters = {}, { onRefreshed } = {}) {
     setLoading(true)
     fetchIssues()
 
-    let es = null
-    let fallbackTimer = null
-    let reconnectTimer = null
-
-    function startFallbackPoll() {
-      clearInterval(fallbackTimer)
-      fallbackTimer = setInterval(() => {
-        if (document.visibilityState === 'visible') fetchIssues(true)
-      }, FALLBACK_POLL_INTERVAL)
-    }
-
-    function connectSSE() {
-      if (es) { es.close(); es = null }
-      es = new EventSource('/api/events')
-
-      es.onopen = () => {
-        clearTimeout(reconnectTimer)
-      }
-
-      es.onmessage = () => {
-        if (document.visibilityState === 'visible') fetchIssues(true)
-      }
-
-      es.onerror = () => {
-        es.close()
-        es = null
-        // Retry SSE after 5s; fallback poll keeps data fresh in the meantime
-        reconnectTimer = setTimeout(connectSSE, 5000)
-      }
-    }
-
-    connectSSE()
-    startFallbackPoll()
+    // Subscribe to the shared SSE singleton — no per-instance connection
+    const unsub = subscribeTick(() => {
+      if (document.visibilityState === 'visible') fetchIssues(true)
+    })
 
     const onVisibility = () => {
       if (document.visibilityState === 'visible') fetchIssues(true)
@@ -99,9 +110,7 @@ export function useIssues(filters = {}, { onRefreshed } = {}) {
     document.addEventListener('visibilitychange', onVisibility)
 
     return () => {
-      es?.close()
-      clearInterval(fallbackTimer)
-      clearTimeout(reconnectTimer)
+      unsub()
       document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [fetchIssues])
