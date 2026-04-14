@@ -1,13 +1,16 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import Header from './components/Header.jsx'
 import IssueDetail from './components/IssueDetail.jsx'
 import IssueModal from './components/IssueModal.jsx'
 import ErrorScreen from './components/ErrorScreen.jsx'
 import ToastContainer from './components/ToastContainer.jsx'
+import ShortcutsHelp from './components/ShortcutsHelp.jsx'
+import Footer from './components/Footer.jsx'
 import ListView from './views/ListView.jsx'
 import KanbanView from './views/KanbanView.jsx'
 import { useHealth } from './hooks/useIssues.js'
 import { useToastProvider } from './hooks/useToast.js'
+import { useKeyboard } from './hooks/useKeyboard.js'
 
 function setTheme(theme) {
   localStorage.setItem('beadee-theme', theme)
@@ -23,24 +26,30 @@ export default function App() {
   const [theme, setThemeState] = useState(
     () => localStorage.getItem('beadee-theme') || 'dark'
   )
-  const [activeTab, setActiveTab] = useState('list')
+  const [activeTab, setActiveTab] = useState(
+    () => localStorage.getItem('beadee-tab') || 'list'
+  )
   const [selectedIssueId, setSelectedIssueId] = useState(null)
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingIssue, setEditingIssue] = useState(null)
+  const [showShortcuts, setShowShortcuts] = useState(false)
   const [detailKey, setDetailKey] = useState(0)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [polling, setPolling] = useState(false)
+  const searchRef = useRef(null)
 
   const { health, error: healthError } = useHealth()
   const { toasts, dismiss } = useToastProvider()
 
-  const handleRefresh = useCallback(() => setDetailKey(k => k + 1), [])
+  const handleRefresh  = useCallback(() => setDetailKey(k => k + 1), [])
+  const handleRefreshed = useCallback((date) => { setLastUpdated(date); setPolling(false) }, [])
 
-  const handleRefreshed = useCallback((date) => {
-    setLastUpdated(date)
-    setPolling(false)
-  }, [])
+  function switchTab(tab) {
+    setActiveTab(tab)
+    setSelectedIssueId(null)
+    localStorage.setItem('beadee-tab', tab)
+  }
 
   function handleThemeChange(t) {
     setThemeState(t)
@@ -57,6 +66,21 @@ export default function App() {
     setShowModal(false)
     setEditingIssue(null)
   }
+
+  const modalOpen = showModal || showShortcuts
+
+  // Global shortcuts — disabled when a modal is open
+  useKeyboard({
+    'n': () => { setEditingIssue(null); setShowModal(true) },
+    '/': () => { const el = document.querySelector('.header-search'); el?.focus() },
+    'r': () => handleRefresh(),
+    '1': () => switchTab('list'),
+    '2': () => switchTab('kanban'),
+    '?': () => setShowShortcuts(true),
+    'Escape': () => {
+      if (selectedIssueId) setSelectedIssueId(null)
+    },
+  }, !modalOpen)
 
   const DetailPanel = useCallback(({ issueId, onClose }) => (
     <IssueDetail
@@ -75,7 +99,7 @@ export default function App() {
     <div className="app">
       <Header
         activeTab={activeTab}
-        onTabChange={tab => { setActiveTab(tab); setSelectedIssueId(null) }}
+        onTabChange={switchTab}
         search={search}
         onSearchChange={setSearch}
         onNewIssue={() => { setEditingIssue(null); setShowModal(true) }}
@@ -106,6 +130,8 @@ export default function App() {
         )}
       </main>
 
+      <Footer onShowShortcuts={() => setShowShortcuts(true)} />
+
       {showModal && (
         <IssueModal
           issue={editingIssue}
@@ -113,6 +139,8 @@ export default function App() {
           onSaved={handleModalSaved}
         />
       )}
+
+      {showShortcuts && <ShortcutsHelp onClose={() => setShowShortcuts(false)} />}
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
