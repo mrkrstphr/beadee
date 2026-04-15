@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useIssue, updateIssue, closeIssue } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
+import { useKeyboard } from '../hooks/useKeyboard.js'
 
 const STATUS_ICON = {
   open:        '○',
@@ -58,17 +59,24 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
     setCloseReason('')
   }
 
+  // Derive action availability from current issue status (safe before early returns)
+  const canClaim      = issue?.status === 'open'
+  const canInProgress = issue?.status === 'open' || issue?.status === 'blocked'
+  const canBlock      = issue?.status === 'in_progress' || issue?.status === 'open'
+  const canClose      = issue?.status !== 'closed'
+
+  useKeyboard({
+    c: () => canClaim  && !actionPending && handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed'),
+    e: () => issue && onEdit?.(issue),
+    x: () => canClose  && !closing && setClosing(true),
+  }, !!issue && !closing)
+
   if (loading) return <div className="detail-loading">Loading…</div>
   if (error)   return <div className="detail-error">Error: {error}</div>
   if (!issue)  return null
 
   const blockedBy = issue.dependencies?.filter(d => d.dependency_type === 'blocks') ?? []
   const blocking  = issue.dependencies?.filter(d => d.dependency_type !== 'blocks') ?? []
-
-  const canClaim       = issue.status === 'open'
-  const canInProgress  = issue.status === 'open' || issue.status === 'blocked'
-  const canBlock       = issue.status === 'in_progress' || issue.status === 'open'
-  const canClose       = issue.status !== 'closed'
 
   return (
     <div className="issue-detail">

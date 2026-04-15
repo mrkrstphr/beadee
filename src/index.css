@@ -1350,6 +1350,102 @@ textarea.field-input {
 }
 
 /* ============================================================
+   FOOTER
+   ============================================================ */
+
+.app-footer {
+  align-items: center;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  padding: 4px 16px;
+}
+
+.footer-version {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.footer-shortcuts-btn {
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  font-size: 11px;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.footer-shortcuts-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+   ============================================================ */
+
+.kbd {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: var(--text);
+  display: inline-block;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 11px;
+  line-height: 1;
+  min-width: 20px;
+  padding: 3px 6px;
+  text-align: center;
+}
+
+.kbd-small {
+  font-size: 10px;
+  padding: 2px 4px;
+  min-width: 16px;
+}
+
+.shortcuts-modal {
+  width: 400px;
+}
+
+.shortcuts-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.shortcuts-group { display: flex; flex-direction: column; gap: 6px; }
+
+.shortcuts-group-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.shortcut-row {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.shortcut-desc {
+  color: var(--text);
+  font-size: 13px;
+}
+
+/* ============================================================
    PLACEHOLDER (until views are built)
    ============================================================ */
 
