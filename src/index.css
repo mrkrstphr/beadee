@@ -1555,6 +1555,85 @@ textarea.field-input {
 }
 
 /* ============================================================
+   COMMENT THREAD
+   ============================================================ */
+
+.comment-thread { display: flex; flex-direction: column; gap: 12px; }
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.comment-state {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: italic;
+  padding: 4px 0;
+}
+
+.comment-error { color: var(--danger); font-style: normal; }
+
+.comment {
+  background: var(--bg-surface);
+  border-radius: 6px;
+  padding: 10px 12px;
+  transition: opacity 0.2s;
+}
+
+.comment-optimistic { opacity: 0.55; }
+
+.comment-header {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.comment-author {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.comment-time {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.comment-text {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.comment-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment-input {
+  resize: vertical;
+  width: 100%;
+  font-size: 13px;
+  min-height: 72px;
+}
+
+.comment-post-error {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.comment-compose-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ============================================================
    PLACEHOLDER (until views are built)
    ============================================================ */
 
