@@ -19,7 +19,8 @@
       "Bash(npx vite *)",
       "Bash(curl -s http://localhost:5174)",
       "Bash(chmod +x /Users/kristopher/Projects/Active/rosary/bin/beadee.js)",
-      "Bash(bd comment *)"
+      "Bash(bd comment *)",
+      "Bash(npm uninstall *)"
     ]
   }
 }

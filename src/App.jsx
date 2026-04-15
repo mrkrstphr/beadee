@@ -25,10 +25,10 @@ function setTheme(theme) {
 
 export default function App() {
   const [theme, setThemeState] = useState(
-    () => localStorage.getItem('beadee-theme') || 'dark'
+    () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-theme') : null) || 'dark'
   )
   const [activeTab, setActiveTab] = useState(
-    () => localStorage.getItem('beadee-tab') || 'list'
+    () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-tab') : null) || 'list'
   )
   const [selectedIssueId, setSelectedIssueId] = useState(null)
   const [search, setSearch] = useState('')

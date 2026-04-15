@@ -3,6 +3,8 @@ dist/
 .env*
 *.local
 
+.react-router
+
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db
