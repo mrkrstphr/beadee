@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { startServer } from '../server/index.js'
+import { startServer } from '../server/server.js'
 
 const VERSION = '0.1.0'
 
@@ -17,6 +17,8 @@ Options:
   -v, --version    Print version and exit
   -h, --help       Show this help
 
+For development, use: npm run dev
+
 Run from a directory with .beads/ to start the GUI.
 
 Examples:
@@ -27,7 +29,7 @@ Examples:
 
 function parseArgs(argv) {
   const args = argv.slice(2)
-  const opts = { port: 0, host: '127.0.0.1', open: false, dev: false }
+  const opts = { port: 0, host: '127.0.0.1', open: false }
 
   for (let i = 0; i < args.length; i++) {
     const a = args[i]
@@ -57,10 +59,6 @@ function parseArgs(argv) {
     }
     if (a === '-o' || a === '--open') {
       opts.open = true
-      continue
-    }
-    if (a === '--dev') {
-      opts.dev = true
       continue
     }
     console.error(`Unknown option: ${a}\nRun beadee --help for usage.`)
