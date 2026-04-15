@@ -70,7 +70,20 @@ function IssueRow({ issue, selected, onClick }) {
   )
 }
 
-export default function ListView({ search, selectedIssueId, onSelectIssue, DetailPanel }) {
+function SkeletonRow() {
+  return (
+    <div className="issue-row skeleton-row">
+      <span className="skeleton skeleton-icon" />
+      <span className="issue-row-body">
+        <span className="skeleton skeleton-title" />
+        <span className="skeleton skeleton-meta" />
+      </span>
+      <span className="skeleton skeleton-badge" />
+    </div>
+  )
+}
+
+export default function ListView({ search, selectedIssueId, onSelectIssue, DetailPanel, onRefreshed }) {
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
 
@@ -78,7 +91,7 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
     status: statusFilter,
     type: typeFilter,
     search,
-  })
+  }, { onRefreshed })
 
   return (
     <div className="list-view">
@@ -113,10 +126,14 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
         </div>
 
         <div className="issue-list">
-          {loading && <div className="list-state">Loading…</div>}
+          {loading && [1,2,3,4].map(i => <SkeletonRow key={i} />)}
           {error && <div className="list-state list-error">Error: {error}</div>}
           {!loading && !error && issues.length === 0 && (
-            <div className="list-state list-empty">No issues found</div>
+            <div className="list-state list-empty">
+              {search || statusFilter || typeFilter
+                ? 'No issues match your filters'
+                : 'No issues yet'}
+            </div>
           )}
           {issues.map(issue => (
             <IssueRow

@@ -2,8 +2,12 @@ import { useState, useCallback } from 'react'
 import Header from './components/Header.jsx'
 import IssueDetail from './components/IssueDetail.jsx'
 import IssueModal from './components/IssueModal.jsx'
+import ErrorScreen from './components/ErrorScreen.jsx'
+import ToastContainer from './components/ToastContainer.jsx'
 import ListView from './views/ListView.jsx'
 import KanbanView from './views/KanbanView.jsx'
+import { useHealth } from './hooks/useIssues.js'
+import { useToastProvider } from './hooks/useToast.js'
 
 function setTheme(theme) {
   localStorage.setItem('beadee-theme', theme)
@@ -25,8 +29,18 @@ export default function App() {
   const [showModal, setShowModal] = useState(false)
   const [editingIssue, setEditingIssue] = useState(null)
   const [detailKey, setDetailKey] = useState(0)
+  const [lastUpdated, setLastUpdated] = useState(null)
+  const [polling, setPolling] = useState(false)
+
+  const { health, error: healthError } = useHealth()
+  const { toasts, dismiss } = useToastProvider()
 
   const handleRefresh = useCallback(() => setDetailKey(k => k + 1), [])
+
+  const handleRefreshed = useCallback((date) => {
+    setLastUpdated(date)
+    setPolling(false)
+  }, [])
 
   function handleThemeChange(t) {
     setThemeState(t)
@@ -55,6 +69,8 @@ export default function App() {
     />
   ), [detailKey])
 
+  if (healthError) return <ErrorScreen error={healthError} />
+
   return (
     <div className="app">
       <Header
@@ -65,6 +81,8 @@ export default function App() {
         onNewIssue={() => { setEditingIssue(null); setShowModal(true) }}
         theme={theme}
         onThemeChange={handleThemeChange}
+        lastUpdated={lastUpdated}
+        polling={polling}
       />
 
       <main className="main">
@@ -74,6 +92,7 @@ export default function App() {
             selectedIssueId={selectedIssueId}
             onSelectIssue={setSelectedIssueId}
             DetailPanel={DetailPanel}
+            onRefreshed={handleRefreshed}
           />
         )}
         {activeTab === 'kanban' && (
@@ -82,6 +101,7 @@ export default function App() {
             selectedIssueId={selectedIssueId}
             onSelectIssue={setSelectedIssueId}
             DetailPanel={DetailPanel}
+            onRefreshed={handleRefreshed}
           />
         )}
       </main>
@@ -93,6 +113,8 @@ export default function App() {
           onSaved={handleModalSaved}
         />
       )}
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )
 }

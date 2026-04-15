@@ -32,8 +32,8 @@ function KanbanColumn({ column, issues, selectedIssueId, onSelectIssue }) {
   )
 }
 
-export default function KanbanView({ search, selectedIssueId, onSelectIssue, DetailPanel }) {
-  const { issues, loading, error } = useIssues({ search })
+export default function KanbanView({ search, selectedIssueId, onSelectIssue, DetailPanel, onRefreshed }) {
+  const { issues, loading, error } = useIssues({ search }, { onRefreshed })
 
   const byStatus = {}
   for (const col of COLUMNS) byStatus[col.status] = []
