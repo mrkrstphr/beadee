@@ -1,15 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useHealth } from '../hooks/useIssues.js'
 import RefreshIndicator from './RefreshIndicator.jsx'
-
-const THEMES = [
-  { id: 'dark',      label: 'Dark',      swatch: '#0d1117' },
-  { id: 'light',     label: 'Light',     swatch: '#ffffff' },
-  { id: 'dracula',   label: 'Dracula',   swatch: '#282a36' },
-  { id: 'synthwave', label: 'Synthwave', swatch: '#1a1033' },
-  { id: 'hacker',    label: 'Hacker',    swatch: '#000000' },
-  { id: 'auto',      label: 'Auto',      swatch: null },
-]
 
 function useDebounce(value, delay) {
   const [debounced, setDebounced] = useState(value)
@@ -20,27 +11,15 @@ function useDebounce(value, delay) {
   return debounced
 }
 
-export default function Header({ activeTab, onTabChange, search, onSearchChange, onNewIssue, theme, onThemeChange, lastUpdated, polling }) {
+export default function Header({ activeTab, onTabChange, search, onSearchChange, onNewIssue, lastUpdated, polling }) {
   const { health } = useHealth()
   const [localSearch, setLocalSearch] = useState(search)
-  const [themeOpen, setThemeOpen] = useState(false)
-  const themeRef = useRef(null)
   const debouncedSearch = useDebounce(localSearch, 300)
 
   useEffect(() => { onSearchChange(debouncedSearch) }, [debouncedSearch])
 
-  // Close theme dropdown on outside click
-  useEffect(() => {
-    function handler(e) {
-      if (themeRef.current && !themeRef.current.contains(e.target)) {
-        setThemeOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const currentTheme = THEMES.find(t => t.id === theme) ?? THEMES[0]
+  const showSearch = activeTab !== 'settings'
+  const showNew    = activeTab !== 'settings'
 
   return (
     <header className="header">
@@ -69,51 +48,31 @@ export default function Header({ activeTab, onTabChange, search, onSearchChange,
       </div>
 
       <div className="header-right">
-        <input
-          className="header-search"
-          type="search"
-          placeholder="Search issues…"
-          value={localSearch}
-          onChange={e => setLocalSearch(e.target.value)}
-        />
-
-        <div className="theme-picker" ref={themeRef}>
-          <button
-            className="btn btn-secondary theme-trigger"
-            onClick={() => setThemeOpen(o => !o)}
-            title="Switch theme"
-          >
-            {currentTheme.swatch
-              ? <span className="theme-swatch" style={{ background: currentTheme.swatch }} />
-              : <span className="theme-swatch theme-swatch-auto">A</span>
-            }
-            <span className="theme-label">{currentTheme.label}</span>
-            <span className="theme-caret">▾</span>
-          </button>
-
-          {themeOpen && (
-            <div className="theme-dropdown">
-              {THEMES.map(t => (
-                <button
-                  key={t.id}
-                  className={`theme-option ${t.id === theme ? 'active' : ''}`}
-                  onClick={() => { onThemeChange(t.id); setThemeOpen(false) }}
-                >
-                  {t.swatch
-                    ? <span className="theme-swatch" style={{ background: t.swatch }} />
-                    : <span className="theme-swatch theme-swatch-auto">A</span>
-                  }
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {showSearch && (
+          <input
+            className="header-search"
+            type="search"
+            placeholder="Search issues…"
+            value={localSearch}
+            onChange={e => setLocalSearch(e.target.value)}
+          />
+        )}
 
         <RefreshIndicator lastUpdated={lastUpdated} polling={polling} />
 
-        <button className="btn btn-primary" onClick={onNewIssue}>
-          + New
+        {showNew && (
+          <button className="btn btn-primary" onClick={onNewIssue}>
+            + New
+          </button>
+        )}
+
+        <button
+          className={`btn btn-secondary cog-btn ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => onTabChange(activeTab === 'settings' ? 'list' : 'settings')}
+          title="Settings"
+          aria-label="Settings"
+        >
+          ⚙
         </button>
       </div>
     </header>

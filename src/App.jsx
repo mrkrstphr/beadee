@@ -8,6 +8,7 @@ import ShortcutsHelp from './components/ShortcutsHelp.jsx'
 import Footer from './components/Footer.jsx'
 import ListView from './views/ListView.jsx'
 import KanbanView from './views/KanbanView.jsx'
+import SettingsView from './views/SettingsView.jsx'
 import { useHealth } from './hooks/useIssues.js'
 import { useToastProvider } from './hooks/useToast.js'
 import { useKeyboard } from './hooks/useKeyboard.js'
@@ -77,8 +78,10 @@ export default function App() {
     '1': () => switchTab('list'),
     '2': () => switchTab('kanban'),
     '?': () => setShowShortcuts(true),
+    's': () => switchTab('settings'),
     'Escape': () => {
-      if (selectedIssueId) setSelectedIssueId(null)
+      if (activeTab === 'settings') switchTab('list')
+      else if (selectedIssueId) setSelectedIssueId(null)
     },
   }, !modalOpen)
 
@@ -103,8 +106,6 @@ export default function App() {
         search={search}
         onSearchChange={setSearch}
         onNewIssue={() => { setEditingIssue(null); setShowModal(true) }}
-        theme={theme}
-        onThemeChange={handleThemeChange}
         lastUpdated={lastUpdated}
         polling={polling}
       />
@@ -127,6 +128,9 @@ export default function App() {
             DetailPanel={DetailPanel}
             onRefreshed={handleRefreshed}
           />
+        )}
+        {activeTab === 'settings' && (
+          <SettingsView theme={theme} onThemeChange={handleThemeChange} />
         )}
       </main>
 
