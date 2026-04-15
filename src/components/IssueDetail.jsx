@@ -135,61 +135,9 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
         )}
       </div>
 
-      {/* Description */}
-      {issue.description && (
-        <div className="detail-section">
-          <div className="detail-section-label">Description</div>
-          <div className="detail-description">{issue.description}</div>
-        </div>
-      )}
-
-      {/* Notes */}
-      {issue.notes && (
-        <div className="detail-section">
-          <div className="detail-section-label">Notes</div>
-          <div className="detail-description">{issue.notes}</div>
-        </div>
-      )}
-
-      {/* Design */}
-      {issue.design && (
-        <div className="detail-section">
-          <div className="detail-section-label">Design</div>
-          <div className="detail-description">{issue.design}</div>
-        </div>
-      )}
-
-      {/* Dependencies */}
-      {(blockedBy.length > 0 || blocking.length > 0) && (
-        <div className="detail-section">
-          <div className="detail-section-label">Dependencies</div>
-          {blockedBy.length > 0 && (
-            <div className="dep-group">
-              <span className="dep-group-label">Blocked by</span>
-              <div className="dep-chips">
-                {blockedBy.map(d => (
-                  <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
-                ))}
-              </div>
-            </div>
-          )}
-          {blocking.length > 0 && (
-            <div className="dep-group">
-              <span className="dep-group-label">Blocking</span>
-              <div className="dep-chips">
-                {blocking.map(d => (
-                  <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Action buttons */}
       {canClose && (
         <div className="detail-section detail-actions-bottom">
-          <div className="detail-section-label">Actions</div>
           <div className="detail-btn-row">
             {canClaim && (
               <button
@@ -237,6 +185,57 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
                 onKeyDown={e => { if (e.key === 'Enter') handleClose(); if (e.key === 'Escape') setClosing(false) }}
               />
               <button className="btn btn-secondary" onClick={() => setClosing(false)}>Cancel</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Description */}
+      {issue.description && (
+        <div className="detail-section">
+          <div className="detail-section-label">Description</div>
+          <div className="detail-description">{issue.description}</div>
+        </div>
+      )}
+
+      {/* Notes */}
+      {issue.notes && (
+        <div className="detail-section">
+          <div className="detail-section-label">Notes</div>
+          <div className="detail-description">{issue.notes}</div>
+        </div>
+      )}
+
+      {/* Design */}
+      {issue.design && (
+        <div className="detail-section">
+          <div className="detail-section-label">Design</div>
+          <div className="detail-description">{issue.design}</div>
+        </div>
+      )}
+
+      {/* Dependencies */}
+      {(blockedBy.length > 0 || blocking.length > 0) && (
+        <div className="detail-section">
+          <div className="detail-section-label">Dependencies</div>
+          {blockedBy.length > 0 && (
+            <div className="dep-group">
+              <span className="dep-group-label">Blocked by</span>
+              <div className="dep-chips">
+                {blockedBy.map(d => (
+                  <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
+                ))}
+              </div>
+            </div>
+          )}
+          {blocking.length > 0 && (
+            <div className="dep-group">
+              <span className="dep-group-label">Blocking</span>
+              <div className="dep-chips">
+                {blocking.map(d => (
+                  <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
+                ))}
+              </div>
             </div>
           )}
         </div>
