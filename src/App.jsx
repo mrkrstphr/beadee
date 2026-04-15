@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react'
 import Header from './components/Header.jsx'
 import IssueDetail from './components/IssueDetail.jsx'
+import IssueModal from './components/IssueModal.jsx'
 import ListView from './views/ListView.jsx'
+import KanbanView from './views/KanbanView.jsx'
 
 function setTheme(theme) {
   localStorage.setItem('beadee-theme', theme)
@@ -31,11 +33,33 @@ export default function App() {
     setTheme(t)
   }
 
+  function openEdit(issue) {
+    setEditingIssue(issue)
+    setShowModal(true)
+  }
+
+  function handleModalSaved() {
+    handleRefresh()
+    setShowModal(false)
+    setEditingIssue(null)
+  }
+
+  const DetailPanel = useCallback(({ issueId, onClose }) => (
+    <IssueDetail
+      key={`${issueId}-${detailKey}`}
+      issueId={issueId}
+      onClose={onClose}
+      onSelectIssue={setSelectedIssueId}
+      onEdit={openEdit}
+      onRefresh={handleRefresh}
+    />
+  ), [detailKey])
+
   return (
     <div className="app">
       <Header
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={tab => { setActiveTab(tab); setSelectedIssueId(null) }}
         search={search}
         onSearchChange={setSearch}
         onNewIssue={() => { setEditingIssue(null); setShowModal(true) }}
@@ -49,24 +73,26 @@ export default function App() {
             search={search}
             selectedIssueId={selectedIssueId}
             onSelectIssue={setSelectedIssueId}
-            DetailPanel={({ issueId, onClose }) => (
-              <IssueDetail
-                key={`${issueId}-${detailKey}`}
-                issueId={issueId}
-                onClose={onClose}
-                onSelectIssue={setSelectedIssueId}
-                onEdit={issue => { setEditingIssue(issue); setShowModal(true) }}
-                onRefresh={handleRefresh}
-              />
-            )}
+            DetailPanel={DetailPanel}
           />
         )}
         {activeTab === 'kanban' && (
-          <div className="placeholder">
-            <p className="placeholder-title">Board view coming soon</p>
-          </div>
+          <KanbanView
+            search={search}
+            selectedIssueId={selectedIssueId}
+            onSelectIssue={setSelectedIssueId}
+            DetailPanel={DetailPanel}
+          />
         )}
       </main>
+
+      {showModal && (
+        <IssueModal
+          issue={editingIssue}
+          onClose={() => { setShowModal(false); setEditingIssue(null) }}
+          onSaved={handleModalSaved}
+        />
+      )}
     </div>
   )
 }
