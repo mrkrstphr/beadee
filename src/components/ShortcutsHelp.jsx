@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { X } from 'lucide-react'
 
 const SHORTCUTS = [
   { group: 'Global',
@@ -41,7 +42,7 @@ export default function ShortcutsHelp({ onClose }) {
       <div className="modal shortcuts-modal">
         <div className="modal-header">
           <h3 className="modal-title">Keyboard Shortcuts</h3>
-          <button className="btn btn-secondary modal-close" onClick={onClose}>✕</button>
+          <button className="btn btn-secondary modal-close" onClick={onClose}><X size={14} /></button>
         </div>
         <div className="shortcuts-body">
           {SHORTCUTS.map(group => (

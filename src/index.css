@@ -447,6 +447,7 @@ input::placeholder, textarea::placeholder {
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
@@ -620,7 +621,6 @@ input::placeholder, textarea::placeholder {
 
 .issue-row-icon {
   flex-shrink: 0;
-  font-size: 13px;
   margin-top: 1px;
   width: 14px;
 }
@@ -711,7 +711,6 @@ input::placeholder, textarea::placeholder {
 }
 
 .detail-empty-icon {
-  font-size: 32px;
   opacity: 0.3;
 }
 
@@ -750,10 +749,32 @@ input::placeholder, textarea::placeholder {
   margin-bottom: 8px;
 }
 
+.detail-id-group {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
 .detail-id {
   color: var(--text-muted);
   font-family: 'SFMono-Regular', Consolas, monospace;
   font-size: 12px;
+}
+
+.btn-copy-id {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0 2px;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity 0.15s, color 0.15s;
+}
+.btn-copy-id:hover {
+  opacity: 1;
+  color: var(--text-primary);
 }
 
 .detail-actions-top {
@@ -1229,24 +1250,20 @@ textarea.field-input {
   gap: 5px;
 }
 
-.refresh-dot {
-  background: var(--success);
-  border-radius: 50%;
-  display: inline-block;
-  height: 7px;
-  opacity: 0.5;
-  transition: opacity 0.3s;
-  width: 7px;
+.refresh-indicator svg {
+  color: var(--text-muted);
+  opacity: 0.6;
 }
 
-.refresh-dot.pulsing {
-  animation: pulse-dot 1s ease infinite;
+.refresh-indicator svg.spinning {
+  animation: spin 1s linear infinite;
+  color: var(--accent);
   opacity: 1;
 }
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1;   transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.8); }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .refresh-label {
