@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bd --version)",
+      "Bash(bd help *)",
+      "WebSearch",
+      "Bash(bd create *)",
+      "Bash(bd update *)",
+      "Bash(bd list *)",
+      "Bash(bd show *)",
+      "Bash(bd dep *)",
+      "Bash(bd statuses *)",
+      "Bash(bd types *)",
+      "Bash(bd close *)",
+      "Bash(bd graph *)",
+      "Bash(bd ready *)",
+      "Bash(node *)",
+      "Bash(npm install *)",
+      "Bash(npx vite *)",
+      "Bash(curl -s http://localhost:5174)",
+      "Bash(chmod +x /Users/kristopher/Projects/Active/rosary/bin/beadee.js)",
+      "Bash(bd comment *)"
+    ]
+  }
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Settings } from 'lucide-react'
 import { useHealth } from '../hooks/useIssues.js'
 import RefreshIndicator from './RefreshIndicator.jsx'
 
@@ -72,7 +73,7 @@ export default function Header({ activeTab, onTabChange, search, onSearchChange,
           title="Settings"
           aria-label="Settings"
         >
-          ⚙
+          <Settings size={15} strokeWidth={1.75} />
         </button>
       </div>
     </header>

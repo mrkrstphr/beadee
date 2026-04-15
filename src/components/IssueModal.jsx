@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { X } from 'lucide-react'
 import { createIssue, updateIssue } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 
@@ -69,7 +70,7 @@ export default function IssueModal({ issue, onClose, onSaved }) {
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal-header">
           <h3 className="modal-title">{isEdit ? 'Edit Issue' : 'New Issue'}</h3>
-          <button className="btn btn-secondary modal-close" onClick={onClose}>✕</button>
+          <button className="btn btn-secondary modal-close" onClick={onClose}><X size={14} /></button>
         </div>
 
         <form className="modal-body" onSubmit={handleSubmit}>

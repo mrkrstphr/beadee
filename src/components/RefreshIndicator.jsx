@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { RefreshCw } from 'lucide-react'
 
 function timeAgo(date) {
   if (!date) return null
@@ -20,7 +21,7 @@ export default function RefreshIndicator({ lastUpdated, polling }) {
 
   return (
     <div className="refresh-indicator" title={label ? `Updated ${label}` : 'Waiting for data…'}>
-      <span className={`refresh-dot ${polling ? 'pulsing' : ''}`} />
+      <RefreshCw size={13} strokeWidth={1.75} className={polling ? 'spinning' : ''} />
       {label && <span className="refresh-label">Updated {label}</span>}
     </div>
   )

@@ -1,6 +1,8 @@
 import { useState, useMemo, useCallback } from 'react'
+import { Inbox } from 'lucide-react'
 import { useIssues } from '../hooks/useIssues.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
+import StatusIcon from '../components/StatusIcon.jsx'
 
 const STATUS_FILTERS = [
   { label: 'All',         value: '' },
@@ -20,15 +22,6 @@ const TYPE_OPTIONS = [
   { label: 'Spike',     value: 'spike' },
   { label: 'Story',     value: 'story' },
 ]
-
-const STATUS_ICON = {
-  open:        '○',
-  in_progress: '◑',
-  blocked:     '●',
-  closed:      '✓',
-  deferred:    '❄',
-  pinned:      '📌',
-}
 
 const TYPE_SHORT = {
   bug:       'BUG',
@@ -50,9 +43,7 @@ function IssueRow({ issue, selected, onClick }) {
       className={`issue-row ${selected ? 'selected' : ''} status-${issue.status}`}
       onClick={onClick}
     >
-      <span className={`issue-row-icon status-icon-${issue.status}`}>
-        {STATUS_ICON[issue.status] ?? '○'}
-      </span>
+      <StatusIcon status={issue.status} />
       <span className="issue-row-body">
         <span className="issue-row-title">{issue.title}</span>
         <span className="issue-row-meta">
@@ -172,7 +163,7 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
           ? <DetailPanel issueId={selectedIssueId} onClose={() => onSelectIssue(null)} />
           : (
             <div className="detail-empty">
-              <span className="detail-empty-icon">○</span>
+              <Inbox size={32} className="detail-empty-icon" strokeWidth={1.25} />
               <p>Select an issue to view details</p>
             </div>
           )

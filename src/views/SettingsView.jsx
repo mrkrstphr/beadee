@@ -1,3 +1,5 @@
+import { Check } from 'lucide-react'
+
 const THEMES = [
   { id: 'dark',      label: 'Dark',      swatch: '#0d1117', desc: 'GitHub-style dark' },
   { id: 'light',     label: 'Light',     swatch: '#ffffff', desc: 'Clean light mode' },
@@ -33,7 +35,7 @@ export default function SettingsView({ theme, onThemeChange }) {
                 />
                 <span className="theme-card-label">{t.label}</span>
                 <span className="theme-card-desc">{t.desc}</span>
-                {t.id === theme && <span className="theme-card-check">✓</span>}
+                {t.id === theme && <Check size={14} strokeWidth={2.5} className="theme-card-check" />}
               </button>
             ))}
           </div>
