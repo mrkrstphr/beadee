@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { Inbox } from 'lucide-react'
 import { useIssues } from '../hooks/useIssues.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
+import { useLocalStorageState } from '../hooks/useLocalStorageState.js'
 import StatusIcon from '../components/StatusIcon.jsx'
 
 const STATUS_FILTERS = [
@@ -76,8 +77,8 @@ function SkeletonRow() {
 }
 
 export default function ListView({ search, selectedIssueId, onSelectIssue, DetailPanel, onRefreshed }) {
-  const [statusFilter, setStatusFilter] = useState('')
-  const [typeFilter, setTypeFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useLocalStorageState('beadee-status-filter', '')
+  const [typeFilter, setTypeFilter] = useLocalStorageState('beadee-type-filter', '')
 
   const { issues, loading, error } = useIssues({
     status: statusFilter,
