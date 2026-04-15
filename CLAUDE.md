@@ -1,6 +1,6 @@
-# Project Instructions for AI Agents
+# CLAUDE.md
 
-This file provides instructions and context for AI coding agents working on this project.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
@@ -49,21 +49,51 @@ bd close <id>         # Complete work
 - If push fails, resolve and retry until it succeeds
 <!-- END BEADS INTEGRATION -->
 
+---
 
-## Build & Test
-
-_Add your build and test commands here_
+## Commands
 
 ```bash
-# Example:
-# npm install
-# npm test
+npm run dev      # Start dev server (React Router + Vite, http://localhost:5173)
+npm run build    # Production build → build/client/ + build/server/
+npm start        # Run production server (requires npm run build first)
 ```
 
-## Architecture Overview
+No test runner or linter is configured yet.
 
-_Add a brief overview of your project architecture_
+## Architecture
 
-## Conventions & Patterns
+**beadee** is a web GUI for the `bd` (beads) CLI issue tracker. It shells out to `bd --json` for all data — there is no direct database access. No TypeScript — all `.js` / `.jsx`.
 
-_Add your project-specific conventions here_
+### Key architectural constraints
+
+**Embedded Dolt single-writer lock**: `bd` uses an embedded Dolt database that only allows one writer at a time. Concurrent `bdRun` calls will contend for the lock. `server/bd.js` retries up to 4 times with exponential backoff (80ms base) on lock errors. Never run parallel `bdRun` calls.
+
+**SSE feedback loop prevention**: Every `bd` invocation (even reads) writes to `.beads/interactions.jsonl`, which triggers `fs.watch`. All route handlers call `suppressWatch()` before `bdRun` to suppress the watcher for 2 seconds. Mutation routes also call `broadcast()` after `bdRun` for immediate client notification.
+
+### Data flow
+
+```
+Browser → fetch /api/*
+  → RR7 resource route (app/routes/api.*.js)
+    → bdRun() in server/bd.js
+      → bd CLI subprocess (process.cwd() = user's project dir)
+        → Embedded Dolt DB in .beads/
+```
+
+Real-time updates:
+```
+External bd write → .beads/ file change → fs.watch in server/sse.js
+  → broadcast() → SSE event → useIssues subscriber → refetch /api/issues
+
+Mutation via UI → route action → suppressWatch() + broadcast()
+  → SSE event → refetch (fs.watch event suppressed for 2s)
+```
+
+### Themes
+
+Themes are CSS custom property sets on `[data-theme='X']` in `src/index.css`. Theme is stored in `localStorage('beadee-theme')` and applied before first paint via an inline `<script>` in `app/root.jsx`.
+
+### SSR note
+
+`ssr: true` is set in `react-router.config.js` because API routes need server-side `bd` execution. `App.jsx` guards `localStorage` access with `typeof window !== 'undefined'` checks to avoid SSR crashes. UI hooks (`useIssues`, etc.) use `useEffect` so they only run client-side.
