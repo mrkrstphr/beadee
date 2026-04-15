@@ -1,16 +1,10 @@
 import { useState } from 'react'
+import { Check, Copy, Settings, User, X } from 'lucide-react'
 import { useIssue, updateIssue, closeIssue } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
 import CommentThread from './CommentThread.jsx'
-
-const STATUS_ICON = {
-  open:        '○',
-  in_progress: '◑',
-  blocked:     '●',
-  closed:      '✓',
-  deferred:    '❄',
-}
+import StatusIcon from './StatusIcon.jsx'
 
 const PRIORITY_LABEL = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' }
 
@@ -22,11 +16,30 @@ function formatDate(iso) {
 function DepChip({ dep, onSelect }) {
   return (
     <button className="dep-chip" onClick={() => onSelect(dep.id)} title={dep.title}>
-      <span className={`dep-chip-icon status-icon-${dep.status}`}>
-        {STATUS_ICON[dep.status] ?? '○'}
-      </span>
+      <StatusIcon status={dep.status} size={12} />
       <span className="dep-chip-id">{dep.id}</span>
       <span className="dep-chip-title">{dep.title}</span>
+    </button>
+  )
+}
+
+function CopyIdButton({ id }) {
+  const [copied, setCopied] = useState(false)
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(id)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+
+  return (
+    <button
+      className="btn-copy-id"
+      onClick={handleCopy}
+      title="Copy issue ID"
+      aria-label="Copy issue ID"
+    >
+      {copied ? <Check size={13} strokeWidth={2.5} /> : <Copy size={13} strokeWidth={1.75} />}
     </button>
   )
 }
@@ -84,14 +97,17 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
       {/* Header */}
       <div className="detail-header">
         <div className="detail-header-top">
-          <span className="detail-id">{issue.id}</span>
+          <div className="detail-id-group">
+              <span className="detail-id">{issue.id}</span>
+              <CopyIdButton id={issue.id} />
+            </div>
           <div className="detail-actions-top">
             {onEdit && (
               <button className="btn btn-secondary" onClick={() => onEdit(issue)}>
                 Edit
               </button>
             )}
-            <button className="btn btn-secondary detail-close-btn" onClick={onClose}>✕</button>
+            <button className="btn btn-secondary detail-close-btn" onClick={onClose}><X size={14} /></button>
           </div>
         </div>
         <h2 className="detail-title">{issue.title}</h2>
@@ -100,7 +116,8 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
       {/* Meta row */}
       <div className="detail-meta">
         <span className={`badge badge-${issue.status}`}>
-          {STATUS_ICON[issue.status]} {issue.status?.replace('_', ' ')}
+          <StatusIcon status={issue.status} size={12} />
+          {issue.status?.replace('_', ' ')}
         </span>
         {issue.priority !== undefined && (
           <span className={`priority-badge p${issue.priority}`}>
@@ -111,7 +128,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
           <span className="detail-type">{issue.issue_type}</span>
         )}
         {issue.assignee && (
-          <span className="detail-assignee">👤 {issue.assignee}</span>
+          <span className="detail-assignee"><User size={12} strokeWidth={1.75} /> {issue.assignee}</span>
         )}
         {issue.created_at && (
           <span className="detail-date">Created {formatDate(issue.created_at)}</span>

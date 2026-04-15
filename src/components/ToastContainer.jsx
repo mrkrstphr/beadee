@@ -1,3 +1,5 @@
+import { CircleCheck, CircleX } from 'lucide-react'
+
 export default function ToastContainer({ toasts, onDismiss }) {
   if (!toasts.length) return null
   return (
@@ -8,7 +10,11 @@ export default function ToastContainer({ toasts, onDismiss }) {
           className={`toast toast-${t.type}`}
           onClick={() => onDismiss(t.id)}
         >
-          {t.type === 'success' ? '✓' : '✕'} {t.message}
+          {t.type === 'success'
+            ? <CircleCheck size={14} strokeWidth={2} />
+            : <CircleX size={14} strokeWidth={2} />
+          }
+          {t.message}
         </div>
       ))}
     </div>
