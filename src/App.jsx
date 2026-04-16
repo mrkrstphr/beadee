@@ -52,6 +52,14 @@ export default function App() {
     localStorage.setItem('beadee-tab', tab)
   }
 
+  function showIssueDetail(issueId) {
+    setSelectedIssueId(issueId)
+    if (activeTab === 'settings') {
+      setActiveTab('list')
+      localStorage.setItem('beadee-tab', 'list')
+    }
+  }
+
   function handleThemeChange(t) {
     setThemeState(t)
     setTheme(t)
@@ -62,8 +70,9 @@ export default function App() {
     setShowModal(true)
   }
 
-  function handleModalSaved() {
+  function handleModalSaved(saved, { created } = {}) {
     handleRefresh()
+    if (created && saved?.id) showIssueDetail(saved.id)
     setShowModal(false)
     setEditingIssue(null)
   }
