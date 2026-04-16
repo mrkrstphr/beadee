@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
+import { createRequire } from 'module'
 import { startServer } from '../server/server.js'
 
-const VERSION = '0.1.0'
+const require = createRequire(import.meta.url)
+const VERSION = require('../package.json').version
 
 const HELP = `
 beadee — web GUI for the beads issue tracker
