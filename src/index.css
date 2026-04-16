@@ -237,7 +237,7 @@ a:hover {
 
 .header-brand {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
 }
 
@@ -1322,6 +1322,18 @@ textarea.field-input {
   font-size: 11px;
 }
 
+/* Column picker (mobile only — hidden on desktop) */
+.kanban-col-picker { display: none; }
+
+.kanban-picker-count {
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 4px;
+  padding: 1px 5px;
+}
+
 /* Kanban detail slide-in */
 .kanban-detail {
   border-left: 1px solid var(--border);
@@ -1794,4 +1806,153 @@ textarea.field-input {
 
 .placeholder-sub {
   font-size: 13px;
+}
+
+/* ============================================================
+   RESPONSIVE / MOBILE-FIRST
+   ============================================================ */
+
+@media (max-width: 640px) {
+  /* ── Header: two-row layout ─────────────────────────────── */
+  /*  Row 1: brand  |  right actions
+      Row 2: tabs (full width)
+      display:contents on header-left lets its children
+      participate directly in the grid.                       */
+  .header {
+    display: grid;
+    grid-template-areas:
+      "brand right"
+      "tabs  tabs";
+    grid-template-columns: 1fr auto;
+    height: auto;
+    padding: 0;
+    align-items: center;
+  }
+
+  /* Make header-left transparent to the grid */
+  .header-left { display: contents; }
+
+  .header-brand {
+    grid-area: brand;
+    padding: 8px 10px;
+  }
+
+  .header-right {
+    grid-area: right;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  /* Tabs span full width on row 2 */
+  .tabs {
+    grid-area: tabs;
+    gap: 4px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Each tab takes equal space */
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 7px 12px;
+  }
+
+  /* Drop project name — still too cramped even on row 1 */
+  .header-project { display: none; }
+
+  /* Shrink search input */
+  .header-search { width: 120px; }
+
+  /* Hide refresh indicator text; keep only the spin icon */
+  .refresh-label { display: none; }
+
+  /* ── List view: single-column with overlay detail ───────── */
+  .list-view { position: relative; }
+
+  .list-panel {
+    width: 100%;
+    min-width: 0;
+    border-right: none;
+  }
+
+  /* Detail panel: hidden by default, shown as overlay when active */
+  .detail-panel {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    z-index: 10;
+    overflow-y: auto;
+  }
+
+  .list-view.has-detail .list-panel { display: none; }
+  .list-view.has-detail .detail-panel { display: block; }
+
+  /* ── Kanban: one column at a time ───────────────────────── */
+  .kanban-col-picker {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+
+  .kanban-view {
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .kanban-board {
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 12px;
+    gap: 0;
+  }
+
+  /* Active column fills the full width */
+  .kanban-col { width: 100%; }
+  .kanban-col.kanban-col-hidden { display: none; }
+
+  /* ── Kanban: detail slides over board as full-screen panel ─ */
+  .kanban-detail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 50;
+    background: var(--bg);
+    border-left: none;
+    overflow-y: auto;
+  }
+
+  /* ── Modal: full-screen sheet ───────────────────────────── */
+  .modal-backdrop { align-items: flex-end; padding: 0; }
+
+  .modal {
+    width: 100%;
+    max-height: 92dvh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  /* ── Issue detail: tighter padding on small screens ──────── */
+  .issue-detail { padding: 14px 14px 24px; }
+
+  /* Make the close/back button easier to tap */
+  .detail-close-btn { padding: 6px 10px; }
+
+  /* ── Settings ───────────────────────────────────────────── */
+  .settings-view { padding: 16px; }
+  .theme-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* ── Footer: nothing useful on mobile, hide it entirely ─── */
+  .app-footer { display: none; }
 }

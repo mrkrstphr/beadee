@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Header from './components/Header.jsx'
 import IssueDetail from './components/IssueDetail.jsx'
 import IssueModal from './components/IssueModal.jsx'
@@ -27,9 +27,9 @@ export default function App() {
   const [theme, setThemeState] = useState(
     () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-theme') : null) || 'dark'
   )
-  const [activeTab, setActiveTab] = useState(
-    () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-tab') : null) || 'list'
-  )
+  // Always start with 'list' so SSR and client initial renders match,
+  // then restore the persisted tab after hydration.
+  const [activeTab, setActiveTab] = useState('list')
   const [selectedIssueId, setSelectedIssueId] = useState(null)
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
@@ -45,6 +45,11 @@ export default function App() {
 
   const handleRefresh  = useCallback(() => setDetailKey(k => k + 1), [])
   const handleRefreshed = useCallback((date) => { setLastUpdated(date); setPolling(false) }, [])
+
+  useEffect(() => {
+    const stored = localStorage.getItem('beadee-tab')
+    if (stored && stored !== 'list') setActiveTab(stored)
+  }, [])
 
   function switchTab(tab) {
     setActiveTab(tab)

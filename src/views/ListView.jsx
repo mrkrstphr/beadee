@@ -112,7 +112,7 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
   })
 
   return (
-    <div className="list-view">
+    <div className={`list-view${selectedIssueId ? ' has-detail' : ''}`}>
       {/* ── Left panel ─────────────────────────────────────────── */}
       <div className="list-panel">
         <div className="list-panel-toolbar">

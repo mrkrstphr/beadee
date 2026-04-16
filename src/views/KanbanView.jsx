@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useIssues } from '../hooks/useIssues.js'
 import IssueCard from '../components/IssueCard.jsx'
 
@@ -8,9 +9,9 @@ const COLUMNS = [
   { id: 'done',        label: 'Done',        status: 'closed' },
 ]
 
-function KanbanColumn({ column, issues, selectedIssueId, onSelectIssue }) {
+function KanbanColumn({ column, issues, selectedIssueId, onSelectIssue, hidden }) {
   return (
-    <div className={`kanban-col kanban-col-${column.id}`}>
+    <div className={`kanban-col kanban-col-${column.id}${hidden ? ' kanban-col-hidden' : ''}`}>
       <div className="kanban-col-header">
         <span className="kanban-col-label">{column.label}</span>
         <span className="kanban-col-count">{issues.length}</span>
@@ -33,6 +34,7 @@ function KanbanColumn({ column, issues, selectedIssueId, onSelectIssue }) {
 }
 
 export default function KanbanView({ search, selectedIssueId, onSelectIssue, DetailPanel, onRefreshed }) {
+  const [activeColumn, setActiveColumn] = useState('open')
   const { issues, loading, error } = useIssues({ search }, { onRefreshed })
 
   const byStatus = {}
@@ -43,6 +45,22 @@ export default function KanbanView({ search, selectedIssueId, onSelectIssue, Det
 
   return (
     <div className="kanban-view">
+      {/* Column picker — only visible on mobile via CSS */}
+      <div className="kanban-col-picker">
+        {COLUMNS.map(col => (
+          <button
+            key={col.id}
+            className={`pill ${activeColumn === col.id ? 'active' : ''}`}
+            onClick={() => setActiveColumn(col.id)}
+          >
+            {col.label}
+            {!loading && byStatus[col.status]?.length > 0 && (
+              <span className="kanban-picker-count">{byStatus[col.status].length}</span>
+            )}
+          </button>
+        ))}
+      </div>
+
       <div className="kanban-board">
         {loading && <div className="kanban-state">Loading…</div>}
         {error   && <div className="kanban-state kanban-error">Error: {error}</div>}
@@ -53,6 +71,7 @@ export default function KanbanView({ search, selectedIssueId, onSelectIssue, Det
             issues={byStatus[col.status]}
             selectedIssueId={selectedIssueId}
             onSelectIssue={onSelectIssue}
+            hidden={activeColumn !== col.id}
           />
         ))}
       </div>

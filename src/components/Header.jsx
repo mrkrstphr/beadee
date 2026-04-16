@@ -26,6 +26,7 @@ export default function Header({ activeTab, onTabChange, search, onSearchChange,
     <header className="header">
       <div className="header-left">
         <div className="header-brand">
+          <img src="/favicon.svg" alt="" width="20" height="20" style={{ display: 'block' }} />
           <span className="logo">beadee</span>
           {health?.projectName && (
             <span className="header-project">{health.projectName}</span>
