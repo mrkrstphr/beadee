@@ -4,7 +4,7 @@ import { suppressWatch, broadcast } from '../../server/sse.js'
 export async function loader({ params }) {
   const { id } = params
   suppressWatch()
-  const result = await bdRun(['comments', id], process.cwd())
+  const result = await bdRun(['comments', id, '--readonly'], process.cwd())
   return Response.json(Array.isArray(result) ? result : [])
 }
 

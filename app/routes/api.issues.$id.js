@@ -4,7 +4,7 @@ import { suppressWatch, broadcast } from '../../server/sse.js'
 export async function loader({ params }) {
   const { id } = params
   suppressWatch()
-  const result = await bdRun(['show', id, '--long'], process.cwd())
+  const result = await bdRun(['show', id, '--long', '--readonly'], process.cwd())
   const issue = Array.isArray(result) ? result[0] : result
   if (!issue) return Response.json({ error: `Issue ${id} not found` }, { status: 404 })
   return Response.json(issue)

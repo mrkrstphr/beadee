@@ -9,7 +9,7 @@ export async function loader({ request }) {
   const cwd    = process.cwd()
 
   suppressWatch()
-  const issues = await bdRun(['list', '--all'], cwd)
+  const issues = await bdRun(['list', '--all', '--readonly'], cwd)
 
   let result = issues
   if (status) result = result.filter(i => i.status === status)
