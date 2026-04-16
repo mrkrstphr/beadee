@@ -1,5 +1,5 @@
 {
-  "name": "beadee",
+  "name": "@mrkrstphr/beadee",
   "version": "0.1.0",
   "description": "Web GUI for the beads issue tracker",
   "type": "module",

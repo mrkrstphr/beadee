@@ -1,5 +1,13 @@
 src/
+app/
 vite.config.js
+react-router.config.js
 index.html
 .env*
 *.local
+.github/
+.claude/
+.beads/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
