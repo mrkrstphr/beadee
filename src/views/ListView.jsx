@@ -79,6 +79,7 @@ function SkeletonRow() {
 export default function ListView({ search, selectedIssueId, onSelectIssue, DetailPanel, onRefreshed }) {
   const [statusFilter, setStatusFilter] = useLocalStorageState('beadee-status-filter', '')
   const [typeFilter, setTypeFilter] = useLocalStorageState('beadee-type-filter', '')
+  const [hideClosed, setHideClosed] = useLocalStorageState('beadee-hide-closed', true)
 
   const { issues, loading, error } = useIssues({
     status: statusFilter,
@@ -86,23 +87,28 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
     search,
   }, { onRefreshed })
 
+  const displayedIssues = useMemo(() => {
+    if (!hideClosed || statusFilter === 'closed') return issues
+    return issues.filter(i => i.status !== 'closed')
+  }, [issues, hideClosed, statusFilter])
+
   const selectedIdx = useMemo(
-    () => issues.findIndex(i => i.id === selectedIssueId),
-    [issues, selectedIssueId]
+    () => displayedIssues.findIndex(i => i.id === selectedIssueId),
+    [displayedIssues, selectedIssueId]
   )
 
   const navigate = useCallback((dir) => {
-    if (!issues.length) return
+    if (!displayedIssues.length) return
     const next = selectedIdx === -1
-      ? (dir > 0 ? 0 : issues.length - 1)
-      : Math.max(0, Math.min(issues.length - 1, selectedIdx + dir))
-    onSelectIssue(issues[next].id)
-  }, [issues, selectedIdx, onSelectIssue])
+      ? (dir > 0 ? 0 : displayedIssues.length - 1)
+      : Math.max(0, Math.min(displayedIssues.length - 1, selectedIdx + dir))
+    onSelectIssue(displayedIssues[next].id)
+  }, [displayedIssues, selectedIdx, onSelectIssue])
 
   useKeyboard({
     j:      () => navigate(1),
     k:      () => navigate(-1),
-    Enter:  () => { if (selectedIdx !== -1) onSelectIssue(issues[selectedIdx].id) },
+    Enter:  () => { if (selectedIdx !== -1) onSelectIssue(displayedIssues[selectedIdx].id) },
   })
 
   return (
@@ -131,8 +137,15 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
+            <button
+              className={`pill hide-closed-toggle ${hideClosed && statusFilter !== 'closed' ? 'active' : ''}`}
+              onClick={() => setHideClosed(v => !v)}
+              title={hideClosed ? 'Showing active issues — click to show closed' : 'Click to hide closed issues'}
+            >
+              Hide closed
+            </button>
             <span className="issue-count">
-              {loading ? '…' : `${issues.length} issue${issues.length !== 1 ? 's' : ''}`}
+              {loading ? '…' : `${displayedIssues.length} issue${displayedIssues.length !== 1 ? 's' : ''}`}
             </span>
           </div>
         </div>
@@ -140,14 +153,14 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
         <div className="issue-list">
           {loading && [1,2,3,4].map(i => <SkeletonRow key={i} />)}
           {error && <div className="list-state list-error">Error: {error}</div>}
-          {!loading && !error && issues.length === 0 && (
+          {!loading && !error && displayedIssues.length === 0 && (
             <div className="list-state list-empty">
-              {search || statusFilter || typeFilter
+              {search || statusFilter || typeFilter || hideClosed
                 ? 'No issues match your filters'
                 : 'No issues yet'}
             </div>
           )}
-          {issues.map(issue => (
+          {displayedIssues.map(issue => (
             <IssueRow
               key={issue.id}
               issue={issue}
