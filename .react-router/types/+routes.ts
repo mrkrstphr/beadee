@@ -38,7 +38,15 @@ type Pages = {
       "id": string;
     };
   };
+  "/api/issues/:id/labels": {
+    params: {
+      "id": string;
+    };
+  };
   "/api/deps": {
+    params: {};
+  };
+  "/api/labels": {
     params: {};
   };
   "/api/ready": {
@@ -52,7 +60,7 @@ type Pages = {
 type RouteFiles = {
   "root.jsx": {
     id: "root";
-    page: "/" | "/api/events" | "/api/health" | "/api/issues" | "/api/issues/:id" | "/api/issues/:id/close" | "/api/issues/:id/comments" | "/api/deps" | "/api/ready" | "/api/stats";
+    page: "/" | "/api/events" | "/api/health" | "/api/issues" | "/api/issues/:id" | "/api/issues/:id/close" | "/api/issues/:id/comments" | "/api/issues/:id/labels" | "/api/deps" | "/api/labels" | "/api/ready" | "/api/stats";
   };
   "routes/_index.jsx": {
     id: "routes/_index";
@@ -82,9 +90,17 @@ type RouteFiles = {
     id: "routes/api.issues.$id.comments";
     page: "/api/issues/:id/comments";
   };
+  "routes/api.issues.$id.labels.js": {
+    id: "routes/api.issues.$id.labels";
+    page: "/api/issues/:id/labels";
+  };
   "routes/api.deps.js": {
     id: "routes/api.deps";
     page: "/api/deps";
+  };
+  "routes/api.labels.js": {
+    id: "routes/api.labels";
+    page: "/api/labels";
   };
   "routes/api.ready.js": {
     id: "routes/api.ready";
@@ -105,7 +121,9 @@ type RouteModules = {
   "routes/api.issues.$id": typeof import("./app/routes/api.issues.$id.js");
   "routes/api.issues.$id.close": typeof import("./app/routes/api.issues.$id.close.js");
   "routes/api.issues.$id.comments": typeof import("./app/routes/api.issues.$id.comments.js");
+  "routes/api.issues.$id.labels": typeof import("./app/routes/api.issues.$id.labels.js");
   "routes/api.deps": typeof import("./app/routes/api.deps.js");
+  "routes/api.labels": typeof import("./app/routes/api.labels.js");
   "routes/api.ready": typeof import("./app/routes/api.ready.js");
   "routes/api.stats": typeof import("./app/routes/api.stats.js");
 };

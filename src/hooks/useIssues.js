@@ -125,16 +125,27 @@ export function useIssue(id) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  const fetchIssue = useCallback(async () => {
+    if (!id) { setIssue(null); return }
+    try {
+      const data = await apiFetch(`/issues/${id}`)
+      setIssue(data)
+      setError(null)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [id])
+
   useEffect(() => {
     if (!id) { setIssue(null); return }
-    let cancelled = false
     setLoading(true)
-    apiFetch(`/issues/${id}`)
-      .then(data => { if (!cancelled) { setIssue(data); setError(null) } })
-      .catch(err => { if (!cancelled) setError(err.message) })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
-  }, [id])
+    fetchIssue()
+    return subscribeTick(() => {
+      if (document.visibilityState === 'visible') fetchIssue()
+    })
+  }, [id, fetchIssue])
 
   return { issue, loading, error }
 }
@@ -177,4 +188,24 @@ export async function addDep(issue, dependsOn) {
 
 export async function removeDep(issue, dependsOn) {
   return apiFetch('/deps', { method: 'DELETE', body: JSON.stringify({ issue, dependsOn }) })
+}
+
+export async function addLabel(issueId, label) {
+  return apiFetch(`/issues/${issueId}/labels`, { method: 'POST', body: JSON.stringify({ label }) })
+}
+
+export async function removeLabel(issueId, label) {
+  return apiFetch(`/issues/${issueId}/labels`, { method: 'DELETE', body: JSON.stringify({ label }) })
+}
+
+export function useLabels() {
+  const [labels, setLabels] = useState([])
+
+  useEffect(() => {
+    apiFetch('/labels')
+      .then(data => setLabels(data))
+      .catch(() => {})
+  }, [])
+
+  return labels
 }
