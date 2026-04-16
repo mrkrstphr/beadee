@@ -801,6 +801,51 @@ input::placeholder, textarea::placeholder {
   margin-bottom: 20px;
 }
 
+.detail-assignee {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.detail-kv-wrap {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+/* Desktop: two side-by-side key/value pairs per row */
+.detail-kv {
+  display: grid;
+  font-size: 13px;
+  grid-template-columns: max-content 1fr max-content 1fr;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+}
+
+.detail-kv dt,
+.detail-kv dd {
+  border-top: 1px solid var(--border);
+  margin: 0;
+  padding: 9px 12px;
+}
+
+/* Desktop first visual row (4-col grid): no top border */
+.detail-kv dt:nth-child(-n+4),
+.detail-kv dd:nth-child(-n+4) {
+  border-top: none;
+}
+
+.detail-kv dt {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.detail-kv dd {
+  color: var(--text);
+}
+
 .detail-type {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
@@ -810,12 +855,6 @@ input::placeholder, textarea::placeholder {
   font-weight: 600;
   padding: 2px 7px;
   text-transform: uppercase;
-}
-
-.detail-assignee,
-.detail-date {
-  color: var(--text-muted);
-  font-size: 12px;
 }
 
 .detail-section {
@@ -1945,6 +1984,21 @@ textarea.field-input {
 
   /* ── Issue detail: tighter padding on small screens ──────── */
   .issue-detail { padding: 14px 14px 24px; }
+
+  /* KV grid: single column on mobile */
+  .detail-kv {
+    grid-template-columns: max-content 1fr;
+  }
+
+  /* Mobile: items 3-4 now start a new row — restore top border; keep it off items 1-2 */
+  .detail-kv dt:nth-child(-n+4),
+  .detail-kv dd:nth-child(-n+4) {
+    border-top: 1px solid var(--border);
+  }
+  .detail-kv dt:nth-child(-n+2),
+  .detail-kv dd:nth-child(-n+2) {
+    border-top: none;
+  }
 
   /* Make the close/back button easier to tap */
   .detail-close-btn { padding: 6px 10px; }

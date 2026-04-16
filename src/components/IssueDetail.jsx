@@ -212,12 +212,36 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
           <span className="detail-type">{issue.issue_type}</span>
         )}
         {issue.assignee && (
-          <span className="detail-assignee"><User size={12} strokeWidth={1.75} /> {issue.assignee}</span>
-        )}
-        {issue.created_at && (
-          <span className="detail-date">Created {formatDate(issue.created_at)}</span>
+          <span className="detail-assignee">
+            <User size={12} strokeWidth={1.75} /> {issue.assignee}
+          </span>
         )}
       </div>
+
+      {((issue.estimated_minutes != null && issue.estimated_minutes > 0) || issue.due_at || issue.created_at) && (
+        <div className="detail-kv-wrap">
+          <dl className="detail-kv">
+            {issue.estimated_minutes != null && issue.estimated_minutes > 0 && (
+              <>
+                <dt>Estimate</dt>
+                <dd>{issue.estimated_minutes} min</dd>
+              </>
+            )}
+            {issue.due_at && (
+              <>
+                <dt>Due</dt>
+                <dd>{formatDate(issue.due_at)}</dd>
+              </>
+            )}
+            {issue.created_at && (
+              <>
+                <dt>Created</dt>
+                <dd>{formatDate(issue.created_at)}</dd>
+              </>
+            )}
+          </dl>
+        </div>
+      )}
 
       {/* Labels */}
       {((issue.labels?.length > 0) || canClose) && (

@@ -12,6 +12,22 @@ const PRIORITIES = [
   { value: 4, label: 'P4', cls: 'p4' },
 ]
 
+function formatDueInitial(dueAt) {
+  if (!dueAt) return ''
+  const d = new Date(dueAt)
+  if (Number.isNaN(d.getTime())) return ''
+  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+function parseEstimateField(str) {
+  const t = str.trim()
+  if (!t) return { ok: true, value: null }
+  if (!/^\d+$/.test(t)) return { ok: false }
+  const n = parseInt(t, 10)
+  if (n < 0) return { ok: false }
+  return { ok: true, value: n }
+}
+
 export default function IssueModal({ issue, onClose, onSaved }) {
   const isEdit = !!issue
   const titleRef = useRef(null)
@@ -22,6 +38,11 @@ export default function IssueModal({ issue, onClose, onSaved }) {
     type:        issue?.issue_type  ?? 'task',
     priority:    issue?.priority    ?? 2,
     assignee:    issue?.assignee    ?? '',
+    estimate:
+      issue?.estimated_minutes != null && issue.estimated_minutes > 0
+        ? String(issue.estimated_minutes)
+        : '',
+    due:         isEdit ? formatDueInitial(issue?.due_at) : '',
   })
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -44,6 +65,13 @@ export default function IssueModal({ issue, onClose, onSaved }) {
     setSaving(true)
     setError(null)
     try {
+      const est = parseEstimateField(form.estimate)
+      if (!est.ok) {
+        setError('Estimate must be a non-negative whole number (minutes)')
+        setSaving(false)
+        return
+      }
+
       const data = {
         title:       form.title.trim(),
         description: form.description.trim() || undefined,
@@ -51,6 +79,28 @@ export default function IssueModal({ issue, onClose, onSaved }) {
         priority:    form.priority,
         assignee:    form.assignee.trim() || undefined,
       }
+
+      const initialDue = isEdit ? formatDueInitial(issue?.due_at) : ''
+      const dueTrim = form.due.trim()
+
+      if (isEdit) {
+        const prevEst = issue.estimated_minutes
+        if (est.value === null) {
+          if (prevEst != null && prevEst > 0) data.estimate = null
+        } else if (prevEst !== est.value) {
+          data.estimate = est.value
+        }
+
+        if (!dueTrim) {
+          if (issue?.due_at) data.due = null
+        } else if (dueTrim !== initialDue) {
+          data.due = dueTrim
+        }
+      } else {
+        if (est.value !== null) data.estimate = est.value
+        if (dueTrim) data.due = dueTrim
+      }
+
       const saved = isEdit
         ? await updateIssue(issue.id, data)
         : await createIssue(data)
@@ -136,6 +186,32 @@ export default function IssueModal({ issue, onClose, onSaved }) {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="field-row">
+            <label className="field field-half">
+              <span className="field-label">Estimate (minutes)</span>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                className="field-input"
+                placeholder="Optional"
+                value={form.estimate}
+                onChange={e => set('estimate', e.target.value)}
+              />
+            </label>
+            <label className="field field-half">
+              <span className="field-label">Due</span>
+              <input
+                type="text"
+                className="field-input"
+                placeholder="+1d, next monday, 2026-04-15"
+                value={form.due}
+                onChange={e => set('due', e.target.value)}
+                autoComplete="off"
+              />
+            </label>
           </div>
 
           <div className="modal-footer">

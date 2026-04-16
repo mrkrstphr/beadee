@@ -32,6 +32,14 @@ export async function action({ request, params }) {
     if (body.status)                 args.push(`--status=${body.status}`)
     if (body.assignee)               args.push(`--assignee=${body.assignee}`)
     if (body.priority !== undefined) args.push(`--priority=${body.priority}`)
+    if (body.estimate !== undefined) {
+      if (body.estimate === null) args.push('--estimate=0')
+      else args.push(`--estimate=${body.estimate}`)
+    }
+    if (body.due !== undefined) {
+      if (body.due === null || body.due === '') args.push('--due=')
+      else args.push(`--due=${body.due}`)
+    }
   }
 
   const result = await bdRun(args, process.cwd())

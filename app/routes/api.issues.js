@@ -32,7 +32,7 @@ export async function action({ request }) {
   }
 
   const body = await request.json().catch(() => ({}))
-  const { title, description, type = 'task', priority = 2 } = body
+  const { title, description, type = 'task', priority = 2, estimate, due } = body
 
   if (!title) return Response.json({ error: 'title is required' }, { status: 400 })
 
@@ -43,6 +43,11 @@ export async function action({ request }) {
     `--priority=${priority}`,
   ]
   if (description) args.push(`--description=${description}`)
+  if (estimate !== undefined && estimate !== null && estimate !== '') {
+    const n = Number(estimate)
+    if (!Number.isNaN(n) && n >= 0) args.push(`--estimate=${Math.floor(n)}`)
+  }
+  if (due && String(due).trim()) args.push(`--due=${String(due).trim()}`)
 
   const result = await bdRun(args, process.cwd())
   suppressWatch(); broadcast()
