@@ -950,6 +950,75 @@ input::placeholder, textarea::placeholder {
   white-space: nowrap;
 }
 
+/* Labels */
+.label-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.label-chip {
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 500;
+  gap: 4px;
+  padding: 2px 8px 2px 10px;
+}
+
+.label-chip-remove {
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.1s;
+}
+
+.label-chip-remove:hover {
+  color: var(--danger);
+}
+
+.label-add-trigger {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 10px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.label-add-trigger:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.label-chip-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 11px;
+  outline: none;
+  padding: 2px 10px;
+  width: 100px;
+}
+
+.label-chip-input::placeholder {
+  color: var(--text-muted);
+}
+
 /* Action buttons */
 .detail-actions-bottom { }
 
