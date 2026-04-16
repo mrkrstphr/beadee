@@ -4,6 +4,7 @@ import { useIssue, updateIssue, closeIssue } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
 import CommentThread from './CommentThread.jsx'
+import MarkdownContent from './MarkdownContent.jsx'
 import StatusIcon from './StatusIcon.jsx'
 
 const PRIORITY_LABEL = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' }
@@ -194,7 +195,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
       {issue.description && (
         <div className="detail-section">
           <div className="detail-section-label">Description</div>
-          <div className="detail-description">{issue.description}</div>
+          <MarkdownContent text={issue.description} className="detail-description" />
         </div>
       )}
 
@@ -202,7 +203,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
       {issue.notes && (
         <div className="detail-section">
           <div className="detail-section-label">Notes</div>
-          <div className="detail-description">{issue.notes}</div>
+          <MarkdownContent text={issue.notes} className="detail-description" />
         </div>
       )}
 
@@ -210,7 +211,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
       {issue.design && (
         <div className="detail-section">
           <div className="detail-section-label">Design</div>
-          <div className="detail-description">{issue.design}</div>
+          <MarkdownContent text={issue.design} className="detail-description" />
         </div>
       )}
 

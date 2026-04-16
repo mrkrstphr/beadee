@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useComments } from '../hooks/useComments.js'
+import MarkdownContent from './MarkdownContent.jsx'
 
 function timeAgo(iso) {
   const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -24,7 +25,7 @@ function Comment({ comment }) {
           {timeAgo(comment.created_at)}
         </span>
       </div>
-      <div className="comment-text">{comment.text}</div>
+      <MarkdownContent text={comment.text} className="comment-text" />
     </div>
   )
 }
