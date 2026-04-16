@@ -1,6 +1,6 @@
 {
   "name": "@mrkrstphr/beadee",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Web GUI for the beads issue tracker",
   "type": "module",
   "bin": {
