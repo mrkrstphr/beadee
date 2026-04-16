@@ -129,7 +129,7 @@ function CopyIdButton({ id }) {
   )
 }
 
-export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, onRefresh }) {
+export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit }) {
   const { issue, loading, error } = useIssue(issueId)
   const [closing, setClosing] = useState(false)
   const [closeReason, setCloseReason] = useState('')
@@ -139,7 +139,6 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
     setActionPending(true)
     try {
       await fn()
-      onRefresh?.()
       if (successMsg) toast(successMsg, 'success')
     } catch (err) {
       toast(err.message, 'error')
