@@ -8,27 +8,25 @@
   },
   "files": [
     "bin/",
-    "dist/",
+    "build/",
     "server/"
   ],
   "scripts": {
-    "dev": "concurrently \"node bin/beadee.js --port 3001 --dev\" \"vite\"",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "react-router dev",
+    "build": "react-router build",
     "start": "node bin/beadee.js"
   },
   "dependencies": {
-    "@fastify/cors": "^9.0.1",
-    "@fastify/static": "^7.0.4",
-    "fastify": "^4.28.1",
-    "open": "^10.1.0"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "concurrently": "^9.1.0",
-    "lucide-react": "^1.8.0",
+    "@react-router/node": "^7.14.1",
+    "isbot": "^5",
+    "open": "^10.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router": "^7.14.1"
+  },
+  "devDependencies": {
+    "@react-router/dev": "^7.14.1",
+    "lucide-react": "^1.8.0",
     "vite": "^5.4.8"
   },
   "engines": {
