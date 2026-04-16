@@ -4,7 +4,7 @@ import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { createRequestHandler } from '@react-router/node'
+import { createRequestListener } from '@react-router/node'
 import openUrl from 'open'
 import { bdCheck } from './bd.js'
 
@@ -65,7 +65,7 @@ export async function startServer({ port = 0, host = '127.0.0.1', open = false }
   await bdCheck(cwd)
 
   const build = await import(join(buildDir, 'server/index.js'))
-  const handler = createRequestHandler(build, 'production')
+  const handler = createRequestListener({ build, mode: 'production' })
 
   const server = createHttpServer(async (req, res) => {
     // Serve fingerprinted assets directly — RR7 handler doesn't know about them
