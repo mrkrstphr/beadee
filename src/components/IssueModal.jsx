@@ -55,7 +55,7 @@ export default function IssueModal({ issue, onClose, onSaved }) {
         ? await updateIssue(issue.id, data)
         : await createIssue(data)
       toast(isEdit ? 'Issue updated' : 'Issue created', 'success')
-      onSaved?.(saved)
+      onSaved?.(saved, { created: !isEdit })
       onClose()
     } catch (err) {
       setError(err.message)
