@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Check, Copy, Settings, User, X } from 'lucide-react'
-import { useIssue, updateIssue, closeIssue } from '../hooks/useIssues.js'
+import { useIssue, updateIssue, closeIssue, addLabel, removeLabel, useLabels } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
 import CommentThread from './CommentThread.jsx'
@@ -21,6 +21,90 @@ function DepChip({ dep, onSelect }) {
       <span className="dep-chip-id">{dep.id}</span>
       <span className="dep-chip-title">{dep.title}</span>
     </button>
+  )
+}
+
+function LabelChip({ label, onRemove }) {
+  return (
+    <span className="label-chip">
+      {label}
+      {onRemove && (
+        <button className="label-chip-remove" onClick={() => onRemove(label)} title={`Remove ${label}`}>
+          <X size={10} strokeWidth={2.5} />
+        </button>
+      )}
+    </span>
+  )
+}
+
+function LabelAddTrigger({ issueId }) {
+  const allLabels = useLabels()
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState('')
+  const [busy, setBusy] = useState(false)
+  const inputRef = useRef(null)
+  const listId = `label-suggestions-${issueId}`
+
+  function open() {
+    setEditing(true)
+    setTimeout(() => inputRef.current?.focus(), 0)
+  }
+
+  async function commit() {
+    const trimmed = value.trim()
+    if (!trimmed || busy) { close(); return }
+    setBusy(true)
+    try {
+      await addLabel(issueId, trimmed)
+      // SSE broadcast triggers useIssue to refetch
+    } catch (err) {
+      // SSE will update anyway
+    } finally {
+      setBusy(false)
+      close()
+    }
+  }
+
+  function close() {
+    setEditing(false)
+    setValue('')
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') { e.preventDefault(); commit() }
+    if (e.key === 'Escape') { e.preventDefault(); close() }
+  }
+
+  function handleBlur() {
+    // Small delay so datalist selection isn't treated as a blur
+    setTimeout(() => { if (!value.trim()) close() }, 150)
+  }
+
+  if (!editing) {
+    return (
+      <button className="label-add-trigger" onClick={open}>+ Add label</button>
+    )
+  }
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        className="label-chip-input"
+        list={listId}
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        placeholder="label…"
+        disabled={busy}
+      />
+      <datalist id={listId}>
+        {allLabels.map(({ label }) => (
+          <option key={label} value={label} />
+        ))}
+      </datalist>
+    </>
   )
 }
 
@@ -135,6 +219,23 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
           <span className="detail-date">Created {formatDate(issue.created_at)}</span>
         )}
       </div>
+
+      {/* Labels */}
+      {((issue.labels?.length > 0) || canClose) && (
+        <div className="detail-section">
+          <div className="detail-section-label">Labels</div>
+          <div className="label-chips">
+            {(issue.labels ?? []).map(label => (
+              <LabelChip
+                key={label}
+                label={label}
+                onRemove={canClose ? () => handleAction(() => removeLabel(issueId, label), null) : null}
+              />
+            ))}
+            {canClose && <LabelAddTrigger issueId={issueId} />}
+          </div>
+        </div>
+      )}
 
       {/* Action buttons */}
       {canClose && (
