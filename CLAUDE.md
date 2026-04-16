@@ -51,6 +51,14 @@ bd close <id>         # Complete work
 
 ---
 
+## Shell commands
+
+Always use non-interactive flags — some systems alias `cp`/`mv`/`rm` with `-i`:
+
+```bash
+cp -f src dst      rm -f file      rm -rf dir      cp -rf src dst
+```
+
 ## Commands
 
 ```bash
