@@ -3,6 +3,7 @@ build/
 .env*
 *.local
 
+.claude/settings.local.json
 .react-router
 
 # Beads / Dolt files (added by bd init)
