@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { Inbox } from 'lucide-react'
+import { Inbox, ChevronRight } from 'lucide-react'
 import { useIssues } from '../hooks/useIssues.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
 import { useLocalStorageState } from '../hooks/useLocalStorageState.js'
@@ -38,10 +38,10 @@ const TYPE_SHORT = {
 
 const PRIORITY_LABEL = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' }
 
-function IssueRow({ issue, selected, onClick }) {
+function IssueRow({ issue, selected, onClick, indent }) {
   return (
     <button
-      className={`issue-row ${selected ? 'selected' : ''} status-${issue.status}`}
+      className={`issue-row ${selected ? 'selected' : ''} status-${issue.status}${indent ? ' issue-row-indented' : ''}`}
       onClick={onClick}
     >
       <StatusIcon status={issue.status} />
@@ -76,10 +76,37 @@ function SkeletonRow() {
   )
 }
 
+function EpicGroupHeader({ epic, collapsed, onToggle, onSelect, selected }) {
+  return (
+    <div className={`epic-group-header ${selected ? 'selected' : ''}`}>
+      <button
+        className="epic-chevron-btn"
+        onClick={e => { e.stopPropagation(); onToggle() }}
+        aria-label={collapsed ? 'Expand' : 'Collapse'}
+      >
+        <ChevronRight
+          size={12}
+          className={`epic-chevron ${collapsed ? '' : 'expanded'}`}
+        />
+      </button>
+      <button className="epic-group-body" onClick={onSelect}>
+        <StatusIcon status={epic.status} />
+        <span className="badge-type type-epic">EPIC</span>
+        <span className="epic-group-title">{epic.title}</span>
+        <span className={`priority-badge p${epic.priority ?? 2}`}>
+          {PRIORITY_LABEL[epic.priority] ?? 'P2'}
+        </span>
+      </button>
+    </div>
+  )
+}
+
 export default function ListView({ search, selectedIssueId, onSelectIssue, DetailPanel, onRefreshed }) {
   const [statusFilter, setStatusFilter] = useLocalStorageState('beadee-status-filter', '')
   const [typeFilter, setTypeFilter] = useLocalStorageState('beadee-type-filter', '')
   const [hideClosed, setHideClosed] = useLocalStorageState('beadee-hide-closed', true)
+  const [groupByEpic, setGroupByEpic] = useLocalStorageState('beadee-group-by-epic', false)
+  const [collapsedEpics, setCollapsedEpics] = useState(() => new Set())
 
   const { issues, loading, error } = useIssues({
     status: statusFilter,
@@ -92,23 +119,61 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
     return issues.filter(i => i.status !== 'closed')
   }, [issues, hideClosed, statusFilter])
 
+  const epicGroups = useMemo(() => {
+    if (!groupByEpic) return null
+    const epics = displayedIssues.filter(i => i.issue_type === 'epic')
+    const byParent = {}
+    for (const issue of displayedIssues) {
+      if (issue.parent) {
+        if (!byParent[issue.parent]) byParent[issue.parent] = []
+        byParent[issue.parent].push(issue)
+      }
+    }
+    const epicIds = new Set(epics.map(e => e.id))
+    const orphans = displayedIssues.filter(i => !epicIds.has(i.id) && !i.parent)
+    return { epics, byParent, orphans }
+  }, [displayedIssues, groupByEpic])
+
+  const visibleIssues = useMemo(() => {
+    if (!epicGroups) return displayedIssues
+    const result = []
+    for (const epic of epicGroups.epics) {
+      result.push(epic)
+      if (!collapsedEpics.has(epic.id)) {
+        const children = epicGroups.byParent[epic.id] ?? []
+        result.push(...children)
+      }
+    }
+    result.push(...epicGroups.orphans)
+    return result
+  }, [epicGroups, collapsedEpics, displayedIssues])
+
+  const toggleEpic = useCallback((epicId) => {
+    setCollapsedEpics(prev => {
+      const next = new Set(prev)
+      if (next.has(epicId)) next.delete(epicId)
+      else next.add(epicId)
+      return next
+    })
+  }, [])
+
   const selectedIdx = useMemo(
-    () => displayedIssues.findIndex(i => i.id === selectedIssueId),
-    [displayedIssues, selectedIssueId]
+    () => visibleIssues.findIndex(i => i.id === selectedIssueId),
+    [visibleIssues, selectedIssueId]
   )
 
   const navigate = useCallback((dir) => {
-    if (!displayedIssues.length) return
+    if (!visibleIssues.length) return
     const next = selectedIdx === -1
-      ? (dir > 0 ? 0 : displayedIssues.length - 1)
-      : Math.max(0, Math.min(displayedIssues.length - 1, selectedIdx + dir))
-    onSelectIssue(displayedIssues[next].id)
-  }, [displayedIssues, selectedIdx, onSelectIssue])
+      ? (dir > 0 ? 0 : visibleIssues.length - 1)
+      : Math.max(0, Math.min(visibleIssues.length - 1, selectedIdx + dir))
+    onSelectIssue(visibleIssues[next].id)
+  }, [visibleIssues, selectedIdx, onSelectIssue])
 
   useKeyboard({
     j:      () => navigate(1),
     k:      () => navigate(-1),
-    Enter:  () => { if (selectedIdx !== -1) onSelectIssue(displayedIssues[selectedIdx].id) },
+    Enter:  () => { if (selectedIdx !== -1) onSelectIssue(visibleIssues[selectedIdx].id) },
   })
 
   return (
@@ -144,6 +209,13 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
             >
               Hide closed
             </button>
+            <button
+              className={`pill ${groupByEpic ? 'active' : ''}`}
+              onClick={() => setGroupByEpic(v => !v)}
+              title={groupByEpic ? 'Grouped by epic — click to ungroup' : 'Click to group by epic'}
+            >
+              By epic
+            </button>
             <span className="issue-count">
               {loading ? '…' : `${displayedIssues.length} issue${displayedIssues.length !== 1 ? 's' : ''}`}
             </span>
@@ -160,14 +232,49 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
                 : 'No issues yet'}
             </div>
           )}
-          {displayedIssues.map(issue => (
-            <IssueRow
-              key={issue.id}
-              issue={issue}
-              selected={issue.id === selectedIssueId}
-              onClick={() => onSelectIssue(issue.id === selectedIssueId ? null : issue.id)}
-            />
-          ))}
+          {epicGroups
+            ? epicGroups.epics.map(epic => (
+                <div key={epic.id} className="epic-group">
+                  <EpicGroupHeader
+                    epic={epic}
+                    collapsed={collapsedEpics.has(epic.id)}
+                    onToggle={() => toggleEpic(epic.id)}
+                    onSelect={() => onSelectIssue(epic.id === selectedIssueId ? null : epic.id)}
+                    selected={epic.id === selectedIssueId}
+                  />
+                  {!collapsedEpics.has(epic.id) && (epicGroups.byParent[epic.id] ?? []).map(issue => (
+                    <IssueRow
+                      key={issue.id}
+                      issue={issue}
+                      selected={issue.id === selectedIssueId}
+                      onClick={() => onSelectIssue(issue.id === selectedIssueId ? null : issue.id)}
+                      indent
+                    />
+                  ))}
+                </div>
+              )).concat(
+                epicGroups.orphans.length > 0
+                  ? [<div key="__orphans__" className="epic-group epic-group-orphans">
+                      {epicGroups.orphans.map(issue => (
+                        <IssueRow
+                          key={issue.id}
+                          issue={issue}
+                          selected={issue.id === selectedIssueId}
+                          onClick={() => onSelectIssue(issue.id === selectedIssueId ? null : issue.id)}
+                        />
+                      ))}
+                    </div>]
+                  : []
+              )
+            : displayedIssues.map(issue => (
+                <IssueRow
+                  key={issue.id}
+                  issue={issue}
+                  selected={issue.id === selectedIssueId}
+                  onClick={() => onSelectIssue(issue.id === selectedIssueId ? null : issue.id)}
+                />
+              ))
+          }
         </div>
       </div>
 
