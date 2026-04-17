@@ -2,12 +2,12 @@
 
 ![beadee](banner.png)
 
-A web GUI for the [beads](https://github.com/mrkrstphr/beads) issue tracker.
+A web GUI for the [beads](https://github.com/gastownhall/beads) issue tracker.
 
 ## Requirements
 
 - Node.js 18+
-- [beads (`bd`)](https://github.com/mrkrstphr/beads) installed and in your `PATH`
+- `bd`installed and in your `PATH`
 
 ## Installation
 
