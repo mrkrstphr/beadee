@@ -22,4 +22,5 @@ export default [
   route('api/labels',                  'routes/api.labels.js'),
   route('api/ready',                   'routes/api.ready.js'),
   route('api/stats',                   'routes/api.stats.js'),
+  route('api/update',                  'routes/api.update.js'),
 ]
