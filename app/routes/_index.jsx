@@ -1,5 +1,9 @@
-import App from '../../src/App.jsx'
+import { redirect } from 'react-router'
+
+export function loader() {
+  return redirect('/list')
+}
 
 export default function Index() {
-  return <App />
+  return null
 }

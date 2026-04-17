@@ -1,17 +1,15 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
-import Header from './components/Header.jsx'
-import IssueDetail from './components/IssueDetail.jsx'
-import IssueModal from './components/IssueModal.jsx'
-import ErrorScreen from './components/ErrorScreen.jsx'
-import ToastContainer from './components/ToastContainer.jsx'
-import ShortcutsHelp from './components/ShortcutsHelp.jsx'
-import Footer from './components/Footer.jsx'
-import ListView from './views/ListView.jsx'
-import KanbanView from './views/KanbanView.jsx'
-import SettingsView from './views/SettingsView.jsx'
-import { useHealth } from './hooks/useIssues.js'
-import { useToastProvider } from './hooks/useToast.js'
-import { useKeyboard } from './hooks/useKeyboard.js'
+import { useState, useCallback } from 'react'
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router'
+import Header from '../../src/components/Header.jsx'
+import IssueDetail from '../../src/components/IssueDetail.jsx'
+import IssueModal from '../../src/components/IssueModal.jsx'
+import ErrorScreen from '../../src/components/ErrorScreen.jsx'
+import ToastContainer from '../../src/components/ToastContainer.jsx'
+import ShortcutsHelp from '../../src/components/ShortcutsHelp.jsx'
+import Footer from '../../src/components/Footer.jsx'
+import { useHealth } from '../../src/hooks/useIssues.js'
+import { useToastProvider } from '../../src/hooks/useToast.js'
+import { useKeyboard } from '../../src/hooks/useKeyboard.js'
 
 function setTheme(theme) {
   localStorage.setItem('beadee-theme', theme)
@@ -23,14 +21,14 @@ function setTheme(theme) {
   }
 }
 
-export default function App() {
+export default function Layout() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { id } = useParams()
+
   const [theme, setThemeState] = useState(
     () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-theme') : null) || 'dark'
   )
-  // Always start with 'list' so SSR and client initial renders match,
-  // then restore the persisted tab after hydration.
-  const [activeTab, setActiveTab] = useState('list')
-  const [selectedIssueId, setSelectedIssueId] = useState(null)
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingIssue, setEditingIssue] = useState(null)
@@ -38,31 +36,25 @@ export default function App() {
   const [detailKey, setDetailKey] = useState(0)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [polling, setPolling] = useState(false)
-  const searchRef = useRef(null)
 
   const { health, error: healthError } = useHealth()
   const { toasts, dismiss } = useToastProvider()
 
-  const handleRefresh  = useCallback(() => setDetailKey(k => k + 1), [])
+  // Derive active tab from pathname
+  const activeTab = location.pathname.startsWith('/kanban') ? 'kanban'
+    : location.pathname.startsWith('/settings') ? 'settings'
+    : 'list'
+
+  const handleRefresh = useCallback(() => setDetailKey(k => k + 1), [])
   const handleRefreshed = useCallback((date) => { setLastUpdated(date); setPolling(false) }, [])
 
-  useEffect(() => {
-    const stored = localStorage.getItem('beadee-tab')
-    if (stored && stored !== 'list') setActiveTab(stored)
-  }, [])
-
   function switchTab(tab) {
-    setActiveTab(tab)
-    setSelectedIssueId(null)
-    localStorage.setItem('beadee-tab', tab)
+    navigate(`/${tab}`)
   }
 
   function showIssueDetail(issueId) {
-    setSelectedIssueId(issueId)
-    if (activeTab === 'settings') {
-      setActiveTab('list')
-      localStorage.setItem('beadee-tab', 'list')
-    }
+    const view = activeTab === 'settings' ? 'list' : activeTab
+    navigate(`/${view}/${issueId}`)
   }
 
   function handleThemeChange(t) {
@@ -77,14 +69,16 @@ export default function App() {
 
   function handleModalSaved(saved, { created } = {}) {
     handleRefresh()
-    if (created && saved?.id) showIssueDetail(saved.id)
+    if (created && saved?.id) {
+      const view = activeTab === 'settings' ? 'list' : activeTab
+      navigate(`/${view}/${saved.id}`)
+    }
     setShowModal(false)
     setEditingIssue(null)
   }
 
   const modalOpen = showModal || showShortcuts
 
-  // Global shortcuts — disabled when a modal is open
   useKeyboard({
     'n': () => { setEditingIssue(null); setShowModal(true) },
     '/': () => { const el = document.querySelector('.header-search'); el?.focus() },
@@ -94,8 +88,8 @@ export default function App() {
     '?': () => setShowShortcuts(true),
     's': () => switchTab('settings'),
     'Escape': () => {
-      if (activeTab === 'settings') switchTab('list')
-      else if (selectedIssueId) setSelectedIssueId(null)
+      if (activeTab === 'settings') navigate('/list')
+      else if (id) navigate(`/${activeTab}`)
     },
   }, !modalOpen)
 
@@ -104,11 +98,11 @@ export default function App() {
       key={`${issueId}-${detailKey}`}
       issueId={issueId}
       onClose={onClose}
-      onSelectIssue={setSelectedIssueId}
+      onSelectIssue={showIssueDetail}
       onEdit={openEdit}
       onRefresh={handleRefresh}
     />
-  ), [detailKey])
+  ), [detailKey, activeTab])
 
   if (healthError) return <ErrorScreen error={healthError} />
 
@@ -125,27 +119,7 @@ export default function App() {
       />
 
       <main className="main">
-        {activeTab === 'list' && (
-          <ListView
-            search={search}
-            selectedIssueId={selectedIssueId}
-            onSelectIssue={setSelectedIssueId}
-            DetailPanel={DetailPanel}
-            onRefreshed={handleRefreshed}
-          />
-        )}
-        {activeTab === 'kanban' && (
-          <KanbanView
-            search={search}
-            selectedIssueId={selectedIssueId}
-            onSelectIssue={setSelectedIssueId}
-            DetailPanel={DetailPanel}
-            onRefreshed={handleRefreshed}
-          />
-        )}
-        {activeTab === 'settings' && (
-          <SettingsView theme={theme} onThemeChange={handleThemeChange} />
-        )}
+        <Outlet context={{ search, DetailPanel, onRefreshed: handleRefreshed, onRefresh: handleRefresh, theme, onThemeChange: handleThemeChange }} />
       </main>
 
       <Footer onShowShortcuts={() => setShowShortcuts(true)} />

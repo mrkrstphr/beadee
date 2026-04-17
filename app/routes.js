@@ -1,7 +1,14 @@
-import { index, route } from '@react-router/dev/routes'
+import { index, route, layout } from '@react-router/dev/routes'
 
 export default [
-  index('routes/_index.jsx'),
+  layout('routes/_layout.jsx', [
+    index('routes/_index.jsx'),
+    route('list',       'routes/list.jsx'),
+    route('list/:id',   'routes/list.$id.jsx'),
+    route('kanban',     'routes/kanban.jsx'),
+    route('kanban/:id', 'routes/kanban.$id.jsx'),
+    route('settings',   'routes/settings.jsx'),
+  ]),
 
   route('api/events',                  'routes/api.events.js'),
   route('api/health',                  'routes/api.health.js'),
