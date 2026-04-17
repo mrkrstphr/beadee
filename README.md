@@ -1,5 +1,7 @@
 # beadee
 
+![beadee](banner.png)
+
 A web GUI for the [beads](https://github.com/mrkrstphr/beads) issue tracker.
 
 ## Requirements
