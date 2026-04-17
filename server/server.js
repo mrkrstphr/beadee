@@ -19,7 +19,6 @@ const MIME = {
   '.json': 'application/json',
   '.png':  'image/png',
   '.svg':  'image/svg+xml',
-  '.ico':  'image/x-icon',
   '.woff2':'font/woff2',
   '.woff': 'font/woff',
 }
@@ -69,7 +68,7 @@ export async function startServer({ port = 0, host = '127.0.0.1', open = false }
 
   const server = createHttpServer(async (req, res) => {
     // Serve fingerprinted assets directly — RR7 handler doesn't know about them
-    if (req.url?.startsWith('/assets/') || req.url === '/favicon.ico') {
+    if (req.url?.startsWith('/assets/') || req.url === '/favicon.svg') {
       if (await tryServeStatic(req, res)) return
     }
     await handler(req, res)
