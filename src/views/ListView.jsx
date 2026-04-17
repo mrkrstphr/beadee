@@ -4,6 +4,7 @@ import { useIssues } from '../hooks/useIssues.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
 import { useLocalStorageState } from '../hooks/useLocalStorageState.js'
 import StatusIcon from '../components/StatusIcon.jsx'
+import ResizableDivider from '../components/ResizableDivider.jsx'
 
 const STATUS_FILTERS = [
   { label: 'All',         value: '' },
@@ -107,6 +108,8 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
   const [hideClosed, setHideClosed] = useLocalStorageState('beadee-hide-closed', true)
   const [groupByEpic, setGroupByEpic] = useLocalStorageState('beadee-group-by-epic', false)
   const [collapsedEpics, setCollapsedEpics] = useState(() => new Set())
+  const [rawPanelWidth, setListPanelWidth] = useLocalStorageState('beadee-list-panel-width', 320)
+  const listPanelWidth = Number(rawPanelWidth) || 320
 
   const { issues, loading, error } = useIssues({
     status: statusFilter,
@@ -179,7 +182,7 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
   return (
     <div className={`list-view${selectedIssueId ? ' has-detail' : ''}`}>
       {/* ── Left panel ─────────────────────────────────────────── */}
-      <div className="list-panel">
+      <div className="list-panel" style={{ '--list-panel-width': `${listPanelWidth}px` }}>
         <div className="list-panel-toolbar">
           <div className="status-pills">
             {STATUS_FILTERS.map(f => (
@@ -277,6 +280,8 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
           }
         </div>
       </div>
+
+      <ResizableDivider currentWidth={listPanelWidth} onResize={setListPanelWidth} minWidth={200} />
 
       {/* ── Right panel ────────────────────────────────────────── */}
       <div className="detail-panel">
