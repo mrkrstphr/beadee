@@ -461,6 +461,75 @@ input::placeholder, textarea::placeholder {
 .badge-closed   { background: var(--badge-closed);  color: var(--badge-closed-text); }
 .badge-blocked  { background: var(--badge-blocked); color: var(--badge-blocked-text); }
 .badge-deferred { background: var(--bg-elevated);   color: var(--text-muted); }
+.badge-pinned   { background: var(--bg-elevated);   color: var(--text-muted); }
+.badge-hooked   { background: var(--bg-elevated);   color: var(--text-muted); }
+
+.status-dropdown-wrap {
+  display: inline-flex;
+  padding: 0;
+  position: relative;
+}
+
+.status-dropdown-trigger {
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  gap: 5px;
+  letter-spacing: inherit;
+  outline: none;
+  padding: 3px 6px;
+  text-transform: inherit;
+}
+
+.status-dropdown-trigger:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.status-dropdown-menu {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  min-width: max-content;
+  overflow: hidden;
+  padding: 4px;
+  position: absolute;
+  top: calc(100% + 4px);
+  z-index: 100;
+}
+
+.status-dropdown-option {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+  padding: 5px 8px;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+.status-dropdown-option:hover {
+  background: var(--bg-surface);
+}
+
+.status-dropdown-option.is-current {
+  color: var(--text-muted);
+}
 
 /* ============================================================
    PRIORITY DOTS

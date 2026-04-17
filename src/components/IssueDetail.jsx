@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { Check, Copy, Settings, User, X } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Check, Copy, ChevronDown, User, X } from 'lucide-react'
 import { useIssue, useChildren, updateIssue, closeIssue, addLabel, removeLabel, useLabels } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
@@ -8,6 +8,7 @@ import MarkdownContent from './MarkdownContent.jsx'
 import StatusIcon from './StatusIcon.jsx'
 
 const PRIORITY_LABEL = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' }
+const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed']
 
 function formatDate(iso) {
   if (!iso) return null
@@ -108,6 +109,48 @@ function LabelAddTrigger({ issueId }) {
   )
 }
 
+function StatusDropdown({ status, onChange, disabled }) {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e) {
+      if (!wrapRef.current?.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  return (
+    <span ref={wrapRef} className={`badge badge-${status} status-dropdown-wrap`}>
+      <button
+        className="status-dropdown-trigger"
+        onClick={() => !disabled && setOpen(o => !o)}
+        disabled={disabled}
+      >
+        <StatusIcon status={status} size={12} />
+        <span>{status.replace('_', ' ')}</span>
+        <ChevronDown size={10} strokeWidth={2} />
+      </button>
+      {open && (
+        <div className="status-dropdown-menu">
+          {ALL_STATUSES.map(s => (
+            <button
+              key={s}
+              className={`status-dropdown-option${s === status ? ' is-current' : ''}`}
+              onClick={() => { setOpen(false); onChange(s) }}
+            >
+              <StatusIcon status={s} size={11} />
+              {s.replace('_', ' ')}
+            </button>
+          ))}
+        </div>
+      )}
+    </span>
+  )
+}
+
 function CopyIdButton({ id }) {
   const [copied, setCopied] = useState(false)
 
@@ -132,7 +175,7 @@ function CopyIdButton({ id }) {
 export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit }) {
   const { issue, loading, error } = useIssue(issueId)
   const { children } = useChildren(issueId)
-  const [closing, setClosing] = useState(false)
+  const [pendingClose, setPendingClose] = useState(false)
   const [closeReason, setCloseReason] = useState('')
   const [actionPending, setActionPending] = useState(false)
 
@@ -148,27 +191,32 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
     }
   }
 
-  async function handleClose() {
-    if (!closing) { setClosing(true); return }
+  async function handleStatusChange(newStatus) {
+    if (newStatus === issue.status) return
+    if (newStatus === 'closed') {
+      setPendingClose(true)
+      return
+    }
+    await handleAction(() => updateIssue(issueId, { status: newStatus }), `Marked ${newStatus.replace('_', ' ')}`)
+  }
+
+  async function handleCloseConfirm() {
     await handleAction(
       () => closeIssue(issueId, closeReason || undefined),
       'Issue closed'
     )
-    setClosing(false)
+    setPendingClose(false)
     setCloseReason('')
   }
 
-  // Derive action availability from current issue status (safe before early returns)
-  const canClaim      = issue?.status === 'open'
-  const canInProgress = issue?.status === 'open' || issue?.status === 'blocked'
-  const canBlock      = issue?.status === 'in_progress' || issue?.status === 'open'
-  const canClose      = issue?.status !== 'closed'
+  const canClaim = issue?.status === 'open'
+  const canClose = issue?.status !== 'closed'
 
   useKeyboard({
-    c: () => canClaim  && !actionPending && handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed'),
+    c: () => canClaim && !actionPending && handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed'),
     e: () => issue && onEdit?.(issue),
-    x: () => canClose  && !closing && setClosing(true),
-  }, !!issue && !closing)
+    x: () => canClose && !pendingClose && setPendingClose(true),
+  }, !!issue && !pendingClose)
 
   if (loading) return <div className="detail-loading">Loading…</div>
   if (error)   return <div className="detail-error">Error: {error}</div>
@@ -187,6 +235,15 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
               <CopyIdButton id={issue.id} />
             </div>
           <div className="detail-actions-top">
+            {canClaim && (
+              <button
+                className="btn btn-secondary"
+                disabled={actionPending}
+                onClick={() => handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed')}
+              >
+                Claim
+              </button>
+            )}
             {onEdit && (
               <button className="btn btn-secondary" onClick={() => onEdit(issue)}>
                 Edit
@@ -200,10 +257,11 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
 
       {/* Meta row */}
       <div className="detail-meta">
-        <span className={`badge badge-${issue.status}`}>
-          <StatusIcon status={issue.status} size={12} />
-          {issue.status?.replace('_', ' ')}
-        </span>
+        <StatusDropdown
+          status={issue.status}
+          onChange={handleStatusChange}
+          disabled={actionPending}
+        />
         {issue.priority !== undefined && (
           <span className={`priority-badge p${issue.priority}`}>
             {PRIORITY_LABEL[issue.priority]}
@@ -261,58 +319,28 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
         </div>
       )}
 
-      {/* Action buttons */}
-      {canClose && (
+      {/* Close confirmation */}
+      {pendingClose && (
         <div className="detail-section detail-actions-bottom">
-          <div className="detail-btn-row">
-            {canClaim && (
-              <button
-                className="btn btn-secondary"
-                disabled={actionPending}
-                onClick={() => handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed')}
-              >
-                Claim
-              </button>
-            )}
-            {canInProgress && (
-              <button
-                className="btn btn-secondary"
-                disabled={actionPending}
-                onClick={() => handleAction(() => updateIssue(issueId, { status: 'in_progress' }), 'Marked in progress')}
-              >
-                Mark In Progress
-              </button>
-            )}
-            {canBlock && (
-              <button
-                className="btn btn-secondary"
-                disabled={actionPending}
-                onClick={() => handleAction(() => updateIssue(issueId, { status: 'blocked' }), 'Marked blocked')}
-              >
-                Mark Blocked
-              </button>
-            )}
-            <button
-              className="btn btn-danger"
-              disabled={actionPending}
-              onClick={handleClose}
-            >
-              {closing ? 'Confirm Close' : 'Close Issue'}
+          <div className="close-reason-row">
+            <input
+              autoFocus
+              className="close-reason-input"
+              placeholder="Close reason (optional)"
+              value={closeReason}
+              onChange={e => setCloseReason(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleCloseConfirm()
+                if (e.key === 'Escape') { setPendingClose(false); setCloseReason('') }
+              }}
+            />
+            <button className="btn btn-danger" disabled={actionPending} onClick={handleCloseConfirm}>
+              Close
+            </button>
+            <button className="btn btn-secondary" onClick={() => { setPendingClose(false); setCloseReason('') }}>
+              Cancel
             </button>
           </div>
-          {closing && (
-            <div className="close-reason-row">
-              <input
-                autoFocus
-                className="close-reason-input"
-                placeholder="Reason (optional)"
-                value={closeReason}
-                onChange={e => setCloseReason(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleClose(); if (e.key === 'Escape') setClosing(false) }}
-              />
-              <button className="btn btn-secondary" onClick={() => setClosing(false)}>Cancel</button>
-            </div>
-          )}
         </div>
       )}
 
