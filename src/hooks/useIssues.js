@@ -150,6 +150,36 @@ export function useIssue(id) {
   return { issue, loading, error }
 }
 
+// ── useChildren ──────────────────────────────────────────────────────────────
+
+export function useChildren(id) {
+  const [children, setChildren] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  const fetchChildren = useCallback(async () => {
+    if (!id) { setChildren([]); return }
+    try {
+      const data = await apiFetch(`/issues/${id}/children`)
+      setChildren(Array.isArray(data) ? data : [])
+    } catch {
+      setChildren([])
+    } finally {
+      setLoading(false)
+    }
+  }, [id])
+
+  useEffect(() => {
+    if (!id) { setChildren([]); return }
+    setLoading(true)
+    fetchChildren()
+    return subscribeTick(() => {
+      if (document.visibilityState === 'visible') fetchChildren()
+    })
+  }, [id, fetchChildren])
+
+  return { children, loading }
+}
+
 // ── useHealth ────────────────────────────────────────────────────────────────
 
 export function useHealth() {

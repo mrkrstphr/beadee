@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { Check, Copy, Settings, User, X } from 'lucide-react'
-import { useIssue, updateIssue, closeIssue, addLabel, removeLabel, useLabels } from '../hooks/useIssues.js'
+import { useIssue, useChildren, updateIssue, closeIssue, addLabel, removeLabel, useLabels } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
 import CommentThread from './CommentThread.jsx'
@@ -131,6 +131,7 @@ function CopyIdButton({ id }) {
 
 export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit }) {
   const { issue, loading, error } = useIssue(issueId)
+  const { children } = useChildren(issueId)
   const [closing, setClosing] = useState(false)
   const [closeReason, setCloseReason] = useState('')
   const [actionPending, setActionPending] = useState(false)
@@ -363,6 +364,18 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Children */}
+      {children.length > 0 && (
+        <div className="detail-section">
+          <div className="detail-section-label">Children</div>
+          <div className="dep-chips">
+            {children.map(child => (
+              <DepChip key={child.id} dep={child} onSelect={onSelectIssue ?? (() => {})} />
+            ))}
+          </div>
         </div>
       )}
 
