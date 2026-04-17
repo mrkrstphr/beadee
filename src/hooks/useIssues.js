@@ -185,14 +185,16 @@ export function useChildren(id) {
 export function useHealth() {
   const [health, setHealth] = useState(null)
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     apiFetch('/health')
       .then(data => { setHealth(data); setError(null) })
       .catch(err => setError(err.message))
+      .finally(() => setLoading(false))
   }, [])
 
-  return { health, error }
+  return { health, error, loading }
 }
 
 // ── Mutation helpers ─────────────────────────────────────────────────────────

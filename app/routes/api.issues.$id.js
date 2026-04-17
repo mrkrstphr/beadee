@@ -40,6 +40,9 @@ export async function action({ request, params }) {
       if (body.due === null || body.due === '') args.push('--due=')
       else args.push(`--due=${body.due}`)
     }
+    if (body.notes      !== undefined) args.push(`--notes=${body.notes}`)
+    if (body.design     !== undefined) args.push(`--design=${body.design}`)
+    if (body.acceptance !== undefined) args.push(`--acceptance=${body.acceptance}`)
   }
 
   const result = await bdRun(args, process.cwd())

@@ -1,12 +1,11 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { access } from 'node:fs/promises'
+import { access, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 const execFileAsync = promisify(execFile)
 
-// Embedded Dolt is single-writer; concurrent bd calls contend for the lock.
-// Retry up to this many times with exponential backoff before giving up.
+// Dolt server can still return transient lock errors; retry with backoff.
 const BD_LOCK_RETRIES = 4
 const BD_LOCK_RETRY_BASE_MS = 80
 
@@ -112,4 +111,27 @@ export async function bdCheck(cwd) {
   }
 
   return { bd: bdPath, beads: true }
+}
+
+/**
+ * Verify that beads is running in dolt server mode (not embedded).
+ * Throws BD_EMBEDDED_DOLT if metadata.json indicates embedded mode.
+ *
+ * @param {string} cwd - user's project directory
+ */
+export async function bdModeCheck(cwd) {
+  const metadataPath = join(cwd, '.beads', 'metadata.json')
+  try {
+    const raw = await readFile(metadataPath, 'utf8')
+    const metadata = JSON.parse(raw)
+    if (metadata.dolt_mode === 'embedded') {
+      throw Object.assign(
+        new Error('BD_EMBEDDED_DOLT'),
+        { code: 'BD_EMBEDDED_DOLT', cwd }
+      )
+    }
+  } catch (err) {
+    if (err.code === 'BD_EMBEDDED_DOLT') throw err
+    // metadata.json missing or unreadable — not our problem to catch here
+  }
 }

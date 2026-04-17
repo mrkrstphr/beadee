@@ -37,7 +37,7 @@ export default function Layout() {
   const [lastUpdated, setLastUpdated] = useState(null)
   const [polling, setPolling] = useState(false)
 
-  const { health, error: healthError } = useHealth()
+  const { health, error: healthError, loading: healthLoading } = useHealth()
   const { toasts, dismiss } = useToastProvider()
 
   // Derive active tab from pathname
@@ -104,6 +104,7 @@ export default function Layout() {
     />
   ), [detailKey, activeTab])
 
+  if (healthLoading) return null
   if (healthError) return <ErrorScreen error={healthError} />
 
   return (

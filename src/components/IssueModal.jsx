@@ -43,6 +43,9 @@ export default function IssueModal({ issue, onClose, onSaved }) {
         ? String(issue.estimated_minutes)
         : '',
     due:         isEdit ? formatDueInitial(issue?.due_at) : '',
+    notes:       issue?.notes              ?? '',
+    design:      issue?.design             ?? '',
+    acceptance:  issue?.acceptance_criteria ?? '',
   })
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -78,6 +81,9 @@ export default function IssueModal({ issue, onClose, onSaved }) {
         type:        form.type,
         priority:    form.priority,
         assignee:    form.assignee.trim() || undefined,
+        notes:       form.notes.trim()      || undefined,
+        design:      form.design.trim()     || undefined,
+        acceptance:  form.acceptance.trim() || undefined,
       }
 
       const initialDue = isEdit ? formatDueInitial(issue?.due_at) : ''
@@ -146,6 +152,39 @@ export default function IssueModal({ issue, onClose, onSaved }) {
               placeholder="Why this issue exists and what needs to be done"
               value={form.description}
               onChange={e => set('description', e.target.value)}
+            />
+          </label>
+
+          <label className="field">
+            <span className="field-label">Acceptance Criteria</span>
+            <textarea
+              className="field-input"
+              rows={3}
+              placeholder="Done when…"
+              value={form.acceptance}
+              onChange={e => set('acceptance', e.target.value)}
+            />
+          </label>
+
+          <label className="field">
+            <span className="field-label">Notes</span>
+            <textarea
+              className="field-input field-markdown"
+              rows={3}
+              placeholder="Supplementary context (markdown)"
+              value={form.notes}
+              onChange={e => set('notes', e.target.value)}
+            />
+          </label>
+
+          <label className="field">
+            <span className="field-label">Design</span>
+            <textarea
+              className="field-input field-markdown"
+              rows={3}
+              placeholder="Architecture decisions, rationale (markdown)"
+              value={form.design}
+              onChange={e => set('design', e.target.value)}
             />
           </label>
 

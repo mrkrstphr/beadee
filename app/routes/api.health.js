@@ -1,8 +1,16 @@
 import { basename } from 'node:path'
-import { bdCheck, bdVersion } from '../../server/bd.js'
+import { bdCheck, bdModeCheck, bdVersion } from '../../server/bd.js'
 
 export async function loader() {
   const cwd = process.cwd()
+  try {
+    await bdModeCheck(cwd)
+  } catch (err) {
+    if (err.code === 'BD_EMBEDDED_DOLT') {
+      return Response.json({ ok: false, error: 'BD_EMBEDDED_DOLT' }, { status: 503 })
+    }
+    throw err
+  }
   const [{ bd }, version] = await Promise.all([bdCheck(cwd), bdVersion()])
   return Response.json({ ok: true, projectName: basename(cwd), bdVersion: version, cwd, bd })
 }
