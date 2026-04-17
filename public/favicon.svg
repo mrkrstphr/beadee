@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <style>
+    .bead { fill: #000; }
+    .string { stroke: #000; }
+    @media (prefers-color-scheme: dark) {
+      .bead { fill: #fff; }
+      .string { stroke: #fff; }
+    }
+  </style>
+
+  <path class="string" d="M 6 22 Q 16 6 26 22" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+  <circle class="bead" cx="7" cy="21" r="4"/>
+  <circle class="bead" cx="16" cy="11" r="5"/>
+  <circle class="bead" cx="25" cy="21" r="4"/>
+</svg>
