@@ -1554,8 +1554,14 @@ textarea.field-input {
 }
 
 .footer-version {
-  color: var(--text-muted);
+  color: var(--accent);
   font-size: 11px;
+  text-decoration: none;
+}
+
+.footer-version:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 
 .footer-shortcuts-btn {
