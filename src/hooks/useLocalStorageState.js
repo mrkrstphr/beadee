@@ -8,7 +8,7 @@ export function useLocalStorageState(key, defaultValue) {
     try {
       const saved = localStorage.getItem(key)
       if (saved !== null) {
-        setState(saved)
+        setState(JSON.parse(saved))
       }
     } catch (e) {
       console.warn(`Error reading localStorage key "${key}":`, e)
@@ -19,7 +19,7 @@ export function useLocalStorageState(key, defaultValue) {
   useEffect(() => {
     if (isLoaded) {
       try {
-        localStorage.setItem(key, state)
+        localStorage.setItem(key, JSON.stringify(state))
       } catch (e) {
         console.warn(`Error writing localStorage key "${key}":`, e)
       }
