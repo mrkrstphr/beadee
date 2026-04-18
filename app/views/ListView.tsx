@@ -6,6 +6,7 @@ import { useLocalStorageState } from '../hooks/useLocalStorageState.js';
 import StatusIcon from '../components/StatusIcon.jsx';
 import ResizableDivider from '../components/ResizableDivider.jsx';
 import type { Issue } from '../types.js';
+import { PRIORITY_LABEL, TYPE_SHORT } from '../types.js';
 
 const STATUS_FILTERS = [
   { label: 'All', value: '' },
@@ -25,20 +26,6 @@ const TYPE_OPTIONS = [
   { label: 'Spike', value: 'spike' },
   { label: 'Story', value: 'story' },
 ];
-
-const TYPE_SHORT: Record<string, string> = {
-  bug: 'BUG',
-  feature: 'FEAT',
-  task: 'TASK',
-  chore: 'CHR',
-  epic: 'EPIC',
-  spike: 'SPK',
-  story: 'STR',
-  decision: 'DEC',
-  milestone: 'MS',
-};
-
-const PRIORITY_LABEL: Record<number, string> = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' };
 
 interface IssueRowProps {
   issue: Issue;

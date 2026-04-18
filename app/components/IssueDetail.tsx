@@ -18,8 +18,7 @@ import ConfirmDialog from './ConfirmDialog.jsx';
 import MarkdownContent from './MarkdownContent.jsx';
 import StatusIcon from './StatusIcon.jsx';
 import type { Issue, Dependency, LabelItem } from '../types.js';
-
-const PRIORITY_LABEL: Record<number, string> = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' };
+import { PRIORITY_LABEL } from '../types.js';
 const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed'];
 
 function formatDate(iso: string | null | undefined): string | null {
