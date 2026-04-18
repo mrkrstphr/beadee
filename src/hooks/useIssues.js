@@ -43,6 +43,19 @@ function subscribeTick(fn) {
   return () => sseSubscribers.delete(fn);
 }
 
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    if (sseInstance) {
+      sseInstance.close();
+      sseInstance = null;
+    }
+    clearInterval(fallbackInterval);
+    clearTimeout(sseReconnectTimer);
+    fallbackInterval = null;
+    sseReconnectTimer = null;
+  });
+}
+
 async function apiFetch(path, options = {}) {
   const res = await fetch(`${API}${path}`, {
     headers: { 'Content-Type': 'application/json' },
