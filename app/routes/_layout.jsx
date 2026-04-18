@@ -59,20 +59,23 @@ export default function Layout() {
     navigate(`/${tab}`);
   }
 
-  function showIssueDetail(issueId) {
-    const view = activeTab === 'settings' || activeTab === 'memories' ? 'list' : activeTab;
-    navigate(`/${view}/${issueId}`);
-  }
+  const showIssueDetail = useCallback(
+    (issueId) => {
+      const view = activeTab === 'settings' || activeTab === 'memories' ? 'list' : activeTab;
+      navigate(`/${view}/${issueId}`);
+    },
+    [activeTab, navigate],
+  );
 
   function handleThemeChange(t) {
     setThemeState(t);
     setTheme(t);
   }
 
-  function openEdit(issue) {
+  const openEdit = useCallback((issue) => {
     setEditingIssue(issue);
     setShowModal(true);
-  }
+  }, []);
 
   function handleModalSaved(saved, { created } = {}) {
     handleRefresh();
@@ -85,6 +88,10 @@ export default function Layout() {
   }
 
   const modalOpen = showModal || showShortcuts;
+
+  const handleDelete = useCallback(() => {
+    navigate(`/${activeTab}`);
+  }, [activeTab, navigate]);
 
   useKeyboard(
     {
@@ -110,10 +117,6 @@ export default function Layout() {
     !modalOpen,
   );
 
-  function handleDelete() {
-    navigate(`/${activeTab}`);
-  }
-
   const DetailPanel = useCallback(
     ({ issueId, onClose }) => (
       <IssueDetail
@@ -126,7 +129,7 @@ export default function Layout() {
         onRefresh={handleRefresh}
       />
     ),
-    [detailKey, activeTab],
+    [detailKey, showIssueDetail, openEdit, handleDelete, handleRefresh],
   );
 
   if (healthLoading) return null;
