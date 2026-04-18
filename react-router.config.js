@@ -4,4 +4,4 @@ export default {
   // API routes are resource routes that still run server-side.
   ssr: true,
   routes: './app/routes.js',
-}
+};

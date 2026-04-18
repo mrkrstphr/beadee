@@ -14,7 +14,9 @@
   "scripts": {
     "dev": "react-router dev",
     "build": "react-router build",
-    "start": "node bin/beadee.js"
+    "start": "node bin/beadee.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@react-router/node": "^7.14.1",
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "@react-router/dev": "^7.14.1",
+    "prettier": "^3.8.3",
     "vite": "^5.4.8"
   },
   "engines": {

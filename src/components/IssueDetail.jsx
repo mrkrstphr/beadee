@@ -1,20 +1,33 @@
-import { useState, useRef, useEffect } from 'react'
-import { Check, Copy, ChevronDown, User, X, Trash2 } from 'lucide-react'
-import { useIssue, useChildren, updateIssue, closeIssue, deleteIssue, addLabel, removeLabel, useLabels } from '../hooks/useIssues.js'
-import { toast } from '../hooks/useToast.js'
-import { useKeyboard } from '../hooks/useKeyboard.js'
-import CollapsibleSection from './CollapsibleSection.jsx'
-import CommentThread from './CommentThread.jsx'
-import ConfirmDialog from './ConfirmDialog.jsx'
-import MarkdownContent from './MarkdownContent.jsx'
-import StatusIcon from './StatusIcon.jsx'
+import { useState, useRef, useEffect } from 'react';
+import { Check, Copy, ChevronDown, User, X, Trash2 } from 'lucide-react';
+import {
+  useIssue,
+  useChildren,
+  updateIssue,
+  closeIssue,
+  deleteIssue,
+  addLabel,
+  removeLabel,
+  useLabels,
+} from '../hooks/useIssues.js';
+import { toast } from '../hooks/useToast.js';
+import { useKeyboard } from '../hooks/useKeyboard.js';
+import CollapsibleSection from './CollapsibleSection.jsx';
+import CommentThread from './CommentThread.jsx';
+import ConfirmDialog from './ConfirmDialog.jsx';
+import MarkdownContent from './MarkdownContent.jsx';
+import StatusIcon from './StatusIcon.jsx';
 
-const PRIORITY_LABEL = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' }
-const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed']
+const PRIORITY_LABEL = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' };
+const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed'];
 
 function formatDate(iso) {
-  if (!iso) return null
-  return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+  if (!iso) return null;
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 function DepChip({ dep, onSelect }) {
@@ -24,7 +37,7 @@ function DepChip({ dep, onSelect }) {
       <span className="dep-chip-id">{dep.id}</span>
       <span className="dep-chip-title">{dep.title}</span>
     </button>
-  )
+  );
 }
 
 function LabelChip({ label, onRemove }) {
@@ -32,61 +45,78 @@ function LabelChip({ label, onRemove }) {
     <span className="label-chip">
       {label}
       {onRemove && (
-        <button className="label-chip-remove" onClick={() => onRemove(label)} title={`Remove ${label}`}>
+        <button
+          className="label-chip-remove"
+          onClick={() => onRemove(label)}
+          title={`Remove ${label}`}
+        >
           <X size={10} strokeWidth={2.5} />
         </button>
       )}
     </span>
-  )
+  );
 }
 
 function LabelAddTrigger({ issueId }) {
-  const allLabels = useLabels()
-  const [editing, setEditing] = useState(false)
-  const [value, setValue] = useState('')
-  const [busy, setBusy] = useState(false)
-  const inputRef = useRef(null)
-  const listId = `label-suggestions-${issueId}`
+  const allLabels = useLabels();
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState('');
+  const [busy, setBusy] = useState(false);
+  const inputRef = useRef(null);
+  const listId = `label-suggestions-${issueId}`;
 
   function open() {
-    setEditing(true)
-    setTimeout(() => inputRef.current?.focus(), 0)
+    setEditing(true);
+    setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   async function commit() {
-    const trimmed = value.trim()
-    if (!trimmed || busy) { close(); return }
-    setBusy(true)
+    const trimmed = value.trim();
+    if (!trimmed || busy) {
+      close();
+      return;
+    }
+    setBusy(true);
     try {
-      await addLabel(issueId, trimmed)
+      await addLabel(issueId, trimmed);
       // SSE broadcast triggers useIssue to refetch
     } catch (err) {
       // SSE will update anyway
     } finally {
-      setBusy(false)
-      close()
+      setBusy(false);
+      close();
     }
   }
 
   function close() {
-    setEditing(false)
-    setValue('')
+    setEditing(false);
+    setValue('');
   }
 
   function handleKeyDown(e) {
-    if (e.key === 'Enter') { e.preventDefault(); commit() }
-    if (e.key === 'Escape') { e.preventDefault(); close() }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      commit();
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      close();
+    }
   }
 
   function handleBlur() {
     // Small delay so datalist selection isn't treated as a blur
-    setTimeout(() => { if (!value.trim()) close() }, 150)
+    setTimeout(() => {
+      if (!value.trim()) close();
+    }, 150);
   }
 
   if (!editing) {
     return (
-      <button className="label-add-trigger" onClick={open}>+ Add label</button>
-    )
+      <button className="label-add-trigger" onClick={open}>
+        + Add label
+      </button>
+    );
   }
 
   return (
@@ -96,7 +126,7 @@ function LabelAddTrigger({ issueId }) {
         className="label-chip-input"
         list={listId}
         value={value}
-        onChange={e => setValue(e.target.value)}
+        onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         placeholder="label…"
@@ -108,27 +138,27 @@ function LabelAddTrigger({ issueId }) {
         ))}
       </datalist>
     </>
-  )
+  );
 }
 
 function StatusDropdown({ status, onChange, disabled }) {
-  const [open, setOpen] = useState(false)
-  const wrapRef = useRef(null)
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     function handleClick(e) {
-      if (!wrapRef.current?.contains(e.target)) setOpen(false)
+      if (!wrapRef.current?.contains(e.target)) setOpen(false);
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [open])
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
 
   return (
     <span ref={wrapRef} className={`badge badge-${status} status-dropdown-wrap`}>
       <button
         className="status-dropdown-trigger"
-        onClick={() => !disabled && setOpen(o => !o)}
+        onClick={() => !disabled && setOpen((o) => !o)}
         disabled={disabled}
       >
         <StatusIcon status={status} size={12} />
@@ -137,11 +167,14 @@ function StatusDropdown({ status, onChange, disabled }) {
       </button>
       {open && (
         <div className="status-dropdown-menu">
-          {ALL_STATUSES.map(s => (
+          {ALL_STATUSES.map((s) => (
             <button
               key={s}
               className={`status-dropdown-option${s === status ? ' is-current' : ''}`}
-              onClick={() => { setOpen(false); onChange(s) }}
+              onClick={() => {
+                setOpen(false);
+                onChange(s);
+              }}
             >
               <StatusIcon status={s} size={11} />
               {s.replace('_', ' ')}
@@ -150,16 +183,16 @@ function StatusDropdown({ status, onChange, disabled }) {
         </div>
       )}
     </span>
-  )
+  );
 }
 
 function CopyIdButton({ id }) {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(id)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+    await navigator.clipboard.writeText(id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   }
 
   return (
@@ -171,300 +204,330 @@ function CopyIdButton({ id }) {
     >
       {copied ? <Check size={13} strokeWidth={2.5} /> : <Copy size={13} strokeWidth={1.75} />}
     </button>
-  )
+  );
 }
 
-
 export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, onDelete }) {
-  const { issue, loading, error } = useIssue(issueId)
-  const { children } = useChildren(issueId)
-  const { issue: parentIssue } = useIssue(issue?.parent ?? null)
-  const [pendingClose, setPendingClose] = useState(false)
-  const [closeReason, setCloseReason] = useState('')
-  const [actionPending, setActionPending] = useState(false)
-  const [editMenuOpen, setEditMenuOpen] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const editMenuRef = useRef(null)
+  const { issue, loading, error } = useIssue(issueId);
+  const { children } = useChildren(issueId);
+  const { issue: parentIssue } = useIssue(issue?.parent ?? null);
+  const [pendingClose, setPendingClose] = useState(false);
+  const [closeReason, setCloseReason] = useState('');
+  const [actionPending, setActionPending] = useState(false);
+  const [editMenuOpen, setEditMenuOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const editMenuRef = useRef(null);
 
   async function handleAction(fn, successMsg) {
-    setActionPending(true)
+    setActionPending(true);
     try {
-      await fn()
-      if (successMsg) toast(successMsg, 'success')
+      await fn();
+      if (successMsg) toast(successMsg, 'success');
     } catch (err) {
-      toast(err.message, 'error')
+      toast(err.message, 'error');
     } finally {
-      setActionPending(false)
+      setActionPending(false);
     }
   }
 
   async function handleStatusChange(newStatus) {
-    if (newStatus === issue.status) return
+    if (newStatus === issue.status) return;
     if (newStatus === 'closed') {
-      setPendingClose(true)
-      return
+      setPendingClose(true);
+      return;
     }
-    await handleAction(() => updateIssue(issueId, { status: newStatus }), `Marked ${newStatus.replace('_', ' ')}`)
+    await handleAction(
+      () => updateIssue(issueId, { status: newStatus }),
+      `Marked ${newStatus.replace('_', ' ')}`,
+    );
   }
 
   async function handleCloseConfirm() {
-    await handleAction(
-      () => closeIssue(issueId, closeReason || undefined),
-      'Issue closed'
-    )
-    setPendingClose(false)
-    setCloseReason('')
+    await handleAction(() => closeIssue(issueId, closeReason || undefined), 'Issue closed');
+    setPendingClose(false);
+    setCloseReason('');
   }
 
-  const canClaim = issue?.status === 'open'
-  const canClose = issue?.status !== 'closed'
+  const canClaim = issue?.status === 'open';
+  const canClose = issue?.status !== 'closed';
 
   useEffect(() => {
-    if (!editMenuOpen) return
+    if (!editMenuOpen) return;
     function handler(e) {
-      if (editMenuRef.current && !editMenuRef.current.contains(e.target)) setEditMenuOpen(false)
+      if (editMenuRef.current && !editMenuRef.current.contains(e.target)) setEditMenuOpen(false);
     }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [editMenuOpen])
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [editMenuOpen]);
 
   async function handleDelete() {
-    setConfirmDelete(false)
-    setEditMenuOpen(false)
+    setConfirmDelete(false);
+    setEditMenuOpen(false);
     await handleAction(async () => {
-      await deleteIssue(issueId)
-    }, 'Issue deleted')
-    onDelete?.()
+      await deleteIssue(issueId);
+    }, 'Issue deleted');
+    onDelete?.();
   }
 
-  useKeyboard({
-    c: () => canClaim && !actionPending && handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed'),
-    e: () => issue && onEdit?.(issue),
-    x: () => canClose && !pendingClose && setPendingClose(true),
-  }, !!issue && !pendingClose && !confirmDelete)
+  useKeyboard(
+    {
+      c: () =>
+        canClaim &&
+        !actionPending &&
+        handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed'),
+      e: () => issue && onEdit?.(issue),
+      x: () => canClose && !pendingClose && setPendingClose(true),
+    },
+    !!issue && !pendingClose && !confirmDelete,
+  );
 
-  if (loading) return <div className="detail-loading">Loading…</div>
-  if (error)   return <div className="detail-error">Error: {error}</div>
-  if (!issue)  return null
+  if (loading) return <div className="detail-loading">Loading…</div>;
+  if (error) return <div className="detail-error">Error: {error}</div>;
+  if (!issue) return null;
 
-  const blockedBy = issue.dependencies?.filter(d => d.dependency_type === 'blocks') ?? []
+  const blockedBy = issue.dependencies?.filter((d) => d.dependency_type === 'blocks') ?? [];
 
   return (
     <>
-    {confirmDelete && (
-      <ConfirmDialog
-        title="Delete Issue"
-        message={`Are you sure you want to delete ${issueId}? This cannot be undone.`}
-        confirmLabel="Delete"
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmDelete(false)}
-      />
-    )}
-    <div className="issue-detail">
-      {/* Header */}
-      <div className="detail-header">
-        <div className="detail-header-top">
-          <div className="detail-id-group">
-            {issue.parent && (
-              <>
-                <button
-                  className="detail-id detail-parent-link"
-                  onClick={() => onSelectIssue?.(issue.parent)}
-                  title="Parent issue"
-                >
-                  {issue.parent}
-                </button>
-                <span className="detail-id detail-breadcrumb-sep">/</span>
-              </>
-            )}
-            <span className="detail-id">{issue.id}</span>
-            <CopyIdButton id={issue.id} />
-          </div>
-          <div className="detail-actions-top">
-            {canClaim && (
-              <button
-                className="btn btn-secondary"
-                disabled={actionPending}
-                onClick={() => handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed')}
-              >
-                Claim
-              </button>
-            )}
-            {onEdit && (
-              <div className="btn-split" ref={editMenuRef}>
-                <button className="btn btn-secondary btn-split-main" onClick={() => onEdit(issue)}>
-                  Edit
-                </button>
-                <button
-                  className="btn btn-secondary btn-split-chevron"
-                  onClick={() => setEditMenuOpen(o => !o)}
-                  aria-label="More actions"
-                >
-                  <ChevronDown size={12} />
-                </button>
-                {editMenuOpen && (
-                  <div className="btn-split-menu">
-                    <button
-                      className="btn-split-menu-item btn-split-menu-danger"
-                      onClick={() => { setEditMenuOpen(false); setConfirmDelete(true) }}
-                    >
-                      <Trash2 size={13} /> Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-            <button className="btn btn-secondary detail-close-btn" onClick={onClose}><X size={14} /></button>
-          </div>
-        </div>
-        <h2 className="detail-title">{issue.title}</h2>
-      </div>
-
-      {/* Meta row */}
-      <div className="detail-meta">
-        <StatusDropdown
-          status={issue.status}
-          onChange={handleStatusChange}
-          disabled={actionPending}
+      {confirmDelete && (
+        <ConfirmDialog
+          title="Delete Issue"
+          message={`Are you sure you want to delete ${issueId}? This cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmDelete(false)}
         />
-        {issue.priority !== undefined && (
-          <span className={`priority-badge p${issue.priority}`}>
-            {PRIORITY_LABEL[issue.priority]}
-          </span>
-        )}
-        {issue.issue_type && (
-          <span className="detail-type">{issue.issue_type}</span>
-        )}
-        {issue.assignee && (
-          <span className="detail-assignee">
-            <User size={12} strokeWidth={1.75} /> {issue.assignee}
-          </span>
-        )}
-      </div>
-
-      {((issue.estimated_minutes != null && issue.estimated_minutes > 0) || issue.due_at || issue.created_at) && (
-        <div className="detail-kv-wrap">
-          <dl className="detail-kv">
-            {issue.estimated_minutes != null && issue.estimated_minutes > 0 && (
-              <>
-                <dt>Estimate</dt>
-                <dd>{issue.estimated_minutes} min</dd>
-              </>
-            )}
-            {issue.due_at && (
-              <>
-                <dt>Due</dt>
-                <dd>{formatDate(issue.due_at)}</dd>
-              </>
-            )}
-            {issue.created_at && (
-              <>
-                <dt>Created</dt>
-                <dd>{formatDate(issue.created_at)}</dd>
-              </>
-            )}
-          </dl>
-        </div>
       )}
-
-      {/* Labels */}
-      {((issue.labels?.length > 0) || canClose) && (
-        <CollapsibleSection name="Labels">
-          <div className="label-chips">
-            {(issue.labels ?? []).map(label => (
-              <LabelChip
-                key={label}
-                label={label}
-                onRemove={canClose ? () => handleAction(() => removeLabel(issueId, label), null) : null}
-              />
-            ))}
-            {canClose && <LabelAddTrigger issueId={issueId} />}
-          </div>
-        </CollapsibleSection>
-      )}
-
-      {/* Close confirmation */}
-      {pendingClose && (
-        <div className="detail-section detail-actions-bottom">
-          <div className="close-reason-row">
-            <input
-              autoFocus
-              className="close-reason-input"
-              placeholder="Close reason (optional)"
-              value={closeReason}
-              onChange={e => setCloseReason(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleCloseConfirm()
-                if (e.key === 'Escape') { setPendingClose(false); setCloseReason('') }
-              }}
-            />
-            <button className="btn btn-danger" disabled={actionPending} onClick={handleCloseConfirm}>
-              Close
-            </button>
-            <button className="btn btn-secondary" onClick={() => { setPendingClose(false); setCloseReason('') }}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Description */}
-      {issue.description && (
-        <CollapsibleSection name="Description">
-          <MarkdownContent text={issue.description} className="detail-description" />
-        </CollapsibleSection>
-      )}
-
-      {/* Notes */}
-      {issue.notes && (
-        <CollapsibleSection name="Notes">
-          <MarkdownContent text={issue.notes} className="detail-description" />
-        </CollapsibleSection>
-      )}
-
-      {/* Design */}
-      {issue.design && (
-        <CollapsibleSection name="Design">
-          <MarkdownContent text={issue.design} className="detail-description" />
-        </CollapsibleSection>
-      )}
-
-      {/* Dependencies */}
-      {blockedBy.length > 0 && (
-        <CollapsibleSection name="Dependencies">
-          <div className="dep-group">
-            <span className="dep-group-label">Blocked by</span>
-            <div className="dep-chips">
-              {blockedBy.map(d => (
-                <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
-              ))}
+      <div className="issue-detail">
+        {/* Header */}
+        <div className="detail-header">
+          <div className="detail-header-top">
+            <div className="detail-id-group">
+              {issue.parent && (
+                <>
+                  <button
+                    className="detail-id detail-parent-link"
+                    onClick={() => onSelectIssue?.(issue.parent)}
+                    title="Parent issue"
+                  >
+                    {issue.parent}
+                  </button>
+                  <span className="detail-id detail-breadcrumb-sep">/</span>
+                </>
+              )}
+              <span className="detail-id">{issue.id}</span>
+              <CopyIdButton id={issue.id} />
+            </div>
+            <div className="detail-actions-top">
+              {canClaim && (
+                <button
+                  className="btn btn-secondary"
+                  disabled={actionPending}
+                  onClick={() =>
+                    handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed')
+                  }
+                >
+                  Claim
+                </button>
+              )}
+              {onEdit && (
+                <div className="btn-split" ref={editMenuRef}>
+                  <button
+                    className="btn btn-secondary btn-split-main"
+                    onClick={() => onEdit(issue)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-split-chevron"
+                    onClick={() => setEditMenuOpen((o) => !o)}
+                    aria-label="More actions"
+                  >
+                    <ChevronDown size={12} />
+                  </button>
+                  {editMenuOpen && (
+                    <div className="btn-split-menu">
+                      <button
+                        className="btn-split-menu-item btn-split-menu-danger"
+                        onClick={() => {
+                          setEditMenuOpen(false);
+                          setConfirmDelete(true);
+                        }}
+                      >
+                        <Trash2 size={13} /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+              <button className="btn btn-secondary detail-close-btn" onClick={onClose}>
+                <X size={14} />
+              </button>
             </div>
           </div>
-        </CollapsibleSection>
-      )}
+          <h2 className="detail-title">{issue.title}</h2>
+        </div>
 
-      {/* Parent */}
-      {parentIssue && (
-        <CollapsibleSection name="Parent">
-          <div className="dep-chips">
-            <DepChip dep={parentIssue} onSelect={onSelectIssue ?? (() => {})} />
+        {/* Meta row */}
+        <div className="detail-meta">
+          <StatusDropdown
+            status={issue.status}
+            onChange={handleStatusChange}
+            disabled={actionPending}
+          />
+          {issue.priority !== undefined && (
+            <span className={`priority-badge p${issue.priority}`}>
+              {PRIORITY_LABEL[issue.priority]}
+            </span>
+          )}
+          {issue.issue_type && <span className="detail-type">{issue.issue_type}</span>}
+          {issue.assignee && (
+            <span className="detail-assignee">
+              <User size={12} strokeWidth={1.75} /> {issue.assignee}
+            </span>
+          )}
+        </div>
+
+        {((issue.estimated_minutes != null && issue.estimated_minutes > 0) ||
+          issue.due_at ||
+          issue.created_at) && (
+          <div className="detail-kv-wrap">
+            <dl className="detail-kv">
+              {issue.estimated_minutes != null && issue.estimated_minutes > 0 && (
+                <>
+                  <dt>Estimate</dt>
+                  <dd>{issue.estimated_minutes} min</dd>
+                </>
+              )}
+              {issue.due_at && (
+                <>
+                  <dt>Due</dt>
+                  <dd>{formatDate(issue.due_at)}</dd>
+                </>
+              )}
+              {issue.created_at && (
+                <>
+                  <dt>Created</dt>
+                  <dd>{formatDate(issue.created_at)}</dd>
+                </>
+              )}
+            </dl>
           </div>
-        </CollapsibleSection>
-      )}
+        )}
 
-      {/* Children */}
-      {children.length > 0 && (
-        <CollapsibleSection name="Children">
-          <div className="dep-chips">
-            {children.map(child => (
-              <DepChip key={child.id} dep={child} onSelect={onSelectIssue ?? (() => {})} />
-            ))}
+        {/* Labels */}
+        {(issue.labels?.length > 0 || canClose) && (
+          <CollapsibleSection name="Labels">
+            <div className="label-chips">
+              {(issue.labels ?? []).map((label) => (
+                <LabelChip
+                  key={label}
+                  label={label}
+                  onRemove={
+                    canClose ? () => handleAction(() => removeLabel(issueId, label), null) : null
+                  }
+                />
+              ))}
+              {canClose && <LabelAddTrigger issueId={issueId} />}
+            </div>
+          </CollapsibleSection>
+        )}
+
+        {/* Close confirmation */}
+        {pendingClose && (
+          <div className="detail-section detail-actions-bottom">
+            <div className="close-reason-row">
+              <input
+                autoFocus
+                className="close-reason-input"
+                placeholder="Close reason (optional)"
+                value={closeReason}
+                onChange={(e) => setCloseReason(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleCloseConfirm();
+                  if (e.key === 'Escape') {
+                    setPendingClose(false);
+                    setCloseReason('');
+                  }
+                }}
+              />
+              <button
+                className="btn btn-danger"
+                disabled={actionPending}
+                onClick={handleCloseConfirm}
+              >
+                Close
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setPendingClose(false);
+                  setCloseReason('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-        </CollapsibleSection>
-      )}
+        )}
 
-      <CommentThread issueId={issueId} />
-    </div>
+        {/* Description */}
+        {issue.description && (
+          <CollapsibleSection name="Description">
+            <MarkdownContent text={issue.description} className="detail-description" />
+          </CollapsibleSection>
+        )}
+
+        {/* Notes */}
+        {issue.notes && (
+          <CollapsibleSection name="Notes">
+            <MarkdownContent text={issue.notes} className="detail-description" />
+          </CollapsibleSection>
+        )}
+
+        {/* Design */}
+        {issue.design && (
+          <CollapsibleSection name="Design">
+            <MarkdownContent text={issue.design} className="detail-description" />
+          </CollapsibleSection>
+        )}
+
+        {/* Dependencies */}
+        {blockedBy.length > 0 && (
+          <CollapsibleSection name="Dependencies">
+            <div className="dep-group">
+              <span className="dep-group-label">Blocked by</span>
+              <div className="dep-chips">
+                {blockedBy.map((d) => (
+                  <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
+                ))}
+              </div>
+            </div>
+          </CollapsibleSection>
+        )}
+
+        {/* Parent */}
+        {parentIssue && (
+          <CollapsibleSection name="Parent">
+            <div className="dep-chips">
+              <DepChip dep={parentIssue} onSelect={onSelectIssue ?? (() => {})} />
+            </div>
+          </CollapsibleSection>
+        )}
+
+        {/* Children */}
+        {children.length > 0 && (
+          <CollapsibleSection name="Children">
+            <div className="dep-chips">
+              {children.map((child) => (
+                <DepChip key={child.id} dep={child} onSelect={onSelectIssue ?? (() => {})} />
+              ))}
+            </div>
+          </CollapsibleSection>
+        )}
+
+        <CommentThread issueId={issueId} />
+      </div>
     </>
-  )
+  );
 }

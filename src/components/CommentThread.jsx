@@ -1,22 +1,22 @@
-import { useState, useEffect, useRef } from 'react'
-import { useComments } from '../hooks/useComments.js'
-import MarkdownContent from './MarkdownContent.jsx'
-import CollapsibleSection from './CollapsibleSection.jsx'
+import { useState, useEffect, useRef } from 'react';
+import { useComments } from '../hooks/useComments.js';
+import MarkdownContent from './MarkdownContent.jsx';
+import CollapsibleSection from './CollapsibleSection.jsx';
 
 function timeAgo(iso) {
-  const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
-  if (secs < 60)   return 'just now'
-  if (secs < 3600) return `${Math.floor(secs / 60)}m ago`
-  if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (secs < 60) return 'just now';
+  if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+  if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 function Comment({ comment }) {
-  const [, forceUpdate] = useState(0)
+  const [, forceUpdate] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => forceUpdate(n => n + 1), 30000)
-    return () => clearInterval(t)
-  }, [])
+    const t = setInterval(() => forceUpdate((n) => n + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
 
   return (
     <div className={`comment ${comment.optimistic ? 'comment-optimistic' : ''}`}>
@@ -28,36 +28,36 @@ function Comment({ comment }) {
       </div>
       <MarkdownContent text={comment.text} className="comment-text" />
     </div>
-  )
+  );
 }
 
 export default function CommentThread({ issueId }) {
-  const { comments, loading, error, addComment } = useComments(issueId)
-  const [text, setText] = useState('')
-  const [posting, setPosting] = useState(false)
-  const [postError, setPostError] = useState(null)
-  const textareaRef = useRef(null)
+  const { comments, loading, error, addComment } = useComments(issueId);
+  const [text, setText] = useState('');
+  const [posting, setPosting] = useState(false);
+  const [postError, setPostError] = useState(null);
+  const textareaRef = useRef(null);
 
   async function handleSubmit(e) {
-    e.preventDefault()
-    if (!text.trim() || posting) return
-    setPosting(true)
-    setPostError(null)
+    e.preventDefault();
+    if (!text.trim() || posting) return;
+    setPosting(true);
+    setPostError(null);
     try {
-      await addComment(text)
-      setText('')
+      await addComment(text);
+      setText('');
     } catch (err) {
-      setPostError(err.message)
+      setPostError(err.message);
     } finally {
-      setPosting(false)
+      setPosting(false);
     }
   }
 
   function handleKeyDown(e) {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit(e)
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit(e);
   }
 
-  const sectionName = `Comments${!loading && comments.length > 0 ? ` (${comments.length})` : ''}`
+  const sectionName = `Comments${!loading && comments.length > 0 ? ` (${comments.length})` : ''}`;
 
   return (
     <CollapsibleSection name={sectionName} storageKey="Comments" className="comment-thread">
@@ -67,7 +67,9 @@ export default function CommentThread({ issueId }) {
         {!loading && !error && comments.length === 0 && (
           <div className="comment-state comment-empty">No comments yet</div>
         )}
-        {comments.map(c => <Comment key={c.id} comment={c} />)}
+        {comments.map((c) => (
+          <Comment key={c.id} comment={c} />
+        ))}
       </div>
 
       <form className="comment-compose" onSubmit={handleSubmit}>
@@ -77,21 +79,17 @@ export default function CommentThread({ issueId }) {
           rows={3}
           placeholder="Add a comment… (⌘Enter to submit)"
           value={text}
-          onChange={e => setText(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={posting}
         />
         {postError && <div className="comment-post-error">{postError}</div>}
         <div className="comment-compose-footer">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={posting || !text.trim()}
-          >
+          <button type="submit" className="btn btn-primary" disabled={posting || !text.trim()}>
             {posting ? 'Posting…' : 'Add Comment'}
           </button>
         </div>
       </form>
     </CollapsibleSection>
-  )
+  );
 }

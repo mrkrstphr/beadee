@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { createRequire } from 'module'
-import { startServer } from '../server/server.js'
+import { createRequire } from 'module';
+import { startServer } from '../server/server.js';
 
-const require = createRequire(import.meta.url)
-const VERSION = require('../package.json').version
+const require = createRequire(import.meta.url);
+const VERSION = require('../package.json').version;
 
 const HELP = `
 beadee — web GUI for the beads issue tracker
@@ -27,59 +27,59 @@ Examples:
   beadee                  # Start on a random free port
   beadee --port 4000      # Start on port 4000
   beadee --open           # Start and open browser
-`.trim()
+`.trim();
 
 function parseArgs(argv) {
-  const args = argv.slice(2)
-  const opts = { port: 0, host: '127.0.0.1', open: false }
+  const args = argv.slice(2);
+  const opts = { port: 0, host: '127.0.0.1', open: false };
 
   for (let i = 0; i < args.length; i++) {
-    const a = args[i]
+    const a = args[i];
     if (a === '-h' || a === '--help') {
-      console.log(HELP)
-      process.exit(0)
+      console.log(HELP);
+      process.exit(0);
     }
     if (a === '-v' || a === '--version') {
-      console.log(VERSION)
-      process.exit(0)
+      console.log(VERSION);
+      process.exit(0);
     }
     if ((a === '-p' || a === '--port') && args[i + 1]) {
-      opts.port = parseInt(args[++i], 10)
-      continue
+      opts.port = parseInt(args[++i], 10);
+      continue;
     }
     if (a.startsWith('--port=')) {
-      opts.port = parseInt(a.split('=')[1], 10)
-      continue
+      opts.port = parseInt(a.split('=')[1], 10);
+      continue;
     }
     if ((a === '-H' || a === '--host') && args[i + 1]) {
-      opts.host = args[++i]
-      continue
+      opts.host = args[++i];
+      continue;
     }
     if (a.startsWith('--host=')) {
-      opts.host = a.split('=')[1]
-      continue
+      opts.host = a.split('=')[1];
+      continue;
     }
     if (a === '-o' || a === '--open') {
-      opts.open = true
-      continue
+      opts.open = true;
+      continue;
     }
-    console.error(`Unknown option: ${a}\nRun beadee --help for usage.`)
-    process.exit(1)
+    console.error(`Unknown option: ${a}\nRun beadee --help for usage.`);
+    process.exit(1);
   }
 
-  return opts
+  return opts;
 }
 
-const opts = parseArgs(process.argv)
+const opts = parseArgs(process.argv);
 
-startServer(opts).catch(err => {
+startServer(opts).catch((err) => {
   if (err.code === 'BD_NOT_FOUND') {
-    console.error('Error: bd not found in PATH. Install beads first.')
+    console.error('Error: bd not found in PATH. Install beads first.');
   } else if (err.code === 'BD_NO_BEADS_DIR') {
-    console.error(`Error: no .beads/ directory found in ${process.cwd()}.`)
-    console.error('Run beadee from a directory that contains a beads project.')
+    console.error(`Error: no .beads/ directory found in ${process.cwd()}.`);
+    console.error('Run beadee from a directory that contains a beads project.');
   } else {
-    console.error('Error:', err.message)
+    console.error('Error:', err.message);
   }
-  process.exit(1)
-})
+  process.exit(1);
+});

@@ -1,42 +1,42 @@
-import { useState, useMemo, useCallback } from 'react'
-import { Inbox, ChevronRight } from 'lucide-react'
-import { useIssues } from '../hooks/useIssues.js'
-import { useKeyboard } from '../hooks/useKeyboard.js'
-import { useLocalStorageState } from '../hooks/useLocalStorageState.js'
-import StatusIcon from '../components/StatusIcon.jsx'
+import { useState, useMemo, useCallback } from 'react';
+import { Inbox, ChevronRight } from 'lucide-react';
+import { useIssues } from '../hooks/useIssues.js';
+import { useKeyboard } from '../hooks/useKeyboard.js';
+import { useLocalStorageState } from '../hooks/useLocalStorageState.js';
+import StatusIcon from '../components/StatusIcon.jsx';
 
 const STATUS_FILTERS = [
-  { label: 'All',         value: '' },
-  { label: 'Open',        value: 'open' },
+  { label: 'All', value: '' },
+  { label: 'Open', value: 'open' },
   { label: 'In Progress', value: 'in_progress' },
-  { label: 'Blocked',     value: 'blocked' },
-  { label: 'Closed',      value: 'closed' },
-]
+  { label: 'Blocked', value: 'blocked' },
+  { label: 'Closed', value: 'closed' },
+];
 
 const TYPE_OPTIONS = [
   { label: 'All Types', value: '' },
-  { label: 'Bug',       value: 'bug' },
-  { label: 'Feature',   value: 'feature' },
-  { label: 'Task',      value: 'task' },
-  { label: 'Chore',     value: 'chore' },
-  { label: 'Epic',      value: 'epic' },
-  { label: 'Spike',     value: 'spike' },
-  { label: 'Story',     value: 'story' },
-]
+  { label: 'Bug', value: 'bug' },
+  { label: 'Feature', value: 'feature' },
+  { label: 'Task', value: 'task' },
+  { label: 'Chore', value: 'chore' },
+  { label: 'Epic', value: 'epic' },
+  { label: 'Spike', value: 'spike' },
+  { label: 'Story', value: 'story' },
+];
 
 const TYPE_SHORT = {
-  bug:       'BUG',
-  feature:   'FEAT',
-  task:      'TASK',
-  chore:     'CHR',
-  epic:      'EPIC',
-  spike:     'SPK',
-  story:     'STR',
-  decision:  'DEC',
+  bug: 'BUG',
+  feature: 'FEAT',
+  task: 'TASK',
+  chore: 'CHR',
+  epic: 'EPIC',
+  spike: 'SPK',
+  story: 'STR',
+  decision: 'DEC',
   milestone: 'MS',
-}
+};
 
-const PRIORITY_LABEL = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' }
+const PRIORITY_LABEL = { 0: 'P0', 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4' };
 
 function IssueRow({ issue, selected, onClick, indent }) {
   return (
@@ -60,7 +60,7 @@ function IssueRow({ issue, selected, onClick, indent }) {
         {PRIORITY_LABEL[issue.priority] ?? 'P2'}
       </span>
     </button>
-  )
+  );
 }
 
 function SkeletonRow() {
@@ -73,7 +73,7 @@ function SkeletonRow() {
       </span>
       <span className="skeleton skeleton-badge" />
     </div>
-  )
+  );
 }
 
 function EpicGroupHeader({ epic, collapsed, onToggle, onSelect, selected }) {
@@ -81,13 +81,13 @@ function EpicGroupHeader({ epic, collapsed, onToggle, onSelect, selected }) {
     <div className={`epic-group-header ${selected ? 'selected' : ''}`}>
       <button
         className="epic-chevron-btn"
-        onClick={e => { e.stopPropagation(); onToggle() }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
         aria-label={collapsed ? 'Expand' : 'Collapse'}
       >
-        <ChevronRight
-          size={12}
-          className={`epic-chevron ${collapsed ? '' : 'expanded'}`}
-        />
+        <ChevronRight size={12} className={`epic-chevron ${collapsed ? '' : 'expanded'}`} />
       </button>
       <button className="epic-group-body" onClick={onSelect}>
         <StatusIcon status={epic.status} />
@@ -98,83 +98,100 @@ function EpicGroupHeader({ epic, collapsed, onToggle, onSelect, selected }) {
         </span>
       </button>
     </div>
-  )
+  );
 }
 
-export default function ListView({ search, selectedIssueId, onSelectIssue, DetailPanel, onRefreshed }) {
-  const [statusFilter, setStatusFilter] = useLocalStorageState('beadee-status-filter', '')
-  const [typeFilter, setTypeFilter] = useLocalStorageState('beadee-type-filter', '')
-  const [hideClosed, setHideClosed] = useLocalStorageState('beadee-hide-closed', true)
-  const [groupByEpic, setGroupByEpic] = useLocalStorageState('beadee-group-by-epic', false)
-  const [collapsedEpics, setCollapsedEpics] = useState(() => new Set())
+export default function ListView({
+  search,
+  selectedIssueId,
+  onSelectIssue,
+  DetailPanel,
+  onRefreshed,
+}) {
+  const [statusFilter, setStatusFilter] = useLocalStorageState('beadee-status-filter', '');
+  const [typeFilter, setTypeFilter] = useLocalStorageState('beadee-type-filter', '');
+  const [hideClosed, setHideClosed] = useLocalStorageState('beadee-hide-closed', true);
+  const [groupByEpic, setGroupByEpic] = useLocalStorageState('beadee-group-by-epic', false);
+  const [collapsedEpics, setCollapsedEpics] = useState(() => new Set());
 
-  const { issues, loading, error } = useIssues({
-    status: statusFilter,
-    type: typeFilter,
-    search,
-  }, { onRefreshed })
+  const { issues, loading, error } = useIssues(
+    {
+      status: statusFilter,
+      type: typeFilter,
+      search,
+    },
+    { onRefreshed },
+  );
 
   const displayedIssues = useMemo(() => {
-    if (!hideClosed || statusFilter === 'closed') return issues
-    return issues.filter(i => i.status !== 'closed')
-  }, [issues, hideClosed, statusFilter])
+    if (!hideClosed || statusFilter === 'closed') return issues;
+    return issues.filter((i) => i.status !== 'closed');
+  }, [issues, hideClosed, statusFilter]);
 
   const epicGroups = useMemo(() => {
-    if (!groupByEpic) return null
-    const epics = displayedIssues.filter(i => i.issue_type === 'epic')
-    const byParent = {}
+    if (!groupByEpic) return null;
+    const epics = displayedIssues.filter((i) => i.issue_type === 'epic');
+    const byParent = {};
     for (const issue of displayedIssues) {
       if (issue.parent) {
-        if (!byParent[issue.parent]) byParent[issue.parent] = []
-        byParent[issue.parent].push(issue)
+        if (!byParent[issue.parent]) byParent[issue.parent] = [];
+        byParent[issue.parent].push(issue);
       }
     }
-    const epicIds = new Set(epics.map(e => e.id))
-    const orphans = displayedIssues.filter(i => !epicIds.has(i.id) && !i.parent)
-    return { epics, byParent, orphans }
-  }, [displayedIssues, groupByEpic])
+    const epicIds = new Set(epics.map((e) => e.id));
+    const orphans = displayedIssues.filter((i) => !epicIds.has(i.id) && !i.parent);
+    return { epics, byParent, orphans };
+  }, [displayedIssues, groupByEpic]);
 
   const visibleIssues = useMemo(() => {
-    if (!epicGroups) return displayedIssues
-    const result = []
+    if (!epicGroups) return displayedIssues;
+    const result = [];
     for (const epic of epicGroups.epics) {
-      result.push(epic)
+      result.push(epic);
       if (!collapsedEpics.has(epic.id)) {
-        const children = epicGroups.byParent[epic.id] ?? []
-        result.push(...children)
+        const children = epicGroups.byParent[epic.id] ?? [];
+        result.push(...children);
       }
     }
-    result.push(...epicGroups.orphans)
-    return result
-  }, [epicGroups, collapsedEpics, displayedIssues])
+    result.push(...epicGroups.orphans);
+    return result;
+  }, [epicGroups, collapsedEpics, displayedIssues]);
 
   const toggleEpic = useCallback((epicId) => {
-    setCollapsedEpics(prev => {
-      const next = new Set(prev)
-      if (next.has(epicId)) next.delete(epicId)
-      else next.add(epicId)
-      return next
-    })
-  }, [])
+    setCollapsedEpics((prev) => {
+      const next = new Set(prev);
+      if (next.has(epicId)) next.delete(epicId);
+      else next.add(epicId);
+      return next;
+    });
+  }, []);
 
   const selectedIdx = useMemo(
-    () => visibleIssues.findIndex(i => i.id === selectedIssueId),
-    [visibleIssues, selectedIssueId]
-  )
+    () => visibleIssues.findIndex((i) => i.id === selectedIssueId),
+    [visibleIssues, selectedIssueId],
+  );
 
-  const navigate = useCallback((dir) => {
-    if (!visibleIssues.length) return
-    const next = selectedIdx === -1
-      ? (dir > 0 ? 0 : visibleIssues.length - 1)
-      : Math.max(0, Math.min(visibleIssues.length - 1, selectedIdx + dir))
-    onSelectIssue(visibleIssues[next].id)
-  }, [visibleIssues, selectedIdx, onSelectIssue])
+  const navigate = useCallback(
+    (dir) => {
+      if (!visibleIssues.length) return;
+      const next =
+        selectedIdx === -1
+          ? dir > 0
+            ? 0
+            : visibleIssues.length - 1
+          : Math.max(0, Math.min(visibleIssues.length - 1, selectedIdx + dir));
+      onSelectIssue(visibleIssues[next].id);
+    },
+    [visibleIssues, selectedIdx, onSelectIssue],
+  );
 
   useKeyboard({
-    j:      () => navigate(1),
-    k:      () => navigate(-1),
-    Enter:  () => { if (selectedIdx !== -1) onSelectIssue(visibleIssues[selectedIdx].id) },
-  })
+    j: () => navigate(1),
+    k: () => navigate(-1),
+    Enter: () => {
+      if (selectedIdx !== -1) onSelectIssue(visibleIssues[selectedIdx].id);
+    },
+  });
 
   return (
     <div className={`list-view${selectedIssueId ? ' has-detail' : ''}`}>
@@ -182,7 +199,7 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
       <div className="list-panel">
         <div className="list-panel-toolbar">
           <div className="status-pills">
-            {STATUS_FILTERS.map(f => (
+            {STATUS_FILTERS.map((f) => (
               <button
                 key={f.value}
                 className={`pill ${statusFilter === f.value ? 'active' : ''}`}
@@ -196,34 +213,42 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
             <select
               className="type-select"
               value={typeFilter}
-              onChange={e => setTypeFilter(e.target.value)}
+              onChange={(e) => setTypeFilter(e.target.value)}
             >
-              {TYPE_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+              {TYPE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
               ))}
             </select>
             <button
               className={`pill hide-closed-toggle ${hideClosed && statusFilter !== 'closed' ? 'active' : ''}`}
-              onClick={() => setHideClosed(v => !v)}
-              title={hideClosed ? 'Showing active issues — click to show closed' : 'Click to hide closed issues'}
+              onClick={() => setHideClosed((v) => !v)}
+              title={
+                hideClosed
+                  ? 'Showing active issues — click to show closed'
+                  : 'Click to hide closed issues'
+              }
             >
               Hide closed
             </button>
             <button
               className={`pill ${groupByEpic ? 'active' : ''}`}
-              onClick={() => setGroupByEpic(v => !v)}
+              onClick={() => setGroupByEpic((v) => !v)}
               title={groupByEpic ? 'Grouped by epic — click to ungroup' : 'Click to group by epic'}
             >
               By epic
             </button>
             <span className="issue-count">
-              {loading ? '…' : `${displayedIssues.length} issue${displayedIssues.length !== 1 ? 's' : ''}`}
+              {loading
+                ? '…'
+                : `${displayedIssues.length} issue${displayedIssues.length !== 1 ? 's' : ''}`}
             </span>
           </div>
         </div>
 
         <div className="issue-list">
-          {loading && [1,2,3,4].map(i => <SkeletonRow key={i} />)}
+          {loading && [1, 2, 3, 4].map((i) => <SkeletonRow key={i} />)}
           {error && <div className="list-state list-error">Error: {error}</div>}
           {!loading && !error && displayedIssues.length === 0 && (
             <div className="list-state list-empty">
@@ -233,63 +258,70 @@ export default function ListView({ search, selectedIssueId, onSelectIssue, Detai
             </div>
           )}
           {epicGroups
-            ? epicGroups.epics.map(epic => (
-                <div key={epic.id} className="epic-group">
-                  <EpicGroupHeader
-                    epic={epic}
-                    collapsed={collapsedEpics.has(epic.id)}
-                    onToggle={() => toggleEpic(epic.id)}
-                    onSelect={() => onSelectIssue(epic.id === selectedIssueId ? null : epic.id)}
-                    selected={epic.id === selectedIssueId}
-                  />
-                  {!collapsedEpics.has(epic.id) && (epicGroups.byParent[epic.id] ?? []).map(issue => (
-                    <IssueRow
-                      key={issue.id}
-                      issue={issue}
-                      selected={issue.id === selectedIssueId}
-                      onClick={() => onSelectIssue(issue.id === selectedIssueId ? null : issue.id)}
-                      indent
+            ? epicGroups.epics
+                .map((epic) => (
+                  <div key={epic.id} className="epic-group">
+                    <EpicGroupHeader
+                      epic={epic}
+                      collapsed={collapsedEpics.has(epic.id)}
+                      onToggle={() => toggleEpic(epic.id)}
+                      onSelect={() => onSelectIssue(epic.id === selectedIssueId ? null : epic.id)}
+                      selected={epic.id === selectedIssueId}
                     />
-                  ))}
-                </div>
-              )).concat(
-                epicGroups.orphans.length > 0
-                  ? [<div key="__orphans__" className="epic-group epic-group-orphans">
-                      {epicGroups.orphans.map(issue => (
+                    {!collapsedEpics.has(epic.id) &&
+                      (epicGroups.byParent[epic.id] ?? []).map((issue) => (
                         <IssueRow
                           key={issue.id}
                           issue={issue}
                           selected={issue.id === selectedIssueId}
-                          onClick={() => onSelectIssue(issue.id === selectedIssueId ? null : issue.id)}
+                          onClick={() =>
+                            onSelectIssue(issue.id === selectedIssueId ? null : issue.id)
+                          }
+                          indent
                         />
                       ))}
-                    </div>]
-                  : []
-              )
-            : displayedIssues.map(issue => (
+                  </div>
+                ))
+                .concat(
+                  epicGroups.orphans.length > 0
+                    ? [
+                        <div key="__orphans__" className="epic-group epic-group-orphans">
+                          {epicGroups.orphans.map((issue) => (
+                            <IssueRow
+                              key={issue.id}
+                              issue={issue}
+                              selected={issue.id === selectedIssueId}
+                              onClick={() =>
+                                onSelectIssue(issue.id === selectedIssueId ? null : issue.id)
+                              }
+                            />
+                          ))}
+                        </div>,
+                      ]
+                    : [],
+                )
+            : displayedIssues.map((issue) => (
                 <IssueRow
                   key={issue.id}
                   issue={issue}
                   selected={issue.id === selectedIssueId}
                   onClick={() => onSelectIssue(issue.id === selectedIssueId ? null : issue.id)}
                 />
-              ))
-          }
+              ))}
         </div>
       </div>
 
       {/* ── Right panel ────────────────────────────────────────── */}
       <div className="detail-panel">
-        {selectedIssueId
-          ? <DetailPanel issueId={selectedIssueId} onClose={() => onSelectIssue(null)} />
-          : (
-            <div className="detail-empty">
-              <Inbox size={32} className="detail-empty-icon" strokeWidth={1.25} />
-              <p>Select an issue to view details</p>
-            </div>
-          )
-        }
+        {selectedIssueId ? (
+          <DetailPanel issueId={selectedIssueId} onClose={() => onSelectIssue(null)} />
+        ) : (
+          <div className="detail-empty">
+            <Inbox size={32} className="detail-empty-icon" strokeWidth={1.25} />
+            <p>Select an issue to view details</p>
+          </div>
+        )}
       </div>
     </div>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { version } from "../../package.json";
-import UpdateDialog from "./UpdateDialog.jsx";
+import { useEffect, useState } from 'react';
+import { version } from '../../package.json';
+import UpdateDialog from './UpdateDialog.jsx';
 
-const CACHE_KEY = "beadee-update-check";
+const CACHE_KEY = 'beadee-update-check';
 const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours
 
 function getCached() {
@@ -34,7 +34,7 @@ export default function Footer({ onShowShortcuts }) {
         if (cached.hasUpdate) setUpdateInfo(cached);
         return;
       }
-      fetch("/api/update")
+      fetch('/api/update')
         .then((r) => r.json())
         .then((data) => {
           setCache(data);
@@ -61,10 +61,7 @@ export default function Footer({ onShowShortcuts }) {
             beadee v{version}
           </a>
           {updateInfo && (
-            <button
-              className="footer-update-btn"
-              onClick={() => setShowDialog(true)}
-            >
+            <button className="footer-update-btn" onClick={() => setShowDialog(true)}>
               v{updateInfo.latestVersion} available
             </button>
           )}
