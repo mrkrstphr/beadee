@@ -1,12 +1,9 @@
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
-// Configure marked: no pedantic, gfm enabled (tables, strikethrough, etc.)
-marked.setOptions({ gfm: true, breaks: true });
-
 function renderMarkdown(text) {
   if (typeof window === 'undefined') return null;
-  const raw = marked.parse(text || '');
+  const raw = marked.parse(text || '', { gfm: true, breaks: true });
   return DOMPurify.sanitize(raw, {
     ALLOWED_TAGS: [
       'p',
