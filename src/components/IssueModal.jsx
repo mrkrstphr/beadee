@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useId } from 'react'
 import { X } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createIssue, updateIssue, useLabels } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 
@@ -252,16 +252,11 @@ export default function IssueModal({ issue, onClose, onSaved }) {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.title.trim()) { setError('Title is required'); return }
+    const est = parseEstimateField(form.estimate)
+    if (!est.ok) { setError('Estimate must be a non-negative whole number (minutes)'); return }
     setSaving(true)
     setError(null)
     try {
-      const est = parseEstimateField(form.estimate)
-      if (!est.ok) {
-        setError('Estimate must be a non-negative whole number (minutes)')
-        setSaving(false)
-        return
-      }
-
       const data = {
         title:        form.title.trim(),
         description:  form.description.trim() || undefined,
