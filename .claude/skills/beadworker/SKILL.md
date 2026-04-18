@@ -72,11 +72,15 @@ Work the issue to completion. Follow all project conventions from CLAUDE.md:
 
 Read the relevant source files before editing. Prefer editing existing files over creating new ones.
 
-### 6. Format
+### 6. Format & Lint
 
-Run `npm run format` to apply code formatting. Stage any resulting changes together with your implementation changes.
+Run `npm run format` to apply code formatting. Run `npm run lint` to check for linting errors. Repeat until all issues are resolved.
+
+Do not disable linter rules or add exceptions. If the code doesn't fit the rules, it needs to be refactored until it does.
 
 ### 7. Commit
+
+Stage any resulting changes together with your implementation changes.
 
 Stage only the files changed for this issue. Write a conventional commit — **no scope**, no mention of the issue ID. Include a body if the change warrants calling out non-obvious details (e.g. a tricky workaround, a subtle invariant, why an approach was chosen over an alternative):
 
