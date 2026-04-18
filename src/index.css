@@ -1014,13 +1014,51 @@ input::placeholder, textarea::placeholder {
   padding: 14px 0;
 }
 
+.detail-section.is-collapsed {
+  padding-bottom: 10px;
+}
+
+.detail-section-toggle {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 0;
+  width: 100%;
+}
+
+.detail-section-toggle:hover .detail-section-label {
+  color: var(--text);
+}
+
+.detail-section.is-collapsed .detail-section-toggle {
+  margin-bottom: 0;
+}
+
 .detail-section-label {
   color: var(--text-muted);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  margin-bottom: 8px;
   text-transform: uppercase;
+}
+
+.section-chevron {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.section-chevron.is-up {
+  transform: rotate(-90deg);
+}
+
+.detail-section-body {
+  /* no extra styles needed, children provide their own spacing */
 }
 
 .detail-description {

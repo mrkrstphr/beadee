@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useComments } from '../hooks/useComments.js'
 import MarkdownContent from './MarkdownContent.jsx'
+import CollapsibleSection from './CollapsibleSection.jsx'
 
 function timeAgo(iso) {
   const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -56,12 +57,10 @@ export default function CommentThread({ issueId }) {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit(e)
   }
 
-  return (
-    <div className="detail-section comment-thread">
-      <div className="detail-section-label">
-        Comments {!loading && comments.length > 0 && `(${comments.length})`}
-      </div>
+  const sectionName = `Comments${!loading && comments.length > 0 ? ` (${comments.length})` : ''}`
 
+  return (
+    <CollapsibleSection name={sectionName} storageKey="Comments" className="comment-thread">
       <div className="comment-list">
         {loading && <div className="comment-state">Loading…</div>}
         {error && <div className="comment-state comment-error">Error: {error}</div>}
@@ -93,6 +92,6 @@ export default function CommentThread({ issueId }) {
           </button>
         </div>
       </form>
-    </div>
+    </CollapsibleSection>
   )
 }

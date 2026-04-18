@@ -3,6 +3,7 @@ import { Check, Copy, ChevronDown, User, X } from 'lucide-react'
 import { useIssue, useChildren, updateIssue, closeIssue, addLabel, removeLabel, useLabels } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
+import CollapsibleSection from './CollapsibleSection.jsx'
 import CommentThread from './CommentThread.jsx'
 import MarkdownContent from './MarkdownContent.jsx'
 import StatusIcon from './StatusIcon.jsx'
@@ -172,6 +173,7 @@ function CopyIdButton({ id }) {
   )
 }
 
+
 export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit }) {
   const { issue, loading, error } = useIssue(issueId)
   const { children } = useChildren(issueId)
@@ -316,8 +318,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
 
       {/* Labels */}
       {((issue.labels?.length > 0) || canClose) && (
-        <div className="detail-section">
-          <div className="detail-section-label">Labels</div>
+        <CollapsibleSection name="Labels">
           <div className="label-chips">
             {(issue.labels ?? []).map(label => (
               <LabelChip
@@ -328,7 +329,7 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
             ))}
             {canClose && <LabelAddTrigger issueId={issueId} />}
           </div>
-        </div>
+        </CollapsibleSection>
       )}
 
       {/* Close confirmation */}
@@ -358,32 +359,28 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
 
       {/* Description */}
       {issue.description && (
-        <div className="detail-section">
-          <div className="detail-section-label">Description</div>
+        <CollapsibleSection name="Description">
           <MarkdownContent text={issue.description} className="detail-description" />
-        </div>
+        </CollapsibleSection>
       )}
 
       {/* Notes */}
       {issue.notes && (
-        <div className="detail-section">
-          <div className="detail-section-label">Notes</div>
+        <CollapsibleSection name="Notes">
           <MarkdownContent text={issue.notes} className="detail-description" />
-        </div>
+        </CollapsibleSection>
       )}
 
       {/* Design */}
       {issue.design && (
-        <div className="detail-section">
-          <div className="detail-section-label">Design</div>
+        <CollapsibleSection name="Design">
           <MarkdownContent text={issue.design} className="detail-description" />
-        </div>
+        </CollapsibleSection>
       )}
 
       {/* Dependencies */}
       {blockedBy.length > 0 && (
-        <div className="detail-section">
-          <div className="detail-section-label">Dependencies</div>
+        <CollapsibleSection name="Dependencies">
           <div className="dep-group">
             <span className="dep-group-label">Blocked by</span>
             <div className="dep-chips">
@@ -392,29 +389,27 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
               ))}
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
       )}
 
       {/* Parent */}
       {parentIssue && (
-        <div className="detail-section">
-          <div className="detail-section-label">Parent</div>
+        <CollapsibleSection name="Parent">
           <div className="dep-chips">
             <DepChip dep={parentIssue} onSelect={onSelectIssue ?? (() => {})} />
           </div>
-        </div>
+        </CollapsibleSection>
       )}
 
       {/* Children */}
       {children.length > 0 && (
-        <div className="detail-section">
-          <div className="detail-section-label">Children</div>
+        <CollapsibleSection name="Children">
           <div className="dep-chips">
             {children.map(child => (
               <DepChip key={child.id} dep={child} onSelect={onSelectIssue ?? (() => {})} />
             ))}
           </div>
-        </div>
+        </CollapsibleSection>
       )}
 
       <CommentThread issueId={issueId} />
