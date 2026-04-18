@@ -7,7 +7,6 @@ const SHORTCUTS = [
     items: [
       { key: 'n', desc: 'New issue' },
       { key: '/', desc: 'Focus search' },
-      { key: 'r', desc: 'Refresh' },
       { key: '1', desc: 'List view' },
       { key: '2', desc: 'Board view' },
       { key: 'm', desc: 'Memories' },
