@@ -27,6 +27,6 @@ export async function action({
 
   const result = (await bdRun(['comment', id, text], process.cwd())) as Comment[];
   suppressWatch();
-  broadcast();
+  broadcast({ affectsListView: false, affectedIds: [id] });
   return Response.json(Array.isArray(result) ? result[result.length - 1] : result);
 }

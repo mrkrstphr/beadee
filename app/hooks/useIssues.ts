@@ -4,10 +4,19 @@ import type { Issue, Comment, HealthData, LabelItem } from '../types.js';
 const API = '/api';
 const FALLBACK_POLL_INTERVAL = 30000;
 
-const sseSubscribers = new Set<() => void>();
+interface SSEEvent {
+  type: string;
+  affectsAll?: boolean;
+  affectsListView?: boolean;
+  affectedIds?: string[];
+}
 
-function notifyAll() {
-  for (const fn of sseSubscribers) fn();
+type TickHandler = (event: SSEEvent) => void;
+
+const sseSubscribers = new Set<TickHandler>();
+
+function notifyAll(event: SSEEvent) {
+  for (const fn of sseSubscribers) fn(event);
 }
 
 let sseInstance: EventSource | null = null;
@@ -19,7 +28,15 @@ function ensureSSE() {
 
   function connect() {
     sseInstance = new EventSource(`${API}/events`);
-    sseInstance.onmessage = () => notifyAll();
+    sseInstance.onmessage = (e) => {
+      let event: SSEEvent;
+      try {
+        event = JSON.parse(e.data as string) as SSEEvent;
+      } catch {
+        event = { type: 'change', affectsAll: true };
+      }
+      notifyAll(event);
+    };
     sseInstance.onerror = () => {
       sseInstance!.close();
       sseInstance = null;
@@ -30,11 +47,11 @@ function ensureSSE() {
   connect();
 
   fallbackInterval = setInterval(() => {
-    if (document.visibilityState === 'visible') notifyAll();
+    if (document.visibilityState === 'visible') notifyAll({ type: 'change', affectsAll: true });
   }, FALLBACK_POLL_INTERVAL);
 }
 
-function subscribeTick(fn: () => void): () => void {
+function subscribeTick(fn: TickHandler): () => void {
   sseSubscribers.add(fn);
   ensureSSE();
   return () => sseSubscribers.delete(fn);
@@ -142,8 +159,10 @@ export function useIssues(
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchIssues();
 
-    const unsub = subscribeTick(() => {
-      if (document.visibilityState === 'visible') fetchIssues(true);
+    const unsub = subscribeTick((event) => {
+      if (document.visibilityState === 'visible' && (event.affectsAll || event.affectsListView)) {
+        fetchIssues(true);
+      }
     });
 
     const onVisibility = () => {
@@ -203,8 +222,13 @@ export function useIssue(id: string | null | undefined): UseIssueResult {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchIssue();
     if (!id) return;
-    return subscribeTick(() => {
-      if (document.visibilityState === 'visible') fetchIssue();
+    return subscribeTick((event) => {
+      if (
+        document.visibilityState === 'visible' &&
+        (event.affectsAll || event.affectedIds?.includes(id))
+      ) {
+        fetchIssue();
+      }
     });
   }, [id, fetchIssue]);
 
@@ -240,8 +264,13 @@ export function useChildren(id: string | null | undefined): UseChildrenResult {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchChildren();
     if (!id) return;
-    return subscribeTick(() => {
-      if (document.visibilityState === 'visible') fetchChildren();
+    return subscribeTick((event) => {
+      if (
+        document.visibilityState === 'visible' &&
+        (event.affectsAll || event.affectedIds?.includes(id))
+      ) {
+        fetchChildren();
+      }
     });
   }, [id, fetchChildren]);
 

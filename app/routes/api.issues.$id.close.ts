@@ -19,6 +19,6 @@ export async function action({
 
   const result = (await bdRun(args, process.cwd())) as unknown[] | Record<string, unknown> | null;
   suppressWatch();
-  broadcast();
+  broadcast({ affectsListView: true, affectedIds: [id] });
   return Response.json(Array.isArray(result) ? result[0] : (result ?? { ok: true }));
 }

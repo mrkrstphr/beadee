@@ -1,6 +1,12 @@
 import { watch } from 'node:fs';
 import { join } from 'node:path';
 
+export interface BroadcastEvent {
+  affectsAll?: boolean;
+  affectsListView?: boolean;
+  affectedIds?: string[];
+}
+
 const controllers = new Set<ReadableStreamDefaultController>();
 const encoder = new TextEncoder();
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -11,10 +17,14 @@ export function suppressWatch(): void {
   suppressWatchUntil = Date.now() + 2000;
 }
 
-export function broadcast(): void {
+export function broadcast(event?: BroadcastEvent): void {
+  const payload = event
+    ? JSON.stringify({ type: 'change', ...event })
+    : JSON.stringify({ type: 'change', affectsAll: true });
+  const msg = encoder.encode(`data: ${payload}\n\n`);
   for (const ctrl of controllers) {
     try {
-      ctrl.enqueue(encoder.encode('data: {"type":"change"}\n\n'));
+      ctrl.enqueue(msg);
     } catch {
       controllers.delete(ctrl);
     }
@@ -41,7 +51,7 @@ function ensureWatcher(): void {
       if (filename.includes('lock') || filename.endsWith('.log')) return;
       if (Date.now() < suppressWatchUntil) return;
       if (debounceTimer) clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(broadcast, 200);
+      debounceTimer = setTimeout(() => broadcast(), 200);
     });
     watcher.on('error', () => {});
   } catch {

@@ -25,6 +25,6 @@ export async function action({
   }
 
   suppressWatch();
-  broadcast();
+  broadcast({ affectsListView: false, affectedIds: [id] });
   return Response.json({ ok: true });
 }

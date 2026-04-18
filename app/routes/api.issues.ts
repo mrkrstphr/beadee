@@ -81,6 +81,6 @@ export async function action({ request }: { request: Request }) {
 
   const result = (await bdRun(args, process.cwd())) as Issue | Issue[];
   suppressWatch();
-  broadcast();
+  broadcast({ affectsListView: true, affectedIds: parent ? [parent] : [] });
   return Response.json(Array.isArray(result) ? result[0] : result);
 }

@@ -33,7 +33,7 @@ export async function action({
     suppressWatch();
     await bdRun(['delete', id, '--force'], process.cwd());
     suppressWatch();
-    broadcast();
+    broadcast({ affectsListView: true, affectedIds: [id] });
     return Response.json({ deleted: true });
   }
 
@@ -90,6 +90,6 @@ export async function action({
 
   const result = (await bdRun(args, process.cwd())) as Issue | Issue[];
   suppressWatch();
-  broadcast();
+  broadcast({ affectsListView: true, affectedIds: [id] });
   return Response.json(Array.isArray(result) ? result[0] : result);
 }
