@@ -127,6 +127,7 @@ export function useIssue(id) {
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [notFound, setNotFound] = useState(false);
 
   const fetchIssue = useCallback(async () => {
     if (!id) {
@@ -137,8 +138,15 @@ export function useIssue(id) {
       const data = await apiFetch(`/issues/${id}`);
       setIssue(data);
       setError(null);
+      setNotFound(false);
     } catch (err) {
-      setError(err.message);
+      if (err.status === 404) {
+        setNotFound(true);
+        setError(null);
+      } else {
+        setError(err.message);
+        setNotFound(false);
+      }
     } finally {
       setLoading(false);
     }
@@ -147,6 +155,7 @@ export function useIssue(id) {
   useEffect(() => {
     if (!id) {
       setIssue(null);
+      setNotFound(false);
       return;
     }
     setLoading(true);
@@ -156,7 +165,7 @@ export function useIssue(id) {
     });
   }, [id, fetchIssue]);
 
-  return { issue, loading, error };
+  return { issue, loading, error, notFound };
 }
 
 // ── useChildren ──────────────────────────────────────────────────────────────

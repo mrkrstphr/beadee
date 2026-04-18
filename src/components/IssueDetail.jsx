@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Check, Copy, ChevronDown, User, X, Trash2 } from 'lucide-react';
+import { Check, Copy, ChevronDown, User, X, Trash2, Ghost } from 'lucide-react';
 import {
   useIssue,
   useChildren,
@@ -208,7 +208,7 @@ function CopyIdButton({ id }) {
 }
 
 export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, onDelete }) {
-  const { issue, loading, error } = useIssue(issueId);
+  const { issue, loading, error, notFound } = useIssue(issueId);
   const { children } = useChildren(issueId);
   const { issue: parentIssue } = useIssue(issue?.parent ?? null);
   const [pendingClose, setPendingClose] = useState(false);
@@ -282,6 +282,16 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
   );
 
   if (loading) return <div className="detail-loading">Loading…</div>;
+  if (notFound)
+    return (
+      <div className="detail-not-found">
+        <Ghost size={40} strokeWidth={1.25} className="detail-not-found-icon" />
+        <div className="detail-not-found-id">{issueId}</div>
+        <div className="detail-not-found-msg">
+          Nothing here. This issue doesn&apos;t exist or was deleted.
+        </div>
+      </div>
+    );
   if (error) return <div className="detail-error">Error: {error}</div>;
   if (!issue) return null;
 

@@ -992,6 +992,50 @@ textarea::placeholder {
   color: var(--danger);
 }
 
+.detail-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.detail-not-found-icon {
+  color: var(--border);
+  margin-bottom: 4px;
+  animation: detail-ghost-bob 3s ease-in-out infinite;
+}
+
+@keyframes detail-ghost-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.detail-not-found-id {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.detail-not-found-msg {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 220px;
+  line-height: 1.5;
+}
+
 .detail-header {
   border-bottom: 1px solid var(--border);
   margin-bottom: 14px;
