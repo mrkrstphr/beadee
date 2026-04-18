@@ -57,6 +57,7 @@ export default function MarkdownContent({ text, className }: MarkdownContentProp
   }
 
   return (
+    // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
     <div className={`md-content ${className ?? ''}`} dangerouslySetInnerHTML={{ __html: html }} />
   );
 }

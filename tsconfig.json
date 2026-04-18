@@ -15,6 +15,13 @@
     "types": ["node", "vite/client"],
     "paths": {}
   },
-  "include": ["app/**/*", "server/**/*", "vite.config.ts", "react-router.config.ts", "*.d.ts"],
+  "include": [
+    "app/**/*",
+    "server/**/*",
+    "vite.config.ts",
+    "react-router.config.ts",
+    "eslint.config.ts",
+    "*.d.ts"
+  ],
   "exclude": ["node_modules", "build"]
 }

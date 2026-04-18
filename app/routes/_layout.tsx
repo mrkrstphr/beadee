@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
 import Header from '../components/Header.jsx';
 import IssueDetail from '../components/IssueDetail.jsx';
@@ -12,7 +12,7 @@ import { useToastProvider } from '../hooks/useToast.js';
 import { useKeyboard } from '../hooks/useKeyboard.js';
 import type { Issue } from '../types.js';
 
-function setTheme(theme: string) {
+function applyTheme(theme: string) {
   localStorage.setItem('beadee-theme', theme);
   if (theme === 'auto') {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -22,9 +22,34 @@ function setTheme(theme: string) {
   }
 }
 
+interface DetailPanelCtx {
+  detailKey: number;
+  onSelectIssue: (id: string) => void;
+  onEdit: (issue: Issue) => void;
+  onDelete: () => void;
+  onRefresh: () => void;
+}
+
+const DetailPanelContext = createContext<DetailPanelCtx | null>(null);
+
 interface DetailPanelProps {
   issueId: string;
   onClose: () => void;
+}
+
+function DetailPanel({ issueId, onClose }: DetailPanelProps) {
+  const ctx = useContext(DetailPanelContext)!;
+  return (
+    <IssueDetail
+      key={`${issueId}-${ctx.detailKey}`}
+      issueId={issueId}
+      onClose={onClose}
+      onSelectIssue={ctx.onSelectIssue}
+      onEdit={ctx.onEdit}
+      onDelete={ctx.onDelete}
+      onRefresh={ctx.onRefresh}
+    />
+  );
 }
 
 export interface LayoutOutletContext {
@@ -41,7 +66,7 @@ export default function Layout() {
   const location = useLocation();
   const { id } = useParams();
 
-  const [theme, setThemeState] = useState(
+  const [theme, setTheme] = useState(
     () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-theme') : null) || 'dark',
   );
   const [search, setSearch] = useState('');
@@ -82,8 +107,8 @@ export default function Layout() {
   );
 
   function handleThemeChange(t: string) {
-    setThemeState(t);
     setTheme(t);
+    applyTheme(t);
   }
 
   const openEdit = useCallback((issue: Issue) => {
@@ -131,71 +156,66 @@ export default function Layout() {
     !modalOpen,
   );
 
-  const DetailPanel = useCallback(
-    ({ issueId, onClose }: DetailPanelProps) => (
-      <IssueDetail
-        key={`${issueId}-${detailKey}`}
-        issueId={issueId}
-        onClose={onClose}
-        onSelectIssue={showIssueDetail}
-        onEdit={openEdit}
-        onDelete={handleDelete}
-        onRefresh={handleRefresh}
-      />
-    ),
-    [detailKey, showIssueDetail, openEdit, handleDelete, handleRefresh],
-  );
-
   if (healthLoading) return null;
   if (healthError) return <ErrorScreen error={healthError} />;
 
   return (
-    <div className="app">
-      <Header
-        activeTab={activeTab}
-        onTabChange={switchTab}
-        search={search}
-        onSearchChange={setSearch}
-        onNewIssue={() => {
-          setEditingIssue(null);
-          setShowModal(true);
-        }}
-        lastUpdated={lastUpdated}
-        polling={polling}
-        projectName={health?.projectName}
-      />
-
-      <main className="main">
-        <Outlet
-          context={
-            {
-              search,
-              DetailPanel,
-              onRefreshed: handleRefreshed,
-              onRefresh: handleRefresh,
-              theme,
-              onThemeChange: handleThemeChange,
-            } satisfies LayoutOutletContext
-          }
-        />
-      </main>
-
-      <Footer onShowShortcuts={() => setShowShortcuts(true)} />
-
-      {showModal && (
-        <IssueModal
-          issue={editingIssue}
-          onClose={() => {
-            setShowModal(false);
+    <DetailPanelContext.Provider
+      value={{
+        detailKey,
+        onSelectIssue: showIssueDetail,
+        onEdit: openEdit,
+        onDelete: handleDelete,
+        onRefresh: handleRefresh,
+      }}
+    >
+      <div className="app">
+        <Header
+          activeTab={activeTab}
+          onTabChange={switchTab}
+          search={search}
+          onSearchChange={setSearch}
+          onNewIssue={() => {
             setEditingIssue(null);
+            setShowModal(true);
           }}
-          onSaved={handleModalSaved}
+          lastUpdated={lastUpdated}
+          polling={polling}
+          projectName={health?.projectName}
         />
-      )}
 
-      {showShortcuts && <ShortcutsHelp onClose={() => setShowShortcuts(false)} />}
+        <main className="main">
+          <Outlet
+            context={
+              {
+                search,
+                DetailPanel,
+                onRefreshed: handleRefreshed,
+                onRefresh: handleRefresh,
+                theme,
+                onThemeChange: handleThemeChange,
+              } satisfies LayoutOutletContext
+            }
+          />
+        </main>
 
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
-    </div>
+        <Footer onShowShortcuts={() => setShowShortcuts(true)} />
+
+        {showModal && (
+          <IssueModal
+            issue={editingIssue}
+            onClose={() => {
+              setShowModal(false);
+              setEditingIssue(null);
+            }}
+            onSaved={handleModalSaved}
+          />
+        )}
+
+        {showShortcuts && <ShortcutsHelp onClose={() => setShowShortcuts(false)} />}
+
+        <ToastContainer toasts={toasts} onDismiss={dismiss} />
+      </div>
+    </DetailPanelContext.Provider>
   );
 }

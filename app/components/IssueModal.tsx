@@ -150,7 +150,7 @@ function IssueTypeahead({ value, onChange }: IssueTypeaheadProps) {
         if (d.id) setSelected({ id: d.id, title: d.title });
       })
       .catch(() => setSelected({ id: value, title: value }));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps, @eslint-react/exhaustive-deps
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -297,7 +297,7 @@ export default function IssueModal({ issue, onClose, onSaved }: IssueModalProps)
   const isEdit = !!issue;
   const titleRef = useRef<HTMLInputElement>(null);
 
-  const [form, setForm] = useState<FormState>({
+  const [form, setForm] = useState<FormState>(() => ({
     title: issue?.title ?? '',
     description: issue?.description ?? '',
     type: issue?.issue_type ?? 'task',
@@ -314,7 +314,7 @@ export default function IssueModal({ issue, onClose, onSaved }: IssueModalProps)
     external_ref: issue?.external_ref ?? '',
     parent: issue?.parent ?? '',
     labels: issue?.labels ?? [],
-  });
+  }));
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(!!(issue?.external_ref || issue?.parent));

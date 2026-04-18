@@ -16,13 +16,13 @@ interface UseToastProviderResult {
 
 export function useToastProvider(): UseToastProviderResult {
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const timers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const timersRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
 
   const add = useCallback(({ message, type, id }: Toast) => {
     setToasts((ts) => [...ts, { message, type, id }]);
-    timers.current[id] = setTimeout(() => {
+    timersRef.current[id] = setTimeout(() => {
       setToasts((ts) => ts.filter((t) => t.id !== id));
-      delete timers.current[id];
+      delete timersRef.current[id];
     }, 2500);
   }, []);
 
@@ -34,8 +34,8 @@ export function useToastProvider(): UseToastProviderResult {
   }, [add]);
 
   const dismiss = useCallback((id: number) => {
-    clearTimeout(timers.current[id]);
-    delete timers.current[id];
+    clearTimeout(timersRef.current[id]);
+    delete timersRef.current[id];
     setToasts((ts) => ts.filter((t) => t.id !== id));
   }, []);
 

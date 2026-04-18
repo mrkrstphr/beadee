@@ -35,28 +35,34 @@ export function useComments(issueId: string | null | undefined): UseCommentsResu
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchComments = useCallback(
+    async (signal: { aborted: boolean }) => {
+      if (!issueId) {
+        setComments([]);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await apiFetch<Comment[]>(`/issues/${issueId}/comments`);
+        if (!signal.aborted) setComments(data);
+      } catch (err) {
+        if (!signal.aborted) setError((err as Error).message);
+      } finally {
+        if (!signal.aborted) setLoading(false);
+      }
+    },
+    [issueId],
+  );
+
   useEffect(() => {
-    if (!issueId) {
-      setComments([]);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    apiFetch<Comment[]>(`/issues/${issueId}/comments`)
-      .then((data) => {
-        if (!cancelled) setComments(data);
-      })
-      .catch((err: Error) => {
-        if (!cancelled) setError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    const signal = { aborted: false };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchComments(signal);
     return () => {
-      cancelled = true;
+      signal.aborted = true;
     };
-  }, [issueId]);
+  }, [fetchComments]);
 
   const addComment = useCallback(
     async (text: string) => {

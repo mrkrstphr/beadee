@@ -317,7 +317,6 @@ export default function IssueDetail({
       e: () => issue && onEdit?.(issue),
       x: () => canClose && !pendingClose && setPendingClose(true),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [canClaim, actionPending, issueId, issue, onEdit, canClose, pendingClose],
   );
   useKeyboard(detailKeyBindings, !!issue && !pendingClose && !confirmDelete);

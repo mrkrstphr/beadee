@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Issue, Comment } from '../types.js';
+import type { Issue, Comment, HealthData, LabelItem } from '../types.js';
 
 const API = '/api';
 const FALLBACK_POLL_INTERVAL = 30000;
@@ -101,7 +101,10 @@ export function useIssues(
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const onRefreshedRef = useRef(onRefreshed);
-  onRefreshedRef.current = onRefreshed;
+
+  useEffect(() => {
+    onRefreshedRef.current = onRefreshed;
+  });
 
   const buildUrl = useCallback(() => {
     const params = new URLSearchParams();
@@ -115,6 +118,7 @@ export function useIssues(
   const fetchIssues = useCallback(
     async (isPoll = false) => {
       if (isPoll) setPolling(true);
+      else setLoading(true);
       try {
         const data = await apiFetch<Issue[]>(buildUrl());
         setIssues(data);
@@ -135,7 +139,7 @@ export function useIssues(
   const refetch = useCallback(() => fetchIssues(), [fetchIssues]);
 
   useEffect(() => {
-    setLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchIssues();
 
     const unsub = subscribeTick(() => {
@@ -172,8 +176,10 @@ export function useIssue(id: string | null | undefined): UseIssueResult {
   const fetchIssue = useCallback(async () => {
     if (!id) {
       setIssue(null);
+      setNotFound(false);
       return;
     }
+    setLoading(true);
     try {
       const data = await apiFetch<Issue>(`/issues/${id}`);
       setIssue(data);
@@ -194,13 +200,9 @@ export function useIssue(id: string | null | undefined): UseIssueResult {
   }, [id]);
 
   useEffect(() => {
-    if (!id) {
-      setIssue(null);
-      setNotFound(false);
-      return;
-    }
-    setLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchIssue();
+    if (!id) return;
     return subscribeTick(() => {
       if (document.visibilityState === 'visible') fetchIssue();
     });
@@ -223,6 +225,7 @@ export function useChildren(id: string | null | undefined): UseChildrenResult {
       setChildren([]);
       return;
     }
+    setLoading(true);
     try {
       const data = await apiFetch<Issue[]>(`/issues/${id}/children`);
       setChildren(Array.isArray(data) ? data : []);
@@ -234,12 +237,9 @@ export function useChildren(id: string | null | undefined): UseChildrenResult {
   }, [id]);
 
   useEffect(() => {
-    if (!id) {
-      setChildren([]);
-      return;
-    }
-    setLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchChildren();
+    if (!id) return;
     return subscribeTick(() => {
       if (document.visibilityState === 'visible') fetchChildren();
     });
@@ -249,18 +249,18 @@ export function useChildren(id: string | null | undefined): UseChildrenResult {
 }
 
 interface UseHealthResult {
-  health: import('../types.js').HealthData | null;
+  health: HealthData | null;
   error: string | null;
   loading: boolean;
 }
 
 export function useHealth(): UseHealthResult {
-  const [health, setHealth] = useState<import('../types.js').HealthData | null>(null);
+  const [health, setHealth] = useState<HealthData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<import('../types.js').HealthData>('/health')
+    apiFetch<HealthData>('/health')
       .then((data) => {
         setHealth(data);
         setError(null);
@@ -345,11 +345,11 @@ export async function removeLabel(issueId: string, label: string): Promise<unkno
   });
 }
 
-export function useLabels(): import('../types.js').LabelItem[] {
-  const [labels, setLabels] = useState<import('../types.js').LabelItem[]>([]);
+export function useLabels(): LabelItem[] {
+  const [labels, setLabels] = useState<LabelItem[]>([]);
 
   useEffect(() => {
-    apiFetch<import('../types.js').LabelItem[]>('/labels')
+    apiFetch<LabelItem[]>('/labels')
       .then((data) => setLabels(data))
       .catch(() => {});
   }, []);

@@ -15,6 +15,8 @@
     "dev": "react-router dev",
     "build": "react-router build",
     "start": "node bin/beadee.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
@@ -33,13 +35,20 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
+    "@eslint-react/eslint-plugin": "^4.2.3",
+    "@eslint/js": "^10.0.1",
     "@react-router/dev": "^7.14.1",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "eslint": "^10.2.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.5.0",
     "husky": "^9.1.7",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.58.2",
     "vite": "^5.4.8"
   },
   "engines": {

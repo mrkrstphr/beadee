@@ -15,14 +15,15 @@ interface RefreshIndicatorProps {
 }
 
 export default function RefreshIndicator({ lastUpdated, polling }: RefreshIndicatorProps) {
-  const [label, setLabel] = useState<string | null>(null);
+  const [_tick, setTick] = useState(0);
 
   useEffect(() => {
     if (!lastUpdated) return;
-    setLabel(timeAgo(lastUpdated));
-    const t = setInterval(() => setLabel(timeAgo(lastUpdated)), 5000);
+    const t = setInterval(() => setTick((n) => n + 1), 5000);
     return () => clearInterval(t);
   }, [lastUpdated]);
+
+  const label = timeAgo(lastUpdated);
 
   return (
     <div className="refresh-indicator" title={label ? `Updated ${label}` : 'Waiting for data…'}>

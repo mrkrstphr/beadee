@@ -32,7 +32,9 @@ function getCached(): UpdateInfo | null {
 function setCache(data: UpdateInfo) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
-  } catch {}
+  } catch {
+    // ignore localStorage write errors
+  }
 }
 
 interface FooterProps {
@@ -47,6 +49,7 @@ export default function Footer({ onShowShortcuts }: FooterProps) {
     function checkForUpdate() {
       const cached = getCached();
       if (cached) {
+        // eslint-disable-next-line @eslint-react/set-state-in-effect
         if (cached.hasUpdate) setUpdateInfo(cached);
         return;
       }
