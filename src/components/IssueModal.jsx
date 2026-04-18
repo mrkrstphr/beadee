@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useId } from 'react'
 import { X } from 'lucide-react'
-import { createIssue, updateIssue } from '../hooks/useIssues.js'
+import { createIssue, updateIssue, useLabels } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 
 const TYPES = ['task', 'bug', 'feature', 'chore', 'epic', 'decision', 'spike', 'story', 'milestone']
@@ -26,6 +26,64 @@ function parseEstimateField(str) {
   const n = parseInt(t, 10)
   if (n < 0) return { ok: false }
   return { ok: true, value: n }
+}
+
+function LabelPicker({ value, onChange }) {
+  const allLabels = useLabels()
+  const [adding, setAdding] = useState(false)
+  const [input, setInput] = useState('')
+  const inputRef = useRef(null)
+  const listId = useId()
+
+  useEffect(() => { if (adding) inputRef.current?.focus() }, [adding])
+
+  function add(label) {
+    const trimmed = label.trim().toLowerCase()
+    if (trimmed && !value.includes(trimmed)) onChange([...value, trimmed])
+    setAdding(false)
+    setInput('')
+  }
+
+  function remove(label) {
+    onChange(value.filter(l => l !== label))
+  }
+
+  return (
+    <div className="label-chips">
+      {value.map(label => (
+        <span key={label} className="label-chip">
+          {label}
+          <button type="button" className="label-chip-remove" onClick={() => remove(label)} title={`Remove ${label}`}>×</button>
+        </span>
+      ))}
+      {adding ? (
+        <>
+          <datalist id={listId}>
+            {allLabels.filter(({ label }) => !value.includes(label)).map(({ label }) => (
+              <option key={label} value={label} />
+            ))}
+          </datalist>
+          <input
+            ref={inputRef}
+            list={listId}
+            className="label-chip-input"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') { e.preventDefault(); add(input) }
+              if (e.key === 'Escape') { setAdding(false); setInput('') }
+            }}
+            onBlur={() => { if (input.trim()) add(input); else setAdding(false) }}
+            placeholder="label…"
+          />
+        </>
+      ) : (
+        <button type="button" className="label-add-trigger" onClick={() => setAdding(true)}>
+          + Add label
+        </button>
+      )}
+    </div>
+  )
 }
 
 function IssueTypeahead({ value, onChange }) {
@@ -171,6 +229,7 @@ export default function IssueModal({ issue, onClose, onSaved }) {
     acceptance:   issue?.acceptance_criteria ?? '',
     external_ref: issue?.external_ref        ?? '',
     parent:       issue?.parent              ?? '',
+    labels:       issue?.labels              ?? [],
   })
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -214,6 +273,7 @@ export default function IssueModal({ issue, onClose, onSaved }) {
         acceptance:   form.acceptance.trim()   || undefined,
         external_ref: form.external_ref.trim() || undefined,
         parent:       form.parent.trim()       || undefined,
+        labels:       form.labels,
       }
 
       const initialDue = isEdit ? formatDueInitial(issue?.due_at) : ''
@@ -317,6 +377,11 @@ export default function IssueModal({ issue, onClose, onSaved }) {
               onChange={e => set('design', e.target.value)}
             />
           </label>
+
+          <div className="field">
+            <span className="field-label">Labels</span>
+            <LabelPicker value={form.labels} onChange={v => set('labels', v)} />
+          </div>
 
           <div className="field-row">
             <label className="field field-half">

@@ -32,7 +32,7 @@ export async function action({ request }) {
   }
 
   const body = await request.json().catch(() => ({}))
-  const { title, description, type = 'task', priority = 2, estimate, due, notes, design, acceptance, external_ref, parent } = body
+  const { title, description, type = 'task', priority = 2, estimate, due, notes, design, acceptance, external_ref, parent, labels } = body
 
   if (!title) return Response.json({ error: 'title is required' }, { status: 400 })
 
@@ -53,6 +53,7 @@ export async function action({ request }) {
   if (acceptance)   args.push(`--acceptance=${acceptance}`)
   if (external_ref) args.push(`--external-ref=${external_ref}`)
   if (parent)       args.push(`--parent=${parent}`)
+  if (Array.isArray(labels) && labels.length > 0) args.push(`--labels=${labels.join(',')}`)
 
   const result = await bdRun(args, process.cwd())
   suppressWatch(); broadcast()

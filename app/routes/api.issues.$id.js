@@ -45,6 +45,7 @@ export async function action({ request, params }) {
     if (body.acceptance   !== undefined) args.push(`--acceptance=${body.acceptance}`)
     if (body.external_ref !== undefined) args.push(`--external-ref=${body.external_ref}`)
     if (body.parent       !== undefined) args.push(`--parent=${body.parent}`)
+    if (Array.isArray(body.labels))      args.push(`--set-labels=${body.labels.join(',')}`)
   }
 
   const result = await bdRun(args, process.cwd())
