@@ -628,13 +628,40 @@ textarea::placeholder {
 
 /* Left panel */
 .list-panel {
-  width: 320px;
-  min-width: 260px;
+  width: var(--list-panel-width, 320px);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border);
   background: var(--bg-surface);
+}
+
+.resize-divider {
+  width: 12px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+.resize-divider::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  left: 0;
+  width: 2px;
+  background: var(--border);
+  transition:
+    background 0.15s,
+    width 0.15s,
+    left 0.15s;
+}
+
+.resize-divider:hover::after,
+.resize-divider:active::after {
+  left: 0;
+  width: 4px;
+  background: var(--accent, #6366f1);
 }
 
 .list-panel-toolbar {
@@ -2812,9 +2839,12 @@ textarea.field-input {
   }
 
   .list-panel {
-    width: 100%;
+    width: 100% !important;
     min-width: 0;
-    border-right: none;
+  }
+
+  .resize-divider {
+    display: none;
   }
 
   /* Detail panel: hidden by default, shown as overlay when active */
