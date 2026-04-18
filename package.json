@@ -6,9 +6,6 @@
   "bin": {
     "beadee": "./bin/beadee.js"
   },
-  "config": {
-    "message": "chore: release v%s"
-  },
   "files": [
     "bin/",
     "build/",
