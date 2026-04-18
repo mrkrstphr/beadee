@@ -648,7 +648,7 @@ textarea::placeholder {
   content: '';
   position: absolute;
   inset: 0;
-  left: 5px;
+  left: 0;
   width: 2px;
   background: var(--border);
   transition:
@@ -659,7 +659,7 @@ textarea::placeholder {
 
 .resize-divider:hover::after,
 .resize-divider:active::after {
-  left: 4px;
+  left: 0;
   width: 4px;
   background: var(--accent, #6366f1);
 }
