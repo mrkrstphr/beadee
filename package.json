@@ -16,7 +16,8 @@
     "build": "react-router build",
     "start": "node bin/beadee.js",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@react-router/node": "^7.14.1",
@@ -30,7 +31,10 @@
     "react-router": "^7.14.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@react-router/dev": "^7.14.1",
+    "husky": "^9.1.7",
     "prettier": "^3.8.3",
     "vite": "^5.4.8"
   },
