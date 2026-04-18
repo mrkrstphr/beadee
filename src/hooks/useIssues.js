@@ -125,7 +125,7 @@ export function useIssues(filters = {}, { onRefreshed } = {}) {
 
 export function useIssue(id) {
   const [issue, setIssue] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState(null);
   const [notFound, setNotFound] = useState(false);
 
