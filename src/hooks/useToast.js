@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useLayoutEffect } from 'react';
 
 let _addToast = null;
 
@@ -19,8 +19,12 @@ export function useToastProvider() {
     }, 2500);
   }, []);
 
-  // Register global accessor
-  _addToast = add;
+  useLayoutEffect(() => {
+    _addToast = add;
+    return () => {
+      _addToast = null;
+    };
+  }, [add]);
 
   const dismiss = useCallback((id) => {
     clearTimeout(timers.current[id]);
