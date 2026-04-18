@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
-import { Check, Copy, ChevronDown, User, X } from 'lucide-react'
-import { useIssue, useChildren, updateIssue, closeIssue, addLabel, removeLabel, useLabels } from '../hooks/useIssues.js'
+import { Check, Copy, ChevronDown, User, X, Trash2 } from 'lucide-react'
+import { useIssue, useChildren, updateIssue, closeIssue, deleteIssue, addLabel, removeLabel, useLabels } from '../hooks/useIssues.js'
 import { toast } from '../hooks/useToast.js'
 import { useKeyboard } from '../hooks/useKeyboard.js'
 import CollapsibleSection from './CollapsibleSection.jsx'
 import CommentThread from './CommentThread.jsx'
+import ConfirmDialog from './ConfirmDialog.jsx'
 import MarkdownContent from './MarkdownContent.jsx'
 import StatusIcon from './StatusIcon.jsx'
 
@@ -174,13 +175,16 @@ function CopyIdButton({ id }) {
 }
 
 
-export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit }) {
+export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, onDelete }) {
   const { issue, loading, error } = useIssue(issueId)
   const { children } = useChildren(issueId)
   const { issue: parentIssue } = useIssue(issue?.parent ?? null)
   const [pendingClose, setPendingClose] = useState(false)
   const [closeReason, setCloseReason] = useState('')
   const [actionPending, setActionPending] = useState(false)
+  const [editMenuOpen, setEditMenuOpen] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const editMenuRef = useRef(null)
 
   async function handleAction(fn, successMsg) {
     setActionPending(true)
@@ -215,11 +219,29 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
   const canClaim = issue?.status === 'open'
   const canClose = issue?.status !== 'closed'
 
+  useEffect(() => {
+    if (!editMenuOpen) return
+    function handler(e) {
+      if (editMenuRef.current && !editMenuRef.current.contains(e.target)) setEditMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [editMenuOpen])
+
+  async function handleDelete() {
+    setConfirmDelete(false)
+    setEditMenuOpen(false)
+    await handleAction(async () => {
+      await deleteIssue(issueId)
+    }, 'Issue deleted')
+    onDelete?.()
+  }
+
   useKeyboard({
     c: () => canClaim && !actionPending && handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed'),
     e: () => issue && onEdit?.(issue),
     x: () => canClose && !pendingClose && setPendingClose(true),
-  }, !!issue && !pendingClose)
+  }, !!issue && !pendingClose && !confirmDelete)
 
   if (loading) return <div className="detail-loading">Loading…</div>
   if (error)   return <div className="detail-error">Error: {error}</div>
@@ -228,6 +250,16 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
   const blockedBy = issue.dependencies?.filter(d => d.dependency_type === 'blocks') ?? []
 
   return (
+    <>
+    {confirmDelete && (
+      <ConfirmDialog
+        title="Delete Issue"
+        message={`Are you sure you want to delete ${issueId}? This cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
+    )}
     <div className="issue-detail">
       {/* Header */}
       <div className="detail-header">
@@ -259,9 +291,28 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
               </button>
             )}
             {onEdit && (
-              <button className="btn btn-secondary" onClick={() => onEdit(issue)}>
-                Edit
-              </button>
+              <div className="btn-split" ref={editMenuRef}>
+                <button className="btn btn-secondary btn-split-main" onClick={() => onEdit(issue)}>
+                  Edit
+                </button>
+                <button
+                  className="btn btn-secondary btn-split-chevron"
+                  onClick={() => setEditMenuOpen(o => !o)}
+                  aria-label="More actions"
+                >
+                  <ChevronDown size={12} />
+                </button>
+                {editMenuOpen && (
+                  <div className="btn-split-menu">
+                    <button
+                      className="btn-split-menu-item btn-split-menu-danger"
+                      onClick={() => { setEditMenuOpen(false); setConfirmDelete(true) }}
+                    >
+                      <Trash2 size={13} /> Delete
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
             <button className="btn btn-secondary detail-close-btn" onClick={onClose}><X size={14} /></button>
           </div>
@@ -414,5 +465,6 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
 
       <CommentThread issueId={issueId} />
     </div>
+    </>
   )
 }

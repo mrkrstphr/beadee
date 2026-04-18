@@ -214,6 +214,10 @@ export async function closeIssue(id, reason) {
   })
 }
 
+export async function deleteIssue(id) {
+  return apiFetch(`/issues/${id}`, { method: 'DELETE' })
+}
+
 export async function addDep(issue, dependsOn) {
   return apiFetch('/deps', { method: 'POST', body: JSON.stringify({ issue, dependsOn }) })
 }

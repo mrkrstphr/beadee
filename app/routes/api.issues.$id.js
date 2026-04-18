@@ -11,11 +11,19 @@ export async function loader({ params }) {
 }
 
 export async function action({ request, params }) {
+  const { id } = params
+
+  if (request.method === 'DELETE') {
+    suppressWatch()
+    await bdRun(['delete', id, '--force'], process.cwd())
+    suppressWatch(); broadcast()
+    return Response.json({ deleted: true })
+  }
+
   if (request.method !== 'PATCH') {
     return Response.json({ error: 'Method not allowed' }, { status: 405 })
   }
 
-  const { id } = params
   const body = await request.json().catch(() => ({}))
 
   if (Object.keys(body).length === 0) {

@@ -93,6 +93,10 @@ export default function Layout() {
     },
   }, !modalOpen)
 
+  function handleDelete() {
+    navigate(`/${activeTab}`)
+  }
+
   const DetailPanel = useCallback(({ issueId, onClose }) => (
     <IssueDetail
       key={`${issueId}-${detailKey}`}
@@ -100,6 +104,7 @@ export default function Layout() {
       onClose={onClose}
       onSelectIssue={showIssueDetail}
       onEdit={openEdit}
+      onDelete={handleDelete}
       onRefresh={handleRefresh}
     />
   ), [detailKey, activeTab])

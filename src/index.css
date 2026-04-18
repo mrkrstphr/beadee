@@ -939,6 +939,63 @@ input::placeholder, textarea::placeholder {
   padding: 4px 8px;
 }
 
+.btn-split {
+  position: relative;
+  display: flex;
+}
+
+.btn-split-main {
+  border-radius: 6px 0 0 6px;
+  border-right: none;
+}
+
+.btn-split-chevron {
+  border-radius: 0 6px 6px 0;
+  padding: 5px 7px;
+  border-left: 1px solid var(--border-strong, color-mix(in srgb, var(--border) 60%, var(--text)));
+}
+
+.btn-split-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px;
+  min-width: 120px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.btn-split-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: left;
+}
+
+.btn-split-menu-item:hover {
+  background: var(--border);
+}
+
+.btn-split-menu-danger {
+  color: var(--danger);
+}
+
+.btn-split-menu-danger:hover {
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+}
+
 .detail-title {
   font-size: 18px;
   font-weight: 600;
@@ -1963,6 +2020,10 @@ textarea.field-input {
 
 .update-modal {
   width: 600px;
+}
+
+.confirm-modal {
+  width: 380px;
 }
 
 .update-changelog {
