@@ -71,7 +71,7 @@ function LabelAddTrigger({ issueId }) {
   }
 
   async function commit() {
-    const trimmed = value.trim();
+    const trimmed = (inputRef.current?.value ?? value).trim();
     if (!trimmed || busy) {
       close();
       return;
@@ -96,7 +96,8 @@ function LabelAddTrigger({ issueId }) {
   function handleKeyDown(e) {
     if (e.key === 'Enter') {
       e.preventDefault();
-      commit();
+      // Defer one tick so the browser can update the input value from a datalist selection
+      setTimeout(() => commit(), 0);
     }
     if (e.key === 'Escape') {
       e.preventDefault();
@@ -105,9 +106,13 @@ function LabelAddTrigger({ issueId }) {
   }
 
   function handleBlur() {
-    // Small delay so datalist selection isn't treated as a blur
+    // Delay lets datalist selection finish updating the input before we read it
     setTimeout(() => {
-      if (!value.trim()) close();
+      if (inputRef.current?.value.trim()) {
+        commit();
+      } else {
+        close();
+      }
     }, 150);
   }
 
