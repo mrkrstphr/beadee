@@ -47,7 +47,6 @@ function DetailPanel({ issueId, onClose }: DetailPanelProps) {
       onSelectIssue={ctx.onSelectIssue}
       onEdit={ctx.onEdit}
       onDelete={ctx.onDelete}
-      onRefresh={ctx.onRefresh}
     />
   );
 }

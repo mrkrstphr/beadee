@@ -236,7 +236,6 @@ interface IssueDetailProps {
   onSelectIssue?: (id: string) => void;
   onEdit?: (issue: Issue) => void;
   onDelete?: () => void;
-  onRefresh?: () => void;
 }
 
 export default function IssueDetail({
