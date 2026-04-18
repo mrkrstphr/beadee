@@ -1,15 +1,15 @@
 import { useState, useCallback } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
-import Header from '../../src/components/Header.jsx';
-import IssueDetail from '../../src/components/IssueDetail.jsx';
-import IssueModal from '../../src/components/IssueModal.jsx';
-import ErrorScreen from '../../src/components/ErrorScreen.jsx';
-import ToastContainer from '../../src/components/ToastContainer.jsx';
-import ShortcutsHelp from '../../src/components/ShortcutsHelp.jsx';
-import Footer from '../../src/components/Footer.jsx';
-import { useHealth } from '../../src/hooks/useIssues.js';
-import { useToastProvider } from '../../src/hooks/useToast.js';
-import { useKeyboard } from '../../src/hooks/useKeyboard.js';
+import Header from '../components/Header.jsx';
+import IssueDetail from '../components/IssueDetail.jsx';
+import IssueModal from '../components/IssueModal.jsx';
+import ErrorScreen from '../components/ErrorScreen.jsx';
+import ToastContainer from '../components/ToastContainer.jsx';
+import ShortcutsHelp from '../components/ShortcutsHelp.jsx';
+import Footer from '../components/Footer.jsx';
+import { useHealth } from '../hooks/useIssues.js';
+import { useToastProvider } from '../hooks/useToast.js';
+import { useKeyboard } from '../hooks/useKeyboard.js';
 
 function setTheme(theme) {
   localStorage.setItem('beadee-theme', theme);

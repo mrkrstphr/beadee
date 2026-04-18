@@ -1,5 +1,5 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
-import '../src/index.css';
+import './index.css';
 
 // Inline script applied before first paint to avoid theme flash.
 const themeScript = `

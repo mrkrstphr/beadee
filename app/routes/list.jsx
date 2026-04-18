@@ -1,5 +1,5 @@
 import { useParams, useNavigate, useOutletContext } from 'react-router';
-import ListView from '../../src/views/ListView.jsx';
+import ListView from '../views/ListView.jsx';
 
 export default function ListRoute() {
   const { id } = useParams();
