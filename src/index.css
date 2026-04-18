@@ -1123,6 +1123,10 @@ textarea::placeholder {
   opacity: 1;
   color: var(--text-primary);
 }
+.btn-copy-id--failed {
+  opacity: 1;
+  color: var(--status-closed, #e05252);
+}
 
 .detail-actions-top {
   display: flex;

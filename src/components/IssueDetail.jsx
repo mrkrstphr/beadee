@@ -193,18 +193,24 @@ function StatusDropdown({ status, onChange, disabled }) {
 
 function CopyIdButton({ id }) {
   const [copied, setCopied] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setFailed(true);
+      setTimeout(() => setFailed(false), 1500);
+    }
   }
 
   return (
     <button
-      className="btn-copy-id"
+      className={`btn-copy-id${failed ? ' btn-copy-id--failed' : ''}`}
       onClick={handleCopy}
-      title="Copy issue ID"
+      title={failed ? 'Copy failed' : 'Copy issue ID'}
       aria-label="Copy issue ID"
     >
       {copied ? <Check size={13} strokeWidth={2.5} /> : <Copy size={13} strokeWidth={1.75} />}
