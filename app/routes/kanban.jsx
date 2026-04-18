@@ -1,10 +1,10 @@
-import { useParams, useNavigate, useOutletContext } from 'react-router'
-import KanbanView from '../../src/views/KanbanView.jsx'
+import { useParams, useNavigate, useOutletContext } from 'react-router';
+import KanbanView from '../../src/views/KanbanView.jsx';
 
 export default function KanbanRoute() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const { search, DetailPanel, onRefreshed } = useOutletContext()
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { search, DetailPanel, onRefreshed } = useOutletContext();
 
   return (
     <KanbanView
@@ -14,5 +14,5 @@ export default function KanbanRoute() {
       DetailPanel={DetailPanel}
       onRefreshed={onRefreshed}
     />
-  )
+  );
 }

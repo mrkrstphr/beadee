@@ -1,26 +1,36 @@
-import { useState, useEffect } from 'react'
-import { Settings } from 'lucide-react'
-import { useHealth } from '../hooks/useIssues.js'
-import RefreshIndicator from './RefreshIndicator.jsx'
+import { useState, useEffect } from 'react';
+import { Settings } from 'lucide-react';
+import { useHealth } from '../hooks/useIssues.js';
+import RefreshIndicator from './RefreshIndicator.jsx';
 
 function useDebounce(value, delay) {
-  const [debounced, setDebounced] = useState(value)
+  const [debounced, setDebounced] = useState(value);
   useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay)
-    return () => clearTimeout(t)
-  }, [value, delay])
-  return debounced
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
 }
 
-export default function Header({ activeTab, onTabChange, search, onSearchChange, onNewIssue, lastUpdated, polling }) {
-  const { health } = useHealth()
-  const [localSearch, setLocalSearch] = useState(search)
-  const debouncedSearch = useDebounce(localSearch, 300)
+export default function Header({
+  activeTab,
+  onTabChange,
+  search,
+  onSearchChange,
+  onNewIssue,
+  lastUpdated,
+  polling,
+}) {
+  const { health } = useHealth();
+  const [localSearch, setLocalSearch] = useState(search);
+  const debouncedSearch = useDebounce(localSearch, 300);
 
-  useEffect(() => { onSearchChange(debouncedSearch) }, [debouncedSearch])
+  useEffect(() => {
+    onSearchChange(debouncedSearch);
+  }, [debouncedSearch]);
 
-  const showSearch = activeTab !== 'settings'
-  const showNew    = activeTab !== 'settings'
+  const showSearch = activeTab !== 'settings' && activeTab !== 'memories';
+  const showNew = activeTab !== 'settings' && activeTab !== 'memories';
 
   return (
     <header className="header">
@@ -28,9 +38,7 @@ export default function Header({ activeTab, onTabChange, search, onSearchChange,
         <div className="header-brand">
           <img src="/favicon.svg" alt="" width="20" height="20" style={{ display: 'block' }} />
           <span className="logo">beadee</span>
-          {health?.projectName && (
-            <span className="header-project">{health.projectName}</span>
-          )}
+          {health?.projectName && <span className="header-project">{health.projectName}</span>}
         </div>
 
         <nav className="tabs">
@@ -46,6 +54,12 @@ export default function Header({ activeTab, onTabChange, search, onSearchChange,
           >
             Board
           </button>
+          <button
+            className={`tab ${activeTab === 'memories' ? 'active' : ''}`}
+            onClick={() => onTabChange('memories')}
+          >
+            Memories
+          </button>
         </nav>
       </div>
 
@@ -56,7 +70,7 @@ export default function Header({ activeTab, onTabChange, search, onSearchChange,
             type="search"
             placeholder="Search issues…"
             value={localSearch}
-            onChange={e => setLocalSearch(e.target.value)}
+            onChange={(e) => setLocalSearch(e.target.value)}
           />
         )}
 
@@ -78,5 +92,5 @@ export default function Header({ activeTab, onTabChange, search, onSearchChange,
         </button>
       </div>
     </header>
-  )
+  );
 }

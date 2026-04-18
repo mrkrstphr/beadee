@@ -1,74 +1,43 @@
-import { execFile } from 'node:child_process'
-import { promisify } from 'node:util'
-import { access, readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { execFile } from 'node:child_process';
+import { access, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { promisify } from 'node:util';
 
-const execFileAsync = promisify(execFile)
-
-// Dolt server can still return transient lock errors; retry with backoff.
-const BD_LOCK_RETRIES = 4
-const BD_LOCK_RETRY_BASE_MS = 80
-
-function isLockError(err) {
-  const msg = (err.stderr || err.message || '').toLowerCase()
-  return msg.includes('failed to open database') || msg.includes('database is locked')
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+const execFileAsync = promisify(execFile);
 
 /**
  * Run a bd CLI command and return parsed JSON output.
- * Automatically retries on embedded-Dolt lock contention.
  *
  * @param {string[]} args  - subcommand + arguments, e.g. ['list', '--status=open']
  * @param {string}   cwd   - user's project directory (where .beads/ lives)
  * @returns {Promise<any>} - parsed JSON (array or object)
  */
 export async function bdRun(args, cwd) {
-  let lastErr
-  for (let attempt = 0; attempt <= BD_LOCK_RETRIES; attempt++) {
-    if (attempt > 0) await sleep(BD_LOCK_RETRY_BASE_MS * 2 ** (attempt - 1))
-
-    let stdout
-    try {
-      ;({ stdout } = await execFileAsync('bd', ['--json', ...args], { cwd }))
-    } catch (err) {
-      if (err.code === 'ENOENT') {
-        throw Object.assign(new Error('bd not found in PATH'), { code: 'BD_NOT_FOUND' })
-      }
-      if (isLockError(err) && attempt < BD_LOCK_RETRIES) {
-        lastErr = err
-        continue
-      }
-      const message = (err.stderr || err.message || '').trim()
-      throw Object.assign(new Error(`bd error: ${message}`), {
-        code: 'BD_ERROR',
-        exitCode: err.code,
-        stderr: err.stderr,
-      })
+  let stdout;
+  try {
+    ({ stdout } = await execFileAsync('bd', ['--json', ...args], { cwd }));
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw Object.assign(new Error('bd not found in PATH'), { code: 'BD_NOT_FOUND' });
     }
-
-    const text = stdout.trim()
-    if (!text) return []
-
-    try {
-      return JSON.parse(text)
-    } catch {
-      throw Object.assign(new Error(`bd returned non-JSON output: ${text.slice(0, 200)}`), {
-        code: 'BD_PARSE_ERROR',
-      })
-    }
+    const message = (err.stderr || err.message || '').trim();
+    throw Object.assign(new Error(`bd error: ${message}`), {
+      code: 'BD_ERROR',
+      exitCode: err.code,
+      stderr: err.stderr,
+    });
   }
 
-  // Exhausted retries
-  const message = (lastErr.stderr || lastErr.message || '').trim()
-  throw Object.assign(new Error(`bd error (lock contention after ${BD_LOCK_RETRIES} retries): ${message}`), {
-    code: 'BD_ERROR',
-    exitCode: lastErr.code,
-    stderr: lastErr.stderr,
-  })
+  const text = stdout.trim();
+  if (!text) return [];
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw Object.assign(new Error(`bd returned non-JSON output: ${text.slice(0, 200)}`), {
+      code: 'BD_PARSE_ERROR',
+    });
+  }
 }
 
 /**
@@ -76,10 +45,10 @@ export async function bdRun(args, cwd) {
  */
 export async function bdVersion() {
   try {
-    const { stdout } = await execFileAsync('bd', ['version'])
-    return stdout.trim()
+    const { stdout } = await execFileAsync('bd', ['version']);
+    return stdout.trim();
   } catch {
-    return 'unknown'
+    return 'unknown';
   }
 }
 
@@ -91,26 +60,26 @@ export async function bdVersion() {
  */
 export async function bdCheck(cwd) {
   // Confirm bd binary exists
-  let bdPath
+  let bdPath;
   try {
-    ;({ stdout: bdPath } = await execFileAsync('which', ['bd']))
-    bdPath = bdPath.trim()
+    ({ stdout: bdPath } = await execFileAsync('which', ['bd']));
+    bdPath = bdPath.trim();
   } catch {
-    throw Object.assign(new Error('bd not found in PATH'), { code: 'BD_NOT_FOUND' })
+    throw Object.assign(new Error('bd not found in PATH'), { code: 'BD_NOT_FOUND' });
   }
 
   // Confirm .beads/ directory exists in the project
-  const beadsDir = join(cwd, '.beads')
+  const beadsDir = join(cwd, '.beads');
   try {
-    await access(beadsDir)
+    await access(beadsDir);
   } catch {
-    throw Object.assign(
-      new Error(`.beads/ not found in ${cwd} — is this a beads project?`),
-      { code: 'BD_NO_BEADS_DIR', cwd }
-    )
+    throw Object.assign(new Error(`.beads/ not found in ${cwd} — is this a beads project?`), {
+      code: 'BD_NO_BEADS_DIR',
+      cwd,
+    });
   }
 
-  return { bd: bdPath, beads: true }
+  return { bd: bdPath, beads: true };
 }
 
 /**
@@ -120,18 +89,15 @@ export async function bdCheck(cwd) {
  * @param {string} cwd - user's project directory
  */
 export async function bdModeCheck(cwd) {
-  const metadataPath = join(cwd, '.beads', 'metadata.json')
+  const metadataPath = join(cwd, '.beads', 'metadata.json');
   try {
-    const raw = await readFile(metadataPath, 'utf8')
-    const metadata = JSON.parse(raw)
+    const raw = await readFile(metadataPath, 'utf8');
+    const metadata = JSON.parse(raw);
     if (metadata.dolt_mode === 'embedded') {
-      throw Object.assign(
-        new Error('BD_EMBEDDED_DOLT'),
-        { code: 'BD_EMBEDDED_DOLT', cwd }
-      )
+      throw Object.assign(new Error('BD_EMBEDDED_DOLT'), { code: 'BD_EMBEDDED_DOLT', cwd });
     }
   } catch (err) {
-    if (err.code === 'BD_EMBEDDED_DOLT') throw err
+    if (err.code === 'BD_EMBEDDED_DOLT') throw err;
     // metadata.json missing or unreadable — not our problem to catch here
   }
 }

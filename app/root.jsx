@@ -1,5 +1,5 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
-import '../src/index.css'
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import '../src/index.css';
 
 // Inline script applied before first paint to avoid theme flash.
 const themeScript = `
@@ -10,7 +10,7 @@ const themeScript = `
         ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
         : t
   } catch(e) {}
-`
+`;
 
 export default function Root() {
   return (
@@ -31,5 +31,5 @@ export default function Root() {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }

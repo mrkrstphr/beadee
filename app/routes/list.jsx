@@ -1,10 +1,10 @@
-import { useParams, useNavigate, useOutletContext } from 'react-router'
-import ListView from '../../src/views/ListView.jsx'
+import { useParams, useNavigate, useOutletContext } from 'react-router';
+import ListView from '../../src/views/ListView.jsx';
 
 export default function ListRoute() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const { search, DetailPanel, onRefreshed } = useOutletContext()
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { search, DetailPanel, onRefreshed } = useOutletContext();
 
   return (
     <ListView
@@ -14,5 +14,5 @@ export default function ListRoute() {
       DetailPanel={DetailPanel}
       onRefreshed={onRefreshed}
     />
-  )
+  );
 }
