@@ -223,7 +223,6 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
   if (!issue)  return null
 
   const blockedBy = issue.dependencies?.filter(d => d.dependency_type === 'blocks') ?? []
-  const blocking  = issue.dependencies?.filter(d => d.dependency_type !== 'blocks') ?? []
 
   return (
     <div className="issue-detail">
@@ -369,29 +368,17 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
       )}
 
       {/* Dependencies */}
-      {(blockedBy.length > 0 || blocking.length > 0) && (
+      {blockedBy.length > 0 && (
         <div className="detail-section">
           <div className="detail-section-label">Dependencies</div>
-          {blockedBy.length > 0 && (
-            <div className="dep-group">
-              <span className="dep-group-label">Blocked by</span>
-              <div className="dep-chips">
-                {blockedBy.map(d => (
-                  <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
-                ))}
-              </div>
+          <div className="dep-group">
+            <span className="dep-group-label">Blocked by</span>
+            <div className="dep-chips">
+              {blockedBy.map(d => (
+                <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
+              ))}
             </div>
-          )}
-          {blocking.length > 0 && (
-            <div className="dep-group">
-              <span className="dep-group-label">Blocking</span>
-              <div className="dep-chips">
-                {blocking.map(d => (
-                  <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
-                ))}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       )}
 
