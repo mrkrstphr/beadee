@@ -23,11 +23,9 @@ function applyTheme(theme: string) {
 }
 
 interface DetailPanelCtx {
-  detailKey: number;
   onSelectIssue: (id: string) => void;
   onEdit: (issue: Issue) => void;
   onDelete: () => void;
-  onRefresh: () => void;
 }
 
 const DetailPanelContext = createContext<DetailPanelCtx | null>(null);
@@ -41,7 +39,6 @@ function DetailPanel({ issueId, onClose }: DetailPanelProps) {
   const ctx = useContext(DetailPanelContext)!;
   return (
     <IssueDetail
-      key={`${issueId}-${ctx.detailKey}`}
       issueId={issueId}
       onClose={onClose}
       onSelectIssue={ctx.onSelectIssue}
@@ -55,7 +52,6 @@ export interface LayoutOutletContext {
   search: string;
   DetailPanel: (props: DetailPanelProps) => React.ReactElement;
   onRefreshed: (date: Date) => void;
-  onRefresh: () => void;
   theme: string;
   onThemeChange: (theme: string) => void;
 }
@@ -72,7 +68,6 @@ export default function Layout() {
   const [showModal, setShowModal] = useState(false);
   const [editingIssue, setEditingIssue] = useState<Issue | null>(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [detailKey, setDetailKey] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [polling, setPolling] = useState(false);
 
@@ -87,7 +82,6 @@ export default function Layout() {
         ? 'memories'
         : 'list';
 
-  const handleRefresh = useCallback(() => setDetailKey((k) => k + 1), []);
   const handleRefreshed = useCallback((date: Date) => {
     setLastUpdated(date);
     setPolling(false);
@@ -116,7 +110,6 @@ export default function Layout() {
   }, []);
 
   function handleModalSaved(saved: Issue, { created }: { created?: boolean } = {}) {
-    handleRefresh();
     if (created && saved?.id) {
       const view = activeTab === 'settings' ? 'list' : activeTab;
       navigate(`/${view}/${saved.id}`);
@@ -141,7 +134,6 @@ export default function Layout() {
         const el = document.querySelector('.header-search') as HTMLElement | null;
         el?.focus();
       },
-      r: () => handleRefresh(),
       1: () => switchTab('list'),
       2: () => switchTab('kanban'),
       '?': () => setShowShortcuts(true),
@@ -161,11 +153,9 @@ export default function Layout() {
   return (
     <DetailPanelContext.Provider
       value={{
-        detailKey,
         onSelectIssue: showIssueDetail,
         onEdit: openEdit,
         onDelete: handleDelete,
-        onRefresh: handleRefresh,
       }}
     >
       <div className="app">
@@ -190,7 +180,6 @@ export default function Layout() {
                 search,
                 DetailPanel,
                 onRefreshed: handleRefreshed,
-                onRefresh: handleRefresh,
                 theme,
                 onThemeChange: handleThemeChange,
               } satisfies LayoutOutletContext
