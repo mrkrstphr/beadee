@@ -16,6 +16,7 @@
     "build": "react-router build",
     "start": "node bin/beadee.js",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
