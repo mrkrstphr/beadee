@@ -134,7 +134,8 @@ interface IssueTypeaheadProps {
 
 function IssueTypeahead({ value, onChange }: IssueTypeaheadProps) {
   const [inputValue, setInputValue] = useState('');
-  const [selected, setSelected] = useState<SearchResult | null>(null);
+  const [resolvedTitle, setResolvedTitle] = useState<string | null>(null);
+  const [resolvedId, setResolvedId] = useState<string | null>(null);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
@@ -142,15 +143,26 @@ function IssueTypeahead({ value, onChange }: IssueTypeaheadProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const selected: SearchResult | null =
+    value && resolvedId === value ? { id: resolvedId, title: resolvedTitle ?? value } : null;
+
   useEffect(() => {
     if (!value) return;
-    fetch(`/api/issues/${value}`)
+    const controller = new AbortController();
+    fetch(`/api/issues/${value}`, { signal: controller.signal })
       .then((r) => r.json() as Promise<SearchResult>)
       .then((d) => {
-        if (d.id) setSelected({ id: d.id, title: d.title });
+        setResolvedId(d.id ?? value);
+        setResolvedTitle(d.title ?? value);
       })
-      .catch(() => setSelected({ id: value, title: value }));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps, @eslint-react/exhaustive-deps
+      .catch((err: Error) => {
+        if (err.name !== 'AbortError') {
+          setResolvedId(value);
+          setResolvedTitle(value);
+        }
+      });
+    return () => controller.abort();
+  }, [value]);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -183,7 +195,8 @@ function IssueTypeahead({ value, onChange }: IssueTypeaheadProps) {
   }
 
   function select(issue: SearchResult) {
-    setSelected({ id: issue.id, title: issue.title });
+    setResolvedId(issue.id);
+    setResolvedTitle(issue.title);
     onChange(issue.id);
     setInputValue('');
     setResults([]);
@@ -191,7 +204,8 @@ function IssueTypeahead({ value, onChange }: IssueTypeaheadProps) {
   }
 
   function clear() {
-    setSelected(null);
+    setResolvedId(null);
+    setResolvedTitle(null);
     onChange('');
     setInputValue('');
     setResults([]);
