@@ -11,13 +11,7 @@ function timeAgo(iso) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-function Comment({ comment }) {
-  const [, forceUpdate] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => forceUpdate((n) => n + 1), 30000);
-    return () => clearInterval(t);
-  }, []);
-
+function Comment({ comment, tick: _tick }) {
   return (
     <div className={`comment ${comment.optimistic ? 'comment-optimistic' : ''}`}>
       <div className="comment-header">
@@ -36,7 +30,13 @@ export default function CommentThread({ issueId }) {
   const [text, setText] = useState('');
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState(null);
+  const [tick, setTick] = useState(0);
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const t = setInterval(() => setTick((n) => n + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -68,7 +68,7 @@ export default function CommentThread({ issueId }) {
           <div className="comment-state comment-empty">No comments yet</div>
         )}
         {comments.map((c) => (
-          <Comment key={c.id} comment={c} />
+          <Comment key={c.id} comment={c} tick={tick} />
         ))}
       </div>
 
