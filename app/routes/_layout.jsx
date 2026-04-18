@@ -45,7 +45,9 @@ export default function Layout() {
     ? 'kanban'
     : location.pathname.startsWith('/settings')
       ? 'settings'
-      : 'list';
+      : location.pathname.startsWith('/memories')
+        ? 'memories'
+        : 'list';
 
   const handleRefresh = useCallback(() => setDetailKey((k) => k + 1), []);
   const handleRefreshed = useCallback((date) => {
@@ -58,7 +60,7 @@ export default function Layout() {
   }
 
   function showIssueDetail(issueId) {
-    const view = activeTab === 'settings' ? 'list' : activeTab;
+    const view = activeTab === 'settings' || activeTab === 'memories' ? 'list' : activeTab;
     navigate(`/${view}/${issueId}`);
   }
 
@@ -99,8 +101,9 @@ export default function Layout() {
       2: () => switchTab('kanban'),
       '?': () => setShowShortcuts(true),
       s: () => switchTab('settings'),
+      m: () => switchTab('memories'),
       Escape: () => {
-        if (activeTab === 'settings') navigate('/list');
+        if (activeTab === 'settings' || activeTab === 'memories') navigate('/list');
         else if (id) navigate(`/${activeTab}`);
       },
     },

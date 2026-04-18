@@ -10,6 +10,7 @@ const SHORTCUTS = [
       { key: 'r', desc: 'Refresh' },
       { key: '1', desc: 'List view' },
       { key: '2', desc: 'Board view' },
+      { key: 'm', desc: 'Memories' },
       { key: 's', desc: 'Settings' },
       { key: '?', desc: 'Show this help' },
       { key: 'Esc', desc: 'Close / deselect' },

@@ -29,8 +29,8 @@ export default function Header({
     onSearchChange(debouncedSearch);
   }, [debouncedSearch]);
 
-  const showSearch = activeTab !== 'settings';
-  const showNew = activeTab !== 'settings';
+  const showSearch = activeTab !== 'settings' && activeTab !== 'memories';
+  const showNew = activeTab !== 'settings' && activeTab !== 'memories';
 
   return (
     <header className="header">
@@ -53,6 +53,12 @@ export default function Header({
             onClick={() => onTabChange('kanban')}
           >
             Board
+          </button>
+          <button
+            className={`tab ${activeTab === 'memories' ? 'active' : ''}`}
+            onClick={() => onTabChange('memories')}
+          >
+            Memories
           </button>
         </nav>
       </div>

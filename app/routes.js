@@ -8,6 +8,7 @@ export default [
     route('kanban', 'routes/kanban.jsx'),
     route('kanban/:id', 'routes/kanban.$id.jsx'),
     route('settings', 'routes/settings.jsx'),
+    route('memories', 'routes/memories.jsx'),
   ]),
 
   route('api/events', 'routes/api.events.js'),
@@ -23,4 +24,5 @@ export default [
   route('api/ready', 'routes/api.ready.js'),
   route('api/stats', 'routes/api.stats.js'),
   route('api/update', 'routes/api.update.js'),
+  route('api/memories', 'routes/api.memories.js'),
 ];
