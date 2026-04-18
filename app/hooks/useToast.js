@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useLayoutEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 let _addToast = null;
 
@@ -19,7 +19,7 @@ export function useToastProvider() {
     }, 2500);
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     _addToast = add;
     return () => {
       _addToast = null;
