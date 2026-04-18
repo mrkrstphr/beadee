@@ -148,6 +148,7 @@ export default function Layout() {
         }}
         lastUpdated={lastUpdated}
         polling={polling}
+        projectName={health?.projectName}
       />
 
       <main className="main">

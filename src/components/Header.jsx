@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Settings } from 'lucide-react';
-import { useHealth } from '../hooks/useIssues.js';
 import RefreshIndicator from './RefreshIndicator.jsx';
 
 function useDebounce(value, delay) {
@@ -20,8 +19,8 @@ export default function Header({
   onNewIssue,
   lastUpdated,
   polling,
+  projectName,
 }) {
-  const { health } = useHealth();
   const [localSearch, setLocalSearch] = useState(search);
   const debouncedSearch = useDebounce(localSearch, 300);
 
@@ -38,7 +37,7 @@ export default function Header({
         <div className="header-brand">
           <img src="/favicon.svg" alt="" width="20" height="20" style={{ display: 'block' }} />
           <span className="logo">beadee</span>
-          {health?.projectName && <span className="header-project">{health.projectName}</span>}
+          {projectName && <span className="header-project">{projectName}</span>}
         </div>
 
         <nav className="tabs">
