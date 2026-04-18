@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Check, Copy, ChevronDown, User, X, Trash2, Ghost } from 'lucide-react';
 import {
   useIssue,
@@ -274,17 +274,18 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit, o
     onDelete?.();
   }
 
-  useKeyboard(
-    {
+  const detailKeyBindings = useMemo(
+    () => ({
       c: () =>
         canClaim &&
         !actionPending &&
         handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed'),
       e: () => issue && onEdit?.(issue),
       x: () => canClose && !pendingClose && setPendingClose(true),
-    },
-    !!issue && !pendingClose && !confirmDelete,
+    }),
+    [canClaim, actionPending, handleAction, issueId, issue, onEdit, canClose, pendingClose],
   );
+  useKeyboard(detailKeyBindings, !!issue && !pendingClose && !confirmDelete);
 
   if (loading) return <div className="detail-loading">Loading…</div>;
   if (notFound)

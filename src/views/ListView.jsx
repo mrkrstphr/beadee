@@ -188,13 +188,17 @@ export default function ListView({
     [visibleIssues, selectedIdx, onSelectIssue],
   );
 
-  useKeyboard({
-    j: () => navigate(1),
-    k: () => navigate(-1),
-    Enter: () => {
-      if (selectedIdx !== -1) onSelectIssue(visibleIssues[selectedIdx].id);
-    },
-  });
+  const listKeyBindings = useMemo(
+    () => ({
+      j: () => navigate(1),
+      k: () => navigate(-1),
+      Enter: () => {
+        if (selectedIdx !== -1) onSelectIssue(visibleIssues[selectedIdx].id);
+      },
+    }),
+    [navigate, selectedIdx, visibleIssues, onSelectIssue],
+  );
+  useKeyboard(listKeyBindings);
 
   return (
     <div className={`list-view${selectedIssueId ? ' has-detail' : ''}`}>
