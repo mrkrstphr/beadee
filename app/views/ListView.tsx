@@ -6,7 +6,7 @@ import { useLocalStorageState } from '../hooks/useLocalStorageState.js';
 import StatusIcon from '../components/StatusIcon.jsx';
 import ResizableDivider from '../components/ResizableDivider.jsx';
 import type { Issue } from '../types.js';
-import { PRIORITY_LABEL, TYPE_SHORT } from '../types.js';
+import { PRIORITY_LABEL, TYPE_SHORT } from '../constants.js';
 
 const STATUS_FILTERS = [
   { label: 'All', value: '' },
