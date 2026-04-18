@@ -38,7 +38,7 @@ No test runner or linter is configured yet.
 
 ## Architecture
 
-**beadee** is a web GUI for the `bd` (beads) CLI issue tracker. It shells out to `bd --json` for all data — there is no direct database access. No TypeScript — all `.js` / `.jsx`.
+**beadee** is a web GUI for the `bd` (beads) CLI issue tracker. It shells out to `bd --json` for all data — there is no direct database access. TypeScript throughout — all `.ts` / `.tsx`. Exceptions: `bin/beadee.js` (CLI entrypoint with shebang) and `server/server.js` (runs directly in Node, outside Vite).
 
 ### Key architectural constraints
 
@@ -48,8 +48,8 @@ No test runner or linter is configured yet.
 
 ```
 Browser → fetch /api/*
-  → RR7 resource route (app/routes/api.*.js)
-    → bdRun() in server/bd.js
+  → RR7 resource route (app/routes/api.*.ts)
+    → bdRun() in server/bd.ts
       → bd CLI subprocess (process.cwd() = user's project dir)
         → Dolt DB
 ```
@@ -57,7 +57,7 @@ Browser → fetch /api/*
 Real-time updates:
 
 ```
-External bd write → .beads/ file change → fs.watch in server/sse.js
+External bd write → .beads/ file change → fs.watch in server/sse.ts
   → broadcast() → SSE event → useIssues subscriber → refetch /api/issues
 
 Mutation via UI → route action → suppressWatch() + broadcast()
@@ -70,4 +70,4 @@ Themes are CSS custom property sets on `[data-theme='X']` in `src/index.css`. Th
 
 ### SSR note
 
-`ssr: true` is set in `react-router.config.js` because API routes need server-side `bd` execution. `App.jsx` guards `localStorage` access with `typeof window !== 'undefined'` checks to avoid SSR crashes. UI hooks (`useIssues`, etc.) use `useEffect` so they only run client-side.
+`ssr: true` is set in `react-router.config.ts` because API routes need server-side `bd` execution. `root.tsx` guards `localStorage` access with `typeof window !== 'undefined'` checks to avoid SSR crashes. UI hooks (`useIssues`, etc.) use `useEffect` so they only run client-side.
