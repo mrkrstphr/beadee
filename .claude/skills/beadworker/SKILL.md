@@ -54,11 +54,10 @@ Keep these concise and factual — they are permanent record.
 
 ### 4. Checkout a branch
 
-Derive a short kebab-case branch name from the issue title (e.g. `fix-char-limit`, `add-dark-mode`). Create it off `origin/main`:
+Derive a short kebab-case branch name from the issue title (e.g. `fix-char-limit`, `add-dark-mode`). Create it off `main`:
 
 ```
-git fetch origin
-git checkout -b <short-description> origin/main
+git checkout -b <short-description> main
 ```
 
 ### 5. Implement
