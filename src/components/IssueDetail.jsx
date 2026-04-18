@@ -175,6 +175,7 @@ function CopyIdButton({ id }) {
 export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit }) {
   const { issue, loading, error } = useIssue(issueId)
   const { children } = useChildren(issueId)
+  const { issue: parentIssue } = useIssue(issue?.parent ?? null)
   const [pendingClose, setPendingClose] = useState(false)
   const [closeReason, setCloseReason] = useState('')
   const [actionPending, setActionPending] = useState(false)
@@ -230,9 +231,21 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
       <div className="detail-header">
         <div className="detail-header-top">
           <div className="detail-id-group">
-              <span className="detail-id">{issue.id}</span>
-              <CopyIdButton id={issue.id} />
-            </div>
+            {issue.parent && (
+              <>
+                <button
+                  className="detail-id detail-parent-link"
+                  onClick={() => onSelectIssue?.(issue.parent)}
+                  title="Parent issue"
+                >
+                  {issue.parent}
+                </button>
+                <span className="detail-id detail-breadcrumb-sep">/</span>
+              </>
+            )}
+            <span className="detail-id">{issue.id}</span>
+            <CopyIdButton id={issue.id} />
+          </div>
           <div className="detail-actions-top">
             {canClaim && (
               <button
@@ -378,6 +391,16 @@ export default function IssueDetail({ issueId, onClose, onSelectIssue, onEdit })
                 <DepChip key={d.id} dep={d} onSelect={onSelectIssue ?? (() => {})} />
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Parent */}
+      {parentIssue && (
+        <div className="detail-section">
+          <div className="detail-section-label">Parent</div>
+          <div className="dep-chips">
+            <DepChip dep={parentIssue} onSelect={onSelectIssue ?? (() => {})} />
           </div>
         </div>
       )}

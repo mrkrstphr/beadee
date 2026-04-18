@@ -895,6 +895,24 @@ input::placeholder, textarea::placeholder {
   font-size: 12px;
 }
 
+.detail-parent-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+.detail-parent-link:hover {
+  color: var(--text-primary);
+}
+
+.detail-breadcrumb-sep {
+  opacity: 0.4;
+  user-select: none;
+}
+
 .btn-copy-id {
   background: none;
   border: none;
