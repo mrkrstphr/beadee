@@ -1348,6 +1348,111 @@ textarea.field-input {
   padding-top: 16px;
 }
 
+.advanced-toggle { margin-bottom: 0; }
+
+.advanced-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  gap: 6px;
+  display: flex;
+  align-items: center;
+  padding: 2px 0;
+}
+.advanced-toggle-btn:hover { color: var(--text); }
+
+.advanced-caret {
+  display: inline-block;
+  font-size: 9px;
+  transition: transform 0.15s ease;
+}
+.advanced-caret.open { transform: rotate(90deg); }
+
+/* ---- Typeahead ---- */
+
+.typeahead-wrap { position: relative; }
+
+.typeahead-dropdown {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  list-style: none;
+  margin: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 4px 0;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+}
+
+.typeahead-option {
+  align-items: baseline;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  padding: 7px 10px;
+}
+.typeahead-option:hover,
+.typeahead-option.active { background: color-mix(in srgb, var(--text) 8%, transparent); }
+
+.typeahead-option-id {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+}
+.typeahead-option-title {
+  color: var(--text);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.typeahead-pill-wrap { display: flex; align-items: center; }
+
+.typeahead-pill {
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: inline-flex;
+  gap: 6px;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 4px 8px;
+}
+.typeahead-pill-id {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+}
+.typeahead-pill-title {
+  color: var(--text);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.typeahead-pill-clear {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 0 0 2px;
+}
+.typeahead-pill-clear:hover { color: var(--text); }
+
 /* ============================================================
    KANBAN VIEW
    ============================================================ */

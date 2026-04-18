@@ -28,6 +28,129 @@ function parseEstimateField(str) {
   return { ok: true, value: n }
 }
 
+function IssueTypeahead({ value, onChange }) {
+  const [inputValue, setInputValue] = useState('')
+  const [selected, setSelected] = useState(null) // { id, title }
+  const [results, setResults] = useState([])
+  const [open, setOpen] = useState(false)
+  const [activeIdx, setActiveIdx] = useState(-1)
+  const inputRef = useRef(null)
+  const wrapRef = useRef(null)
+  const debounceRef = useRef(null)
+
+  // On mount, if value is set (edit mode), fetch the issue title for the pill
+  useEffect(() => {
+    if (!value) return
+    fetch(`/api/issues/${value}`)
+      .then(r => r.json())
+      .then(d => { if (d.id) setSelected({ id: d.id, title: d.title }) })
+      .catch(() => setSelected({ id: value, title: value }))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handler(e) {
+      if (!wrapRef.current?.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  function handleInput(e) {
+    const q = e.target.value
+    setInputValue(q)
+    setActiveIdx(-1)
+    clearTimeout(debounceRef.current)
+    if (!q.trim()) { setResults([]); setOpen(false); return }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/issues?search=${encodeURIComponent(q)}`)
+        const data = await res.json()
+        setResults(Array.isArray(data) ? data.slice(0, 8) : [])
+        setOpen(true)
+      } catch {
+        setResults([])
+      }
+    }, 250)
+  }
+
+  function select(issue) {
+    setSelected({ id: issue.id, title: issue.title })
+    onChange(issue.id)
+    setInputValue('')
+    setResults([])
+    setOpen(false)
+  }
+
+  function clear() {
+    setSelected(null)
+    onChange('')
+    setInputValue('')
+    setResults([])
+    setOpen(false)
+    setTimeout(() => inputRef.current?.focus(), 0)
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIdx(i => Math.min(i + 1, results.length - 1))
+      setOpen(true)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIdx(i => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter' && activeIdx >= 0 && results[activeIdx]) {
+      e.preventDefault()
+      select(results[activeIdx])
+    } else if (e.key === 'Escape') {
+      setOpen(false)
+    }
+  }
+
+  if (selected) {
+    return (
+      <div className="typeahead-pill-wrap">
+        <span className="typeahead-pill">
+          <span className="typeahead-pill-id">{selected.id}</span>
+          <button type="button" className="typeahead-pill-clear" onClick={clear} aria-label="Clear parent">×</button>
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="typeahead-wrap" ref={wrapRef}>
+      <input
+        ref={inputRef}
+        type="text"
+        className="field-input"
+        placeholder="Search issues…"
+        value={inputValue}
+        onChange={handleInput}
+        onKeyDown={handleKeyDown}
+        onFocus={() => { if (inputValue && results.length) setOpen(true) }}
+        autoComplete="off"
+      />
+      {open && results.length > 0 && (
+        <ul className="typeahead-dropdown" role="listbox">
+          {results.map((issue, i) => (
+            <li
+              key={issue.id}
+              role="option"
+              aria-selected={i === activeIdx}
+              className={`typeahead-option${i === activeIdx ? ' active' : ''}`}
+              onMouseDown={e => { e.preventDefault(); select(issue) }}
+            >
+              <span className="typeahead-option-id">{issue.id}</span>
+              <span className="typeahead-option-title">{issue.title}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 export default function IssueModal({ issue, onClose, onSaved }) {
   const isEdit = !!issue
   const titleRef = useRef(null)
@@ -42,13 +165,18 @@ export default function IssueModal({ issue, onClose, onSaved }) {
       issue?.estimated_minutes != null && issue.estimated_minutes > 0
         ? String(issue.estimated_minutes)
         : '',
-    due:         isEdit ? formatDueInitial(issue?.due_at) : '',
-    notes:       issue?.notes              ?? '',
-    design:      issue?.design             ?? '',
-    acceptance:  issue?.acceptance_criteria ?? '',
+    due:          isEdit ? formatDueInitial(issue?.due_at) : '',
+    notes:        issue?.notes               ?? '',
+    design:       issue?.design              ?? '',
+    acceptance:   issue?.acceptance_criteria ?? '',
+    external_ref: issue?.external_ref        ?? '',
+    parent:       issue?.parent              ?? '',
   })
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [advancedOpen, setAdvancedOpen] = useState(
+    !!(issue?.external_ref || issue?.parent)
+  )
 
   useEffect(() => { titleRef.current?.focus() }, [])
 
@@ -76,14 +204,16 @@ export default function IssueModal({ issue, onClose, onSaved }) {
       }
 
       const data = {
-        title:       form.title.trim(),
-        description: form.description.trim() || undefined,
-        type:        form.type,
-        priority:    form.priority,
-        assignee:    form.assignee.trim() || undefined,
-        notes:       form.notes.trim()      || undefined,
-        design:      form.design.trim()     || undefined,
-        acceptance:  form.acceptance.trim() || undefined,
+        title:        form.title.trim(),
+        description:  form.description.trim() || undefined,
+        type:         form.type,
+        priority:     form.priority,
+        assignee:     form.assignee.trim()     || undefined,
+        notes:        form.notes.trim()        || undefined,
+        design:       form.design.trim()       || undefined,
+        acceptance:   form.acceptance.trim()   || undefined,
+        external_ref: form.external_ref.trim() || undefined,
+        parent:       form.parent.trim()       || undefined,
       }
 
       const initialDue = isEdit ? formatDueInitial(issue?.due_at) : ''
@@ -252,6 +382,40 @@ export default function IssueModal({ issue, onClose, onSaved }) {
               />
             </label>
           </div>
+
+          <div className="field advanced-toggle">
+            <button
+              type="button"
+              className="advanced-toggle-btn"
+              onClick={() => setAdvancedOpen(o => !o)}
+              aria-expanded={advancedOpen}
+            >
+              <span className={`advanced-caret ${advancedOpen ? 'open' : ''}`}>▶</span>
+              Advanced
+            </button>
+          </div>
+
+          {advancedOpen && (
+            <div className="field-row">
+              <label className="field field-half">
+                <span className="field-label">External Ref</span>
+                <input
+                  type="text"
+                  className="field-input"
+                  placeholder="gh-9, jira-ABC-123"
+                  value={form.external_ref}
+                  onChange={e => set('external_ref', e.target.value)}
+                />
+              </label>
+              <div className="field field-half">
+                <span className="field-label">Parent</span>
+                <IssueTypeahead
+                  value={form.parent}
+                  onChange={v => set('parent', v)}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
