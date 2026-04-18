@@ -26,7 +26,7 @@ export default function Header({
 
   useEffect(() => {
     onSearchChange(debouncedSearch);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, onSearchChange]);
 
   const showSearch = activeTab !== 'settings' && activeTab !== 'memories';
   const showNew = activeTab !== 'settings' && activeTab !== 'memories';
