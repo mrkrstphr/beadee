@@ -1,12 +1,13 @@
-import { useState, useMemo, useCallback } from 'react';
-import { Inbox, ChevronRight } from 'lucide-react';
+import { ChevronRight, Inbox } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import ResizableDivider from '../../components/ResizableDivider/index.jsx';
+import StatusIcon from '../../components/StatusIcon/index.jsx';
+import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
 import { useIssues } from '../../hooks/useIssues.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
-import StatusIcon from '../../components/StatusIcon/index.jsx';
-import ResizableDivider from '../../components/ResizableDivider/index.jsx';
+import type { DetailPanelComponent } from '../../components/DetailPanel/index.js';
 import type { Issue } from '../../types.js';
-import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
 import './ListView.css';
 
 const STATUS_FILTERS = [
@@ -104,10 +105,6 @@ function EpicGroupHeader({ epic, collapsed, onToggle, onSelect, selected }: Epic
       </button>
     </div>
   );
-}
-
-interface DetailPanelComponent {
-  ({ issueId, onClose }: { issueId: string; onClose: () => void }): React.ReactElement;
 }
 
 interface ListViewProps {

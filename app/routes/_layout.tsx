@@ -1,8 +1,8 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import Header from '../components/Header/index.jsx';
-import IssueDetail from '../components/IssueDetail/index.jsx';
+import DetailPanel, { DetailPanelContext } from '../components/DetailPanel/index.jsx';
 import IssueModal from '../components/IssueModal.jsx';
 import ErrorScreen from '../components/ErrorScreen/index.jsx';
 import ToastContainer from '../components/ToastContainer/index.jsx';
@@ -13,6 +13,7 @@ import { useHealth } from '../hooks/useIssues.js';
 import { ToastContext, useToastProvider } from '../hooks/useToast.js';
 import { useKeyboard } from '../hooks/useKeyboard.js';
 import type { Issue } from '../types.js';
+import type { DetailPanelComponent } from '../components/DetailPanel/index.js';
 
 function applyTheme(theme: string) {
   localStorage.setItem('beadee-theme', theme);
@@ -24,34 +25,8 @@ function applyTheme(theme: string) {
   }
 }
 
-interface DetailPanelCtx {
-  onSelectIssue: (id: string) => void;
-  onEdit: (issue: Issue) => void;
-  onDelete: () => void;
-}
-
-const DetailPanelContext = createContext<DetailPanelCtx | null>(null);
-
-interface DetailPanelProps {
-  issueId: string;
-  onClose: () => void;
-}
-
-function DetailPanel({ issueId, onClose }: DetailPanelProps) {
-  const ctx = useContext(DetailPanelContext)!;
-  return (
-    <IssueDetail
-      issueId={issueId}
-      onClose={onClose}
-      onSelectIssue={ctx.onSelectIssue}
-      onEdit={ctx.onEdit}
-      onDelete={ctx.onDelete}
-    />
-  );
-}
-
 export interface LayoutOutletContext {
-  DetailPanel: (props: DetailPanelProps) => React.ReactElement;
+  DetailPanel: DetailPanelComponent;
   onRefreshed: (date: Date) => void;
   theme: string;
   onThemeChange: (theme: string) => void;

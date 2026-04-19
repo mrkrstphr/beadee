@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useIssues } from '../../hooks/useIssues.js';
 import IssueCard from '../../components/IssueCard/index.jsx';
+import type { DetailPanelComponent } from '../../components/DetailPanel/index.js';
 import type { Issue } from '../../types.js';
 import './KanbanView.css';
 
@@ -45,10 +46,6 @@ function KanbanColumn({
       </div>
     </div>
   );
-}
-
-interface DetailPanelComponent {
-  ({ issueId, onClose }: { issueId: string; onClose: () => void }): React.ReactElement;
 }
 
 interface KanbanViewProps {
