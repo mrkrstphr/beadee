@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { createIssue, updateIssue, useLabels } from '../hooks/useIssues.js';
+import type { CreateIssueData, UpdateIssueData } from '../hooks/useIssues.js';
 import { toast } from '../hooks/useToast.js';
 import type { Issue, LabelItem } from '../types.js';
 import Modal from './Modal/index.jsx';
@@ -363,44 +364,58 @@ export default function IssueModal({ issue, onClose, onSaved }: IssueModalProps)
     setSaving(true);
     setError(null);
     try {
-      const data: Record<string, unknown> = {
-        title: form.title.trim(),
-        description: form.description.trim() || undefined,
-        type: form.type,
-        priority: form.priority,
-        assignee: form.assignee.trim() || undefined,
-        notes: form.notes.trim() || undefined,
-        design: form.design.trim() || undefined,
-        acceptance: form.acceptance.trim() || undefined,
-        external_ref: form.external_ref.trim() || undefined,
-        parent: form.parent.trim() || undefined,
-        labels: form.labels,
-      };
-
-      const initialDue = isEdit ? formatDueInitial(issue?.due_at) : '';
       const dueTrim = form.due.trim();
 
+      let saved: Issue;
       if (isEdit) {
+        const initialDue = formatDueInitial(issue?.due_at);
         const prevEst = issue!.estimated_minutes;
+
+        const payload: UpdateIssueData = {
+          title: form.title.trim(),
+          description: form.description.trim() || undefined,
+          priority: form.priority,
+          assignee: form.assignee.trim() || undefined,
+          notes: form.notes.trim() || undefined,
+          design: form.design.trim() || undefined,
+          acceptance: form.acceptance.trim() || undefined,
+          external_ref: form.external_ref.trim() || undefined,
+          parent: form.parent.trim() || undefined,
+          labels: form.labels,
+        };
+
         if (est.value === null) {
-          if (prevEst != null && prevEst > 0) data.estimate = null;
+          if (prevEst != null && prevEst > 0) payload.estimate = null;
         } else if (prevEst !== est.value) {
-          data.estimate = est.value;
+          payload.estimate = est.value;
         }
 
         if (!dueTrim) {
-          if (issue?.due_at) data.due = null;
+          if (issue?.due_at) payload.due = null;
         } else if (dueTrim !== initialDue) {
-          data.due = dueTrim;
+          payload.due = dueTrim;
         }
-      } else {
-        if (est.value !== null) data.estimate = est.value;
-        if (dueTrim) data.due = dueTrim;
-      }
 
-      const saved = isEdit
-        ? await updateIssue(issue!.id, data as unknown as Parameters<typeof updateIssue>[1])
-        : await createIssue(data as unknown as Parameters<typeof createIssue>[0]);
+        saved = await updateIssue(issue!.id, payload);
+      } else {
+        const payload: CreateIssueData = {
+          title: form.title.trim(),
+          description: form.description.trim() || undefined,
+          type: form.type,
+          priority: form.priority,
+          notes: form.notes.trim() || undefined,
+          design: form.design.trim() || undefined,
+          acceptance: form.acceptance.trim() || undefined,
+          external_ref: form.external_ref.trim() || undefined,
+          parent: form.parent.trim() || undefined,
+          labels: form.labels,
+        };
+
+        if (est.value !== null) payload.estimate = est.value;
+        if (dueTrim) payload.due = dueTrim;
+
+        saved = await createIssue(payload);
+      }
       toast(isEdit ? 'Issue updated' : 'Issue created', 'success');
       onSaved?.(saved, { created: !isEdit });
       onClose();

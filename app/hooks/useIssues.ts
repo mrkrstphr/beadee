@@ -290,7 +290,7 @@ export function useLabels(): LabelItem[] {
   return data ?? [];
 }
 
-interface CreateIssueData {
+export interface CreateIssueData {
   title: string;
   description?: string;
   type?: string;
@@ -305,7 +305,7 @@ interface CreateIssueData {
   labels?: string[];
 }
 
-interface UpdateIssueData {
+export interface UpdateIssueData {
   title?: string;
   description?: string;
   status?: string;
