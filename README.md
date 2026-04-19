@@ -7,8 +7,8 @@
 
 <div align="center">
 <a href="https://www.npmjs.com/package/@mrkrstphr/beadee">
-<img alt="Release" src="https://img.shields.io/github/v/release/mrkrstphr/beadee?style=flat-square"></a>
-<a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/mrkrstphr/beadee?style=flat-square"></a>
+<img alt="Release" src="https://img.shields.io/github/v/release/mrkrstphr/beadee?style=for-the-badge&labelColor=%23333&color=%23e33e84"></a>
+<a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/mrkrstphr/beadee?style=for-the-badge&labelColor=%23333&color=%23e33e84"></a>
 </div>
 
 ## Features
