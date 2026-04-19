@@ -377,26 +377,6 @@ textarea::placeholder {
 }
 
 /* ============================================================
-   STATUS ICON COLORS  (used by StatusIcon component — shared)
-   ============================================================ */
-
-.status-icon-open {
-  color: var(--text-muted);
-}
-.status-icon-in_progress {
-  color: var(--accent);
-}
-.status-icon-blocked {
-  color: var(--danger);
-}
-.status-icon-closed {
-  color: var(--success);
-}
-.status-icon-deferred {
-  color: var(--text-muted);
-}
-
-/* ============================================================
    PRIORITY DOTS
    ============================================================ */
 
@@ -960,35 +940,6 @@ textarea.field-input {
   }
 }
 
-/* ============================================================
-   KEYBOARD SHORTCUTS
-   ============================================================ */
-
-.kbd {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-bottom-width: 2px;
-  border-radius: 4px;
-  color: var(--text);
-  display: inline-block;
-  font-family: 'SFMono-Regular', Consolas, monospace;
-  font-size: 11px;
-  line-height: 1;
-  min-width: 20px;
-  padding: 3px 6px;
-  text-align: center;
-}
-
-.kbd-small {
-  font-size: 10px;
-  padding: 2px 4px;
-  min-width: 16px;
-}
-
-.shortcuts-modal {
-  width: 400px;
-}
-
 .update-modal {
   width: 600px;
 }
@@ -1020,127 +971,6 @@ textarea.field-input {
   font-size: 13px;
   margin: 0;
   padding: 10px 14px;
-}
-
-.shortcuts-body {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px;
-}
-
-.shortcuts-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.shortcuts-group-label {
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  margin-bottom: 2px;
-  text-transform: uppercase;
-}
-
-.shortcut-row {
-  align-items: center;
-  display: flex;
-  gap: 12px;
-}
-
-.shortcut-desc {
-  color: var(--text);
-  font-size: 13px;
-}
-
-/* ============================================================
-   COMMENT THREAD
-   ============================================================ */
-
-.comment-thread {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.comment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.comment-state {
-  color: var(--text-muted);
-  font-size: 12px;
-  font-style: italic;
-  padding: 4px 0;
-}
-
-.comment-error {
-  color: var(--danger);
-  font-style: normal;
-}
-
-.comment {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 12px 14px;
-  transition: opacity 0.2s;
-}
-
-.comment-optimistic {
-  opacity: 0.55;
-}
-
-.comment-header {
-  align-items: baseline;
-  display: flex;
-  gap: 8px;
-  margin-bottom: 5px;
-}
-
-.comment-author {
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.comment-time {
-  color: var(--text-muted);
-  font-size: 11px;
-}
-
-.comment-text {
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.5;
-  word-break: break-word;
-}
-
-.comment-compose {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.comment-input {
-  resize: vertical;
-  width: 100%;
-  font-size: 13px;
-  min-height: 72px;
-}
-
-.comment-post-error {
-  color: var(--danger);
-  font-size: 12px;
-}
-
-.comment-compose-footer {
-  display: flex;
-  justify-content: flex-end;
 }
 
 /* ============================================================

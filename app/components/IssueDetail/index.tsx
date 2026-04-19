@@ -13,10 +13,10 @@ import {
 import { toast } from '../../hooks/useToast.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
 import CollapsibleSection from '../CollapsibleSection/index.jsx';
-import CommentThread from '../CommentThread.jsx';
+import CommentThread from '../CommentThread/index.jsx';
 import ConfirmDialog from '../ConfirmDialog.jsx';
 import MarkdownContent from '../MarkdownContent/index.jsx';
-import StatusIcon from '../StatusIcon.jsx';
+import StatusIcon from '../StatusIcon/index.jsx';
 import type { Issue, Dependency, LabelItem } from '../../types.js';
 import { PRIORITY_LABEL } from '../../constants.js';
 import './IssueDetail.css';

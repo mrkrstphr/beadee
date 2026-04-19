@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { useComments } from '../hooks/useComments.js';
-import MarkdownContent from './MarkdownContent/index.jsx';
-import CollapsibleSection from './CollapsibleSection/index.jsx';
-import type { Comment } from '../types.js';
+import { useComments } from '../../hooks/useComments.js';
+import MarkdownContent from '../MarkdownContent/index.jsx';
+import CollapsibleSection from '../CollapsibleSection/index.jsx';
+import type { Comment } from '../../types.js';
+import './CommentThread.css';
 
 function timeAgo(iso: string): string {
   const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);

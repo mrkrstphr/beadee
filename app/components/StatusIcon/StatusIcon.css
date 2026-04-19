@@ -1,0 +1,17 @@
+@reference "tailwindcss";
+
+.status-icon-open {
+  color: var(--text-muted);
+}
+.status-icon-in_progress {
+  color: var(--accent);
+}
+.status-icon-blocked {
+  color: var(--danger);
+}
+.status-icon-closed {
+  color: var(--success);
+}
+.status-icon-deferred {
+  color: var(--text-muted);
+}

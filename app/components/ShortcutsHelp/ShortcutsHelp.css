@@ -1,0 +1,39 @@
+@reference "tailwindcss";
+
+.shortcuts-modal {
+  @apply w-[400px];
+}
+
+.shortcuts-body {
+  @apply flex flex-col gap-5 p-5;
+}
+
+.shortcuts-group {
+  @apply flex flex-col gap-1.5;
+}
+
+.shortcuts-group-label {
+  color: var(--text-muted);
+  @apply text-[11px] font-bold tracking-[0.06em] uppercase mb-0.5;
+}
+
+.shortcut-row {
+  @apply items-center flex gap-3;
+}
+
+.shortcut-desc {
+  color: var(--text);
+  @apply text-[13px];
+}
+
+.kbd {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  @apply border-b-2 rounded-[4px] inline-block text-[11px] leading-none min-w-[20px] py-[3px] px-1.5 text-center;
+}
+
+.kbd-small {
+  @apply text-[10px] py-0.5 px-1 min-w-[16px];
+}

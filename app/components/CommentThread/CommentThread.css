@@ -1,0 +1,65 @@
+@reference "tailwindcss";
+
+.comment-thread {
+  @apply flex flex-col gap-3;
+}
+
+.comment-list {
+  @apply flex flex-col gap-[10px] mb-[10px];
+}
+
+.comment-state {
+  color: var(--text-muted);
+  @apply text-[12px] italic py-1;
+}
+
+.comment-error {
+  color: var(--danger);
+  @apply not-italic;
+}
+
+.comment {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  @apply rounded-md px-3.5 py-3 transition-opacity duration-200;
+}
+
+.comment-optimistic {
+  @apply opacity-55;
+}
+
+.comment-header {
+  @apply items-baseline flex gap-2 mb-[5px];
+}
+
+.comment-author {
+  color: var(--text);
+  @apply text-[12px] font-semibold;
+}
+
+.comment-time {
+  color: var(--text-muted);
+  @apply text-[11px];
+}
+
+.comment-text {
+  color: var(--text);
+  @apply text-[13px] leading-[1.5] break-words;
+}
+
+.comment-compose {
+  @apply flex flex-col gap-2;
+}
+
+.comment-input {
+  @apply resize-y w-full text-[13px] min-h-[72px];
+}
+
+.comment-post-error {
+  color: var(--danger);
+  @apply text-[12px];
+}
+
+.comment-compose-footer {
+  @apply flex justify-end;
+}

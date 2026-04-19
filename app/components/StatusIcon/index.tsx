@@ -1,5 +1,6 @@
 import { Circle, CircleDot, CircleX, CircleCheck, Clock, Pin } from 'lucide-react';
-import type { IssueStatus } from '../types.js';
+import type { IssueStatus } from '../../types.js';
+import './StatusIcon.css';
 
 const ICONS: Record<
   string,

@@ -5,7 +5,7 @@ import IssueDetail from '../components/IssueDetail/index.jsx';
 import IssueModal from '../components/IssueModal.jsx';
 import ErrorScreen from '../components/ErrorScreen/index.jsx';
 import ToastContainer from '../components/ToastContainer.jsx';
-import ShortcutsHelp from '../components/ShortcutsHelp.jsx';
+import ShortcutsHelp from '../components/ShortcutsHelp/index.jsx';
 import Footer from '../components/Footer/index.jsx';
 import { useHealth } from '../hooks/useIssues.js';
 import { useToastProvider } from '../hooks/useToast.js';

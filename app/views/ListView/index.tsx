@@ -3,7 +3,7 @@ import { Inbox, ChevronRight } from 'lucide-react';
 import { useIssues } from '../../hooks/useIssues.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
-import StatusIcon from '../../components/StatusIcon.jsx';
+import StatusIcon from '../../components/StatusIcon/index.jsx';
 import ResizableDivider from '../../components/ResizableDivider/index.jsx';
 import type { Issue } from '../../types.js';
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
