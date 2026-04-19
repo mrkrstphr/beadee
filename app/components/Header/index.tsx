@@ -10,6 +10,7 @@ interface HeaderProps {
   lastUpdated: Date | null;
   polling: boolean;
   projectName?: string;
+  onRefresh?: () => void;
 }
 
 export default function Header({
@@ -20,6 +21,7 @@ export default function Header({
   lastUpdated,
   polling,
   projectName,
+  onRefresh,
 }: HeaderProps) {
   const showSearch = activeTab !== 'settings' && activeTab !== 'memories';
   const showNew = activeTab !== 'settings' && activeTab !== 'memories';
@@ -56,7 +58,7 @@ export default function Header({
       </div>
 
       <div className="header-right">
-        <RefreshIndicator lastUpdated={lastUpdated} polling={polling} />
+        <RefreshIndicator lastUpdated={lastUpdated} polling={polling} onRefresh={onRefresh} />
 
         {showSearch && (
           <button

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import Header from '../components/Header/index.jsx';
 import IssueDetail from '../components/IssueDetail/index.jsx';
 import IssueModal from '../components/IssueModal.jsx';
@@ -71,6 +72,7 @@ export default function Layout() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [polling, setPolling] = useState(false);
 
+  const queryClient = useQueryClient();
   const { health, error: healthError, loading: healthLoading } = useHealth();
   const toastValue = useToastProvider();
 
@@ -86,6 +88,10 @@ export default function Layout() {
     setLastUpdated(date);
     setPolling(false);
   }, []);
+
+  const handleForceRefresh = useCallback(() => {
+    void queryClient.invalidateQueries();
+  }, [queryClient]);
 
   function switchTab(tab: string) {
     navigate(`/${tab}`);
@@ -168,6 +174,7 @@ export default function Layout() {
             lastUpdated={lastUpdated}
             polling={polling}
             projectName={health?.projectName}
+            onRefresh={handleForceRefresh}
           />
 
           <main className="main">

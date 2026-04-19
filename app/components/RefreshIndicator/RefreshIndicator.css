@@ -4,6 +4,14 @@
   @apply items-center cursor-default flex gap-[5px];
 }
 
+.refresh-indicator--clickable {
+  @apply cursor-pointer;
+}
+
+.refresh-indicator:not(.refresh-indicator--clickable) svg {
+  @apply pointer-events-none;
+}
+
 .refresh-indicator svg {
   color: var(--text-muted);
   @apply opacity-60;
