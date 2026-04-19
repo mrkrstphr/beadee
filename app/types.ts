@@ -45,13 +45,10 @@ export interface Issue {
   dependency_count: number;
   dependent_count: number;
   comment_count: number;
-  estimate?: number | null;
   estimated_minutes?: number | null;
-  due?: string | null;
   due_at?: string | null;
   notes?: string | null;
   design?: string | null;
-  acceptance?: string | null;
   acceptance_criteria?: string | null;
   external_ref?: string | null;
   parent?: string | null;
