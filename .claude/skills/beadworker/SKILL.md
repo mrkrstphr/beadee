@@ -59,6 +59,8 @@ and create a brand new worktree in `~/Projects/worktrees`:
 
 ```
 git worktree add -b <short-description> ~/Projects/worktrees/<short-description> main
+cd ~/Projects/worktrees/<short-description>
+npm install
 ```
 
 Do all your work within the new worktree. Do not make changes in the main project directory.
