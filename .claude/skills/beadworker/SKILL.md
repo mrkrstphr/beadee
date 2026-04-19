@@ -52,13 +52,16 @@ Once verified:
 
 Keep these concise and factual — they are permanent record.
 
-### 4. Checkout a branch
+### 4. Checkout a branch and create a worktree
 
-Derive a short kebab-case branch name from the issue title (e.g. `fix-char-limit`, `add-dark-mode`). Create it off `main`:
+Derive a short kebab-case branch name from the issue title (e.g. `fix-char-limit`, `add-dark-mode`). Create it off `main`
+and create a brand new worktree in `~/Projects/worktrees`:
 
 ```
-git checkout -b <short-description> main
+git worktree add -b <short-description> ~/Projects/worktrees/<short-description> main
 ```
+
+Do all your work within the new worktree. Do not make changes in the main project directory.
 
 ### 5. Implement
 
