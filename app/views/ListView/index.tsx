@@ -1,5 +1,5 @@
 import { ChevronRight, Inbox } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import ResizableDivider from '../../components/ResizableDivider/index.jsx';
 import StatusIcon from '../../components/StatusIcon/index.jsx';
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
@@ -126,7 +126,11 @@ export default function ListView({
   const [typeFilter, setTypeFilter] = useLocalStorageState('beadee-type-filter', '');
   const [hideClosed, setHideClosed] = useLocalStorageState('beadee-hide-closed', true);
   const [groupByEpic, setGroupByEpic] = useLocalStorageState('beadee-group-by-epic', false);
-  const [collapsedEpics, setCollapsedEpics] = useState<Set<string>>(() => new Set());
+  const [collapsedEpicIds, setCollapsedEpicIds] = useLocalStorageState<string[]>(
+    'beadee-collapsed-epics',
+    [],
+  );
+  const collapsedEpics = useMemo(() => new Set(collapsedEpicIds), [collapsedEpicIds]);
   const [rawPanelWidth, setListPanelWidth] = useLocalStorageState('beadee-list-panel-width', 320);
   const listPanelWidth = Number(rawPanelWidth) || 320;
 
@@ -149,6 +153,13 @@ export default function ListView({
       listRef.current.scrollTop = savedScrollTop;
     }
   }, [loading]);
+
+  useEffect(() => {
+    if (!loading && !error && issues.length > 0) {
+      const liveIds = new Set(issues.map((i) => i.id));
+      setCollapsedEpicIds((prev) => prev.filter((id) => liveIds.has(id)));
+    }
+  }, [loading, error, issues, setCollapsedEpicIds]);
 
   const displayedIssues = useMemo(() => {
     if (!hideClosed || statusFilter === 'closed') return issues;
@@ -184,14 +195,14 @@ export default function ListView({
     return result;
   }, [epicGroups, collapsedEpics, displayedIssues]);
 
-  const toggleEpic = useCallback((epicId: string) => {
-    setCollapsedEpics((prev) => {
-      const next = new Set(prev);
-      if (next.has(epicId)) next.delete(epicId);
-      else next.add(epicId);
-      return next;
-    });
-  }, []);
+  const toggleEpic = useCallback(
+    (epicId: string) => {
+      setCollapsedEpicIds((prev) =>
+        prev.includes(epicId) ? prev.filter((id) => id !== epicId) : [...prev, epicId],
+      );
+    },
+    [setCollapsedEpicIds],
+  );
 
   const selectedIdx = useMemo(
     () => visibleIssues.findIndex((i) => i.id === selectedIssueId),
