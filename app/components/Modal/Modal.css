@@ -1,0 +1,60 @@
+@reference "tailwindcss";
+
+.modal-backdrop {
+  background: rgb(0 0 0 / 0.6);
+  @apply fixed inset-0 z-[200] flex items-center justify-center backdrop-blur-sm;
+}
+
+.modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.5);
+  @apply flex flex-col rounded-xl max-h-[90vh] overflow-hidden w-[520px];
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--border);
+  @apply flex items-center justify-between px-5 py-4;
+}
+
+.modal-title {
+  @apply text-base font-semibold;
+}
+
+.modal-close {
+  @apply text-xs px-2 py-1;
+}
+
+.modal-body {
+  @apply flex flex-col gap-4 overflow-y-auto p-5;
+}
+
+.modal-error {
+  background: rgb(248 81 73 / 0.1);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  @apply rounded-md text-[13px] px-[14px] py-[10px];
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border);
+  @apply flex gap-2 justify-end mt-1 pt-4;
+}
+
+.confirm-modal {
+  @apply w-[380px];
+}
+
+.update-modal {
+  @apply w-[600px];
+}
+
+@media (max-width: 640px) {
+  .modal-backdrop {
+    @apply items-end p-0;
+  }
+
+  .modal {
+    @apply w-full max-h-[92dvh] rounded-b-none border-l-0 border-r-0 border-b-0;
+  }
+}

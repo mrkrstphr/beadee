@@ -1,8 +1,8 @@
-import { X } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { createIssue, updateIssue, useLabels } from '../hooks/useIssues.js';
 import { toast } from '../hooks/useToast.js';
 import type { Issue, LabelItem } from '../types.js';
+import Modal from './Modal/index.jsx';
 
 const TYPES = [
   'task',
@@ -345,14 +345,6 @@ export default function IssueModal({ issue, onClose, onSaved }: IssueModalProps)
     titleRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
-    }
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   function set<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [field]: value }));
   }
@@ -421,191 +413,182 @@ export default function IssueModal({ issue, onClose, onSaved }: IssueModalProps)
   }
 
   return (
-    <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true">
-        <div className="modal-header">
-          <h3 className="modal-title">{isEdit ? 'Edit Issue' : 'New Issue'}</h3>
-          <button className="btn btn-secondary modal-close" onClick={onClose}>
-            <X size={14} />
+    <Modal title={isEdit ? 'Edit Issue' : 'New Issue'} onClose={onClose}>
+      <form className="modal-body" onSubmit={handleSubmit}>
+        {error && <div className="modal-error">{error}</div>}
+
+        <label className="field">
+          <span className="field-label">
+            Title <span className="required">*</span>
+          </span>
+          <input
+            ref={titleRef}
+            className="field-input"
+            placeholder="Short summary"
+            value={form.title}
+            onChange={(e) => set('title', e.target.value)}
+            required
+          />
+        </label>
+
+        <label className="field">
+          <span className="field-label">Description</span>
+          <textarea
+            className="field-input"
+            rows={6}
+            placeholder="Why this issue exists and what needs to be done"
+            value={form.description}
+            onChange={(e) => set('description', e.target.value)}
+          />
+        </label>
+
+        <label className="field">
+          <span className="field-label">Acceptance Criteria</span>
+          <textarea
+            className="field-input"
+            rows={3}
+            placeholder="Done when…"
+            value={form.acceptance}
+            onChange={(e) => set('acceptance', e.target.value)}
+          />
+        </label>
+
+        <label className="field">
+          <span className="field-label">Notes</span>
+          <textarea
+            className="field-input field-markdown"
+            rows={3}
+            placeholder="Supplementary context (markdown)"
+            value={form.notes}
+            onChange={(e) => set('notes', e.target.value)}
+          />
+        </label>
+
+        <label className="field">
+          <span className="field-label">Design</span>
+          <textarea
+            className="field-input field-markdown"
+            rows={3}
+            placeholder="Architecture decisions, rationale (markdown)"
+            value={form.design}
+            onChange={(e) => set('design', e.target.value)}
+          />
+        </label>
+
+        <div className="field">
+          <span className="field-label">Labels</span>
+          <LabelPicker value={form.labels} onChange={(v) => set('labels', v)} />
+        </div>
+
+        <div className="field-row">
+          <label className="field field-half">
+            <span className="field-label">Type</span>
+            <select
+              className="field-input"
+              value={form.type}
+              onChange={(e) => set('type', e.target.value)}
+            >
+              {TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="field field-half">
+            <span className="field-label">Assignee</span>
+            <input
+              className="field-input"
+              placeholder="Username"
+              value={form.assignee}
+              onChange={(e) => set('assignee', e.target.value)}
+            />
+          </label>
+        </div>
+
+        <div className="field">
+          <span className="field-label">Priority</span>
+          <div className="priority-segmented">
+            {PRIORITIES.map((p) => (
+              <button
+                key={p.value}
+                type="button"
+                className={`priority-seg-btn ${p.cls} ${form.priority === p.value ? 'active' : ''}`}
+                onClick={() => set('priority', p.value)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="field-row">
+          <label className="field field-half">
+            <span className="field-label">Estimate (minutes)</span>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              className="field-input"
+              placeholder="Optional"
+              value={form.estimate}
+              onChange={(e) => set('estimate', e.target.value)}
+            />
+          </label>
+          <label className="field field-half">
+            <span className="field-label">Due</span>
+            <input
+              type="text"
+              className="field-input"
+              placeholder="+1d, next monday, 2026-04-15"
+              value={form.due}
+              onChange={(e) => set('due', e.target.value)}
+              autoComplete="off"
+            />
+          </label>
+        </div>
+
+        <div className="field advanced-toggle">
+          <button
+            type="button"
+            className="advanced-toggle-btn"
+            onClick={() => setAdvancedOpen((o) => !o)}
+            aria-expanded={advancedOpen}
+          >
+            <span className={`advanced-caret ${advancedOpen ? 'open' : ''}`}>▶</span>
+            Advanced
           </button>
         </div>
 
-        <form className="modal-body" onSubmit={handleSubmit}>
-          {error && <div className="modal-error">{error}</div>}
-
-          <label className="field">
-            <span className="field-label">
-              Title <span className="required">*</span>
-            </span>
-            <input
-              ref={titleRef}
-              className="field-input"
-              placeholder="Short summary"
-              value={form.title}
-              onChange={(e) => set('title', e.target.value)}
-              required
-            />
-          </label>
-
-          <label className="field">
-            <span className="field-label">Description</span>
-            <textarea
-              className="field-input"
-              rows={6}
-              placeholder="Why this issue exists and what needs to be done"
-              value={form.description}
-              onChange={(e) => set('description', e.target.value)}
-            />
-          </label>
-
-          <label className="field">
-            <span className="field-label">Acceptance Criteria</span>
-            <textarea
-              className="field-input"
-              rows={3}
-              placeholder="Done when…"
-              value={form.acceptance}
-              onChange={(e) => set('acceptance', e.target.value)}
-            />
-          </label>
-
-          <label className="field">
-            <span className="field-label">Notes</span>
-            <textarea
-              className="field-input field-markdown"
-              rows={3}
-              placeholder="Supplementary context (markdown)"
-              value={form.notes}
-              onChange={(e) => set('notes', e.target.value)}
-            />
-          </label>
-
-          <label className="field">
-            <span className="field-label">Design</span>
-            <textarea
-              className="field-input field-markdown"
-              rows={3}
-              placeholder="Architecture decisions, rationale (markdown)"
-              value={form.design}
-              onChange={(e) => set('design', e.target.value)}
-            />
-          </label>
-
-          <div className="field">
-            <span className="field-label">Labels</span>
-            <LabelPicker value={form.labels} onChange={(v) => set('labels', v)} />
-          </div>
-
+        {advancedOpen && (
           <div className="field-row">
             <label className="field field-half">
-              <span className="field-label">Type</span>
-              <select
-                className="field-input"
-                value={form.type}
-                onChange={(e) => set('type', e.target.value)}
-              >
-                {TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field field-half">
-              <span className="field-label">Assignee</span>
-              <input
-                className="field-input"
-                placeholder="Username"
-                value={form.assignee}
-                onChange={(e) => set('assignee', e.target.value)}
-              />
-            </label>
-          </div>
-
-          <div className="field">
-            <span className="field-label">Priority</span>
-            <div className="priority-segmented">
-              {PRIORITIES.map((p) => (
-                <button
-                  key={p.value}
-                  type="button"
-                  className={`priority-seg-btn ${p.cls} ${form.priority === p.value ? 'active' : ''}`}
-                  onClick={() => set('priority', p.value)}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="field-row">
-            <label className="field field-half">
-              <span className="field-label">Estimate (minutes)</span>
-              <input
-                type="number"
-                min={0}
-                step={1}
-                className="field-input"
-                placeholder="Optional"
-                value={form.estimate}
-                onChange={(e) => set('estimate', e.target.value)}
-              />
-            </label>
-            <label className="field field-half">
-              <span className="field-label">Due</span>
+              <span className="field-label">External Ref</span>
               <input
                 type="text"
                 className="field-input"
-                placeholder="+1d, next monday, 2026-04-15"
-                value={form.due}
-                onChange={(e) => set('due', e.target.value)}
-                autoComplete="off"
+                placeholder="gh-9, jira-ABC-123"
+                value={form.external_ref}
+                onChange={(e) => set('external_ref', e.target.value)}
               />
             </label>
-          </div>
-
-          <div className="field advanced-toggle">
-            <button
-              type="button"
-              className="advanced-toggle-btn"
-              onClick={() => setAdvancedOpen((o) => !o)}
-              aria-expanded={advancedOpen}
-            >
-              <span className={`advanced-caret ${advancedOpen ? 'open' : ''}`}>▶</span>
-              Advanced
-            </button>
-          </div>
-
-          {advancedOpen && (
-            <div className="field-row">
-              <label className="field field-half">
-                <span className="field-label">External Ref</span>
-                <input
-                  type="text"
-                  className="field-input"
-                  placeholder="gh-9, jira-ABC-123"
-                  value={form.external_ref}
-                  onChange={(e) => set('external_ref', e.target.value)}
-                />
-              </label>
-              <div className="field field-half">
-                <span className="field-label">Parent</span>
-                <IssueTypeahead value={form.parent} onChange={(v) => set('parent', v)} />
-              </div>
+            <div className="field field-half">
+              <span className="field-label">Parent</span>
+              <IssueTypeahead value={form.parent} onChange={(v) => set('parent', v)} />
             </div>
-          )}
-
-          <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
-              Cancel
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Saving…' : isEdit ? 'Save' : 'Create'}
-            </button>
           </div>
-        </form>
-      </div>
-    </div>
+        )}
+
+        <div className="modal-footer">
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? 'Saving…' : isEdit ? 'Save' : 'Create'}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }

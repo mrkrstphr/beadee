@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { X } from 'lucide-react';
+import Modal from './Modal/index.jsx';
 
 interface ConfirmDialogProps {
   title: string;
@@ -18,35 +17,19 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  useEffect(() => {
-    function handler(e: KeyboardEvent) {
-      if (e.key === 'Escape') onCancel();
-    }
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [onCancel]);
-
   return (
-    <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onCancel()}>
-      <div className="modal confirm-modal">
-        <div className="modal-header">
-          <h3 className="modal-title">{title}</h3>
-          <button className="btn btn-secondary modal-close" onClick={onCancel}>
-            <X size={14} />
+    <Modal title={title} onClose={onCancel} className="confirm-modal">
+      <div className="modal-body">
+        {message && <p>{message}</p>}
+        <div className="modal-footer">
+          <button className="btn btn-secondary" onClick={onCancel}>
+            Cancel
+          </button>
+          <button className={confirmClassName} onClick={onConfirm}>
+            {confirmLabel}
           </button>
         </div>
-        <div className="modal-body">
-          {message && <p>{message}</p>}
-          <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onCancel}>
-              Cancel
-            </button>
-            <button className={confirmClassName} onClick={onConfirm}>
-              {confirmLabel}
-            </button>
-          </div>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }
