@@ -1,4 +1,5 @@
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
+import './IssueCard.css';
 import type { Issue } from '../../types.js';
 
 function initials(name: string): string {

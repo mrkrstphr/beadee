@@ -60,48 +60,6 @@
   @apply text-[12px] italic py-3 px-1.5 text-center;
 }
 
-/* Issue card */
-.issue-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  @apply rounded-lg cursor-pointer flex flex-col gap-1.5 px-3 py-2.5 text-left transition-[border-color,box-shadow] duration-150 w-full;
-}
-
-.issue-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.issue-card.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent);
-}
-
-.issue-card-top {
-  @apply items-center flex gap-1.5;
-}
-
-.card-avatar {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  @apply rounded-full text-[10px] font-bold h-5 leading-5 ml-auto text-center w-5;
-}
-
-.issue-card-title {
-  color: var(--text);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  @apply text-[13px] font-medium leading-[1.4] overflow-hidden;
-}
-
-.issue-card-id {
-  color: var(--text-muted);
-  font-family: 'SFMono-Regular', Consolas, monospace;
-  @apply text-[11px];
-}
-
 /* Column picker (mobile only — hidden on desktop) */
 .kanban-col-picker {
   @apply hidden;
