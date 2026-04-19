@@ -1,4 +1,5 @@
 import { marked } from 'marked';
+import './MarkdownContent.css';
 import DOMPurify from 'dompurify';
 
 function renderMarkdown(text: string): string | null {

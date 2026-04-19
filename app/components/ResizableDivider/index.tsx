@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import './ResizableDivider.css';
 
 interface ResizableDividerProps {
   currentWidth: number;

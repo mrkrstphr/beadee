@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useComments } from '../hooks/useComments.js';
-import MarkdownContent from './MarkdownContent.jsx';
-import CollapsibleSection from './CollapsibleSection.jsx';
+import MarkdownContent from './MarkdownContent/index.jsx';
+import CollapsibleSection from './CollapsibleSection/index.jsx';
 import type { Comment } from '../types.js';
 
 function timeAgo(iso: string): string {

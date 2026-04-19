@@ -1,0 +1,41 @@
+@reference "tailwindcss";
+
+.detail-section {
+  border-top: 1px solid var(--border);
+  @apply py-3.5;
+}
+
+.detail-section.is-collapsed {
+  @apply pb-2.5;
+}
+
+.detail-section-toggle {
+  color: inherit;
+  @apply items-center bg-transparent border-0 cursor-pointer flex gap-1.5 mb-2 p-0 w-full;
+}
+
+.detail-section-toggle:hover .detail-section-label {
+  color: var(--text);
+}
+
+.detail-section.is-collapsed .detail-section-toggle {
+  @apply mb-0;
+}
+
+.detail-section-label {
+  color: var(--text-muted);
+  @apply text-[11px] font-semibold tracking-[0.06em] uppercase;
+}
+
+.section-chevron {
+  color: var(--text-muted);
+  @apply flex-shrink-0 transition-transform duration-150 ease-[ease];
+}
+
+.section-chevron.is-up {
+  @apply -rotate-90;
+}
+
+.detail-section-body {
+  /* no extra styles needed, children provide their own spacing */
+}

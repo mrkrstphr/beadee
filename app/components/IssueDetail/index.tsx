@@ -12,10 +12,10 @@ import {
 } from '../../hooks/useIssues.js';
 import { toast } from '../../hooks/useToast.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
-import CollapsibleSection from '../CollapsibleSection.jsx';
+import CollapsibleSection from '../CollapsibleSection/index.jsx';
 import CommentThread from '../CommentThread.jsx';
 import ConfirmDialog from '../ConfirmDialog.jsx';
-import MarkdownContent from '../MarkdownContent.jsx';
+import MarkdownContent from '../MarkdownContent/index.jsx';
 import StatusIcon from '../StatusIcon.jsx';
 import type { Issue, Dependency, LabelItem } from '../../types.js';
 import { PRIORITY_LABEL } from '../../constants.js';

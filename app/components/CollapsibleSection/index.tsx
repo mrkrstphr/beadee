@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
-import { useLocalStorageState } from '../hooks/useLocalStorageState.js';
+import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
+import './CollapsibleSection.css';
 
 interface CollapsibleSectionProps {
   name: string;

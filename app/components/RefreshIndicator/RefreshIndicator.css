@@ -1,0 +1,26 @@
+@reference "tailwindcss";
+
+.refresh-indicator {
+  @apply items-center cursor-default flex gap-[5px];
+}
+
+.refresh-indicator svg {
+  color: var(--text-muted);
+  @apply opacity-60;
+}
+
+.refresh-indicator svg.spinning {
+  color: var(--accent);
+  @apply animate-spin opacity-100;
+}
+
+.refresh-label {
+  color: var(--text-muted);
+  @apply text-[11px] whitespace-nowrap;
+}
+
+@media (max-width: 640px) {
+  .refresh-label {
+    @apply hidden;
+  }
+}

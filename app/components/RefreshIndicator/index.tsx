@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './RefreshIndicator.css';
 import { RefreshCw } from 'lucide-react';
 
 function timeAgo(date: Date | null): string | null {

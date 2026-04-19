@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
-import MarkdownContent from './MarkdownContent.jsx';
+import MarkdownContent from './MarkdownContent/index.jsx';
 
 interface UpdateDialogProps {
   latestVersion: string;
