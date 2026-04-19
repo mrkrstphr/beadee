@@ -26,7 +26,7 @@
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 22+
 - `bd`installed and in your `PATH`
 
 ## Installation
