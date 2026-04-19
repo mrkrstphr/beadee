@@ -1,6 +1,7 @@
 import { Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import RefreshIndicator from './RefreshIndicator.jsx';
+import RefreshIndicator from '../RefreshIndicator.jsx';
+import './Header.css';
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);

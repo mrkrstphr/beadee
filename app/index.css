@@ -221,153 +221,6 @@ a:hover {
 }
 
 /* ============================================================
-   HEADER
-   ============================================================ */
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  height: 48px;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.header-left,
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.logo {
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--accent);
-  letter-spacing: 0.02em;
-}
-
-.header-project {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.header-search {
-  width: 200px;
-  font-size: 13px;
-  padding: 5px 10px;
-}
-
-/* ============================================================
-   THEME PICKER
-   ============================================================ */
-
-.theme-picker {
-  position: relative;
-}
-
-.theme-trigger {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  font-size: 12px;
-}
-
-.theme-swatch {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.theme-swatch-auto {
-  background: linear-gradient(135deg, #0d1117 50%, #ffffff 50%);
-  font-size: 0;
-}
-
-.theme-label {
-  min-width: 52px;
-}
-
-.theme-caret {
-  font-size: 10px;
-  color: var(--text-muted);
-}
-
-.theme-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 4px;
-  z-index: 100;
-  min-width: 140px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.theme-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  background: none;
-  border: none;
-  border-radius: 5px;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 13px;
-  padding: 6px 10px;
-  text-align: left;
-  transition: background 0.1s;
-}
-
-.theme-option:hover {
-  background: var(--border);
-}
-
-.theme-option.active {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-/* ============================================================
-   TABS
-   ============================================================ */
-
-.tabs {
-  @apply flex gap-0.5;
-}
-
-.tab {
-  color: var(--text-muted);
-  @apply bg-transparent border-0 cursor-pointer text-[13px] py-1.5 px-3 rounded-md transition-[background,color] duration-150;
-}
-
-.tab:hover {
-  background: var(--bg-elevated);
-  color: var(--text);
-}
-
-.tab.active {
-  background: var(--bg-elevated);
-  color: var(--text);
-  @apply font-semibold;
-}
-
-/* ============================================================
    BUTTONS
    ============================================================ */
 
@@ -429,12 +282,6 @@ select:focus {
 input::placeholder,
 textarea::placeholder {
   color: var(--text-muted);
-}
-
-.theme-select {
-  font-size: 12px;
-  padding: 4px 8px;
-  cursor: pointer;
 }
 
 /* ============================================================
@@ -1826,18 +1673,6 @@ textarea.field-input {
   font-size: 13px;
 }
 
-/* Cog button */
-.cog-btn {
-  font-size: 15px;
-  padding: 5px 9px;
-}
-
-.cog-btn.active {
-  background: var(--bg-elevated);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
 /* ============================================================
    COMMENT THREAD
    ============================================================ */
@@ -1955,64 +1790,7 @@ textarea.field-input {
    ============================================================ */
 
 @media (max-width: 640px) {
-  /* ── Header: two-row layout ─────────────────────────────── */
-  /*  Row 1: brand  |  right actions
-      Row 2: tabs (full width)
-      display:contents on header-left lets its children
-      participate directly in the grid.                       */
-  .header {
-    display: grid;
-    grid-template-areas:
-      'brand right'
-      'tabs  tabs';
-    grid-template-columns: 1fr auto;
-    height: auto;
-    padding: 0;
-    align-items: center;
-  }
-
-  /* Make header-left transparent to the grid */
-  .header-left {
-    display: contents;
-  }
-
-  .header-brand {
-    grid-area: brand;
-    padding: 8px 10px;
-  }
-
-  .header-right {
-    grid-area: right;
-    gap: 6px;
-    padding: 8px 10px;
-  }
-
-  /* Tabs span full width on row 2 */
-  .tabs {
-    grid-area: tabs;
-    gap: 4px;
-    padding: 8px 10px;
-    border-top: 1px solid var(--border);
-  }
-
-  /* Each tab takes equal space */
-  .tab {
-    flex: 1;
-    text-align: center;
-    padding: 7px 12px;
-  }
-
-  /* Drop project name — still too cramped even on row 1 */
-  .header-project {
-    display: none;
-  }
-
-  /* Shrink search input */
-  .header-search {
-    width: 120px;
-  }
-
-  /* Hide refresh indicator text; keep only the spin icon */
+  /* Hide refresh indicator text on mobile; keep only the spin icon */
   .refresh-label {
     display: none;
   }

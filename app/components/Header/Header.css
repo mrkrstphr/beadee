@@ -1,0 +1,179 @@
+@reference "tailwindcss";
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  @apply flex items-center justify-between px-4 h-12 flex-shrink-0;
+}
+
+.header-left,
+.header-right {
+  @apply flex items-center gap-3;
+}
+
+.header-brand {
+  @apply flex items-center gap-2;
+}
+
+.logo {
+  color: var(--accent);
+  @apply font-bold text-[15px] tracking-[0.02em];
+}
+
+.header-project {
+  color: var(--text-muted);
+  @apply text-[12px];
+}
+
+.header-search {
+  @apply w-[200px] text-[13px] py-[5px] px-2.5;
+}
+
+/* ============================================================
+   THEME PICKER
+   ============================================================ */
+
+.theme-picker {
+  @apply relative;
+}
+
+.theme-trigger {
+  @apply flex items-center gap-1.5 py-[5px] px-2.5 text-[12px];
+}
+
+.theme-swatch {
+  border: 1px solid var(--border);
+  @apply inline-block w-3 h-3 rounded-[3px] flex-shrink-0;
+}
+
+.theme-swatch-auto {
+  background: linear-gradient(135deg, #0d1117 50%, #ffffff 50%);
+  @apply text-[0];
+}
+
+.theme-label {
+  @apply min-w-[52px];
+}
+
+.theme-caret {
+  color: var(--text-muted);
+  @apply text-[10px];
+}
+
+.theme-dropdown {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  @apply absolute top-[calc(100%+4px)] right-0 rounded-lg p-1 z-100 min-w-[140px] shadow-[0_8px_24px_rgba(0,0,0,0.3)];
+}
+
+.theme-option {
+  color: var(--text);
+  @apply flex items-center gap-2 w-full bg-transparent border-0 rounded-[5px] cursor-pointer text-[13px] px-2.5 py-1.5 text-left transition-[background] duration-100;
+}
+
+.theme-option:hover {
+  background: var(--border);
+}
+
+.theme-option.active {
+  color: var(--accent);
+  @apply font-semibold;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+
+.tabs {
+  @apply flex gap-0.5;
+}
+
+.tab {
+  color: var(--text-muted);
+  @apply bg-transparent border-0 cursor-pointer text-[13px] py-1.5 px-3 rounded-md transition-[background,color] duration-150;
+}
+
+.tab:hover {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.tab.active {
+  background: var(--bg-elevated);
+  color: var(--text);
+  @apply font-semibold;
+}
+
+/* ============================================================
+   COG BUTTON
+   ============================================================ */
+
+.cog-btn {
+  @apply text-[15px] py-[5px] px-[9px];
+}
+
+.cog-btn.active {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ============================================================
+   RESPONSIVE / MOBILE
+   ============================================================ */
+
+@media (max-width: 640px) {
+  /* ── Header: two-row layout ─────────────────────────────── */
+  /*  Row 1: brand  |  right actions
+      Row 2: tabs (full width)
+      display:contents on header-left lets its children
+      participate directly in the grid.                       */
+  .header {
+    grid-template-areas:
+      'brand right'
+      'tabs  tabs';
+    grid-template-columns: 1fr auto;
+    @apply grid h-auto p-0 items-center;
+  }
+
+  /* Make header-left transparent to the grid */
+  .header-left {
+    @apply contents;
+  }
+
+  .header-brand {
+    grid-area: brand;
+    @apply p-[8px_10px];
+  }
+
+  .header-right {
+    grid-area: right;
+    @apply gap-1.5 p-[8px_10px];
+  }
+
+  /* Tabs span full width on row 2 */
+  .tabs {
+    border-top: 1px solid var(--border);
+    grid-area: tabs;
+    @apply gap-1 p-[8px_10px];
+  }
+
+  /* Each tab takes equal space */
+  .tab {
+    @apply flex-1 text-center py-[7px] px-3;
+  }
+
+  /* Drop project name — still too cramped even on row 1 */
+  .header-project {
+    @apply hidden;
+  }
+
+  /* Shrink search input */
+  .header-search {
+    @apply w-[120px];
+  }
+}

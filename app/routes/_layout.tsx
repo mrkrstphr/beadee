@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
-import Header from '../components/Header.jsx';
+import Header from '../components/Header/index.jsx';
 import IssueDetail from '../components/IssueDetail.jsx';
 import IssueModal from '../components/IssueModal.jsx';
 import ErrorScreen from '../components/ErrorScreen.jsx';
