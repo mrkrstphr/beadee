@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Issue, Comment, HealthData, LabelItem } from '../types.js';
 
 const API = '/api';
-const FALLBACK_POLL_INTERVAL = 30000;
+const FALLBACK_POLL_INTERVAL = 300000;
 
 interface SSEEvent {
   type: string;
@@ -19,9 +19,33 @@ function notifyAll(event: SSEEvent) {
   for (const fn of sseSubscribers) fn(event);
 }
 
+let notifyDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingEvent: SSEEvent | null = null;
+
+function mergeEvents(a: SSEEvent, b: SSEEvent): SSEEvent {
+  if (a.affectsAll || b.affectsAll) return { type: 'change', affectsAll: true };
+  return {
+    type: 'change',
+    affectsListView: a.affectsListView || b.affectsListView,
+    affectedIds: [...new Set([...(a.affectedIds ?? []), ...(b.affectedIds ?? [])])],
+  };
+}
+
+function scheduleNotify(event: SSEEvent) {
+  pendingEvent = pendingEvent ? mergeEvents(pendingEvent, event) : event;
+  if (notifyDebounceTimer) clearTimeout(notifyDebounceTimer);
+  notifyDebounceTimer = setTimeout(() => {
+    const e = pendingEvent!;
+    pendingEvent = null;
+    notifyDebounceTimer = null;
+    notifyAll(e);
+  }, 100);
+}
+
 let sseInstance: EventSource | null = null;
 let fallbackInterval: ReturnType<typeof setInterval> | null = null;
 let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+let globalVisibilityListener: (() => void) | null = null;
 
 function ensureSSE() {
   if (sseInstance) return;
@@ -35,7 +59,7 @@ function ensureSSE() {
       } catch {
         event = { type: 'change', affectsAll: true };
       }
-      notifyAll(event);
+      scheduleNotify(event);
     };
     sseInstance.onerror = () => {
       sseInstance!.close();
@@ -47,8 +71,15 @@ function ensureSSE() {
   connect();
 
   fallbackInterval = setInterval(() => {
-    if (document.visibilityState === 'visible') notifyAll({ type: 'change', affectsAll: true });
+    if (document.visibilityState === 'visible')
+      scheduleNotify({ type: 'change', affectsAll: true });
   }, FALLBACK_POLL_INTERVAL);
+
+  globalVisibilityListener = () => {
+    if (document.visibilityState === 'visible')
+      scheduleNotify({ type: 'change', affectsAll: true });
+  };
+  document.addEventListener('visibilitychange', globalVisibilityListener);
 }
 
 function subscribeTick(fn: TickHandler): () => void {
@@ -65,8 +96,14 @@ if (import.meta.hot) {
     }
     if (fallbackInterval) clearInterval(fallbackInterval);
     if (sseReconnectTimer) clearTimeout(sseReconnectTimer);
+    if (notifyDebounceTimer) clearTimeout(notifyDebounceTimer);
+    if (globalVisibilityListener)
+      document.removeEventListener('visibilitychange', globalVisibilityListener);
     fallbackInterval = null;
     sseReconnectTimer = null;
+    notifyDebounceTimer = null;
+    pendingEvent = null;
+    globalVisibilityListener = null;
   });
 }
 
@@ -159,21 +196,11 @@ export function useIssues(
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchIssues();
 
-    const unsub = subscribeTick((event) => {
+    return subscribeTick((event) => {
       if (document.visibilityState === 'visible' && (event.affectsAll || event.affectsListView)) {
         fetchIssues(true);
       }
     });
-
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') fetchIssues(true);
-    };
-    document.addEventListener('visibilitychange', onVisibility);
-
-    return () => {
-      unsub();
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
   }, [fetchIssues]);
 
   return { issues, loading, polling, error, refetch, lastUpdated };
