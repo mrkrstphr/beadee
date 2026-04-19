@@ -2,7 +2,7 @@
 header = ""
 body = """
 {% for group, commits in commits | group_by(attribute="group") %}
-### {{ group }}
+### {{ group | split(pat=" ") | slice(start=1) | join(sep=" ") }}
 {% for commit in commits %}
 - {{ commit.message | upper_first }} ([`{{ commit.id | truncate(length=7, end="") }}`](https://github.com/mrkrstphr/beadee/commit/{{ commit.id }}))
 {%- endfor %}
@@ -16,18 +16,18 @@ filter_unconventional = true
 split_commits = false
 
 commit_parsers = [
-  { message = "^feat", group = "Features" },
-  { message = "^fix", group = "Bug Fixes" },
-  { message = "^perf", group = "Performance" },
-  { message = "^refactor", group = "Refactoring" },
-  { message = "^chore", group = "Chores" },
-  { message = "^docs", group = "Documentation" },
-  { message = "^style", group = "Styling" },
-  { message = "^test", group = "Tests" },
-  { message = "^ci", group = "CI" },
+  { message = "^feat", group = "0 Features" },
+  { message = "^fix", group = "1 Bug Fixes" },
+  { message = "^perf", group = "2 Performance" },
+  { message = "^docs", group = "3 Documentation" },
+  { message = "^refactor", skip = true },
+  { message = "^chore", skip = true },
+  { message = "^style", skip = true },
+  { message = "^test", skip = true },
+  { message = "^ci", skip = true },
 ]
 
-filter_commits = false
+filter_commits = true
 tag_pattern = "v[0-9].*"
 skip_tags = ""
 ignore_tags = ""
