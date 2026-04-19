@@ -1,3 +1,5 @@
+import './ErrorScreen.css';
+
 interface ErrorScreenProps {
   error: string;
 }

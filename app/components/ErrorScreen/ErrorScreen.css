@@ -1,0 +1,56 @@
+@reference "tailwindcss";
+
+.error-screen {
+  @apply items-center flex h-full justify-center w-full;
+}
+
+.error-screen-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  @apply items-center rounded-xl flex flex-col gap-3 max-w-[420px] px-9 py-10 text-center;
+}
+
+.error-screen-icon {
+  color: var(--warning);
+  @apply text-4xl;
+}
+
+.error-screen-title {
+  @apply text-[18px] font-semibold;
+}
+
+.error-screen-msg {
+  color: var(--text-muted);
+  @apply text-[13px] leading-[1.5];
+}
+
+.error-screen-hint {
+  color: var(--text-muted);
+  @apply text-[12px];
+}
+
+.error-screen-msg code,
+.error-screen-hint code {
+  background: var(--bg-elevated);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  @apply rounded px-[5px] py-px;
+}
+
+.error-screen-migration {
+  @apply text-left w-full;
+}
+
+.error-screen-box:has(.error-screen-migration) {
+  @apply max-w-[580px];
+}
+
+.error-screen-steps {
+  color: var(--text-muted);
+  @apply flex flex-col text-[13px] gap-3 leading-[1.5] mt-2 pl-5;
+}
+
+.error-screen-steps pre {
+  background: var(--bg-elevated);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  @apply rounded-md text-[12px] leading-[1.6] mt-1.5 px-3 py-2 whitespace-pre;
+}

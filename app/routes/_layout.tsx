@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
 import Header from '../components/Header/index.jsx';
 import IssueDetail from '../components/IssueDetail.jsx';
 import IssueModal from '../components/IssueModal.jsx';
-import ErrorScreen from '../components/ErrorScreen.jsx';
+import ErrorScreen from '../components/ErrorScreen/index.jsx';
 import ToastContainer from '../components/ToastContainer.jsx';
 import ShortcutsHelp from '../components/ShortcutsHelp.jsx';
 import Footer from '../components/Footer/index.jsx';
