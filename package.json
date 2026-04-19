@@ -12,6 +12,7 @@
     "server/"
   ],
   "scripts": {
+    "test": "vitest",
     "dev": "react-router dev",
     "build": "react-router build",
     "start": "node bin/beadee.js",
@@ -42,17 +43,22 @@
     "@eslint-react/eslint-plugin": "^4.2.3",
     "@eslint/js": "^10.0.1",
     "@react-router/dev": "^7.14.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vitest/ui": "^4.1.4",
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.5.0",
     "husky": "^9.1.7",
+    "jsdom": "^29.0.2",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.2",
-    "vite": "^5.4.8"
+    "vite": "^5.4.8",
+    "vitest": "^4.1.4"
   },
   "engines": {
     "node": ">=22"
