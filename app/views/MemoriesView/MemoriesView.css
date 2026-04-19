@@ -1,60 +1,46 @@
-/* ============================================================
-   MEMORIES VIEW
-   ============================================================ */
+@reference "tailwindcss";
 
 .memories-page {
-  flex: 1;
-  overflow-y: auto;
-  padding: 32px;
+  @apply flex-1 overflow-y-auto p-8;
 }
 
 .memories-page-header {
-  margin-bottom: 28px;
+  @apply mb-7;
 }
 
 .memories-page-heading {
-  align-items: center;
-  display: flex;
-  gap: 10px;
-  margin-bottom: 6px;
+  @apply flex items-center gap-2.5 mb-1.5;
 }
 
 .memories-page-icon {
   color: var(--text-muted);
-  flex-shrink: 0;
+  @apply shrink-0;
 }
 
 .memories-page-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
+  @apply text-xl font-bold m-0;
 }
 
 .memories-page-hint {
   color: var(--text-muted);
-  margin: 0;
+  @apply m-0;
 }
 
 .memories-page-hint code {
   background: var(--bg-elevated);
-  border-radius: 4px;
   font-family: var(--font-mono, monospace);
-  font-size: 13px;
-  padding: 1px 5px;
+  @apply rounded text-[13px] px-1.5 py-px;
 }
 
 .memories-status {
   color: var(--text-muted);
-  font-size: 13px;
-  padding: 12px 0;
+  @apply text-[13px] py-3;
 }
 
 .memories-status code {
   background: var(--bg-elevated);
-  border-radius: 4px;
   font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  padding: 1px 5px;
+  @apply rounded text-[11px] px-1.5 py-px;
 }
 
 .memories-status-error {
@@ -62,54 +48,31 @@
 }
 
 .memories-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  @apply flex flex-col gap-0.5 list-none m-0 p-0;
 }
 
 .memory-card {
   background: var(--bg-surface);
-  border-radius: 6px;
-  padding: 14px 18px;
+  @apply rounded-md px-4.5 py-3.5;
 }
 
 .memory-card-top {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
+  @apply flex items-center gap-2 mb-1.5;
 }
 
 .memory-card-key {
   color: var(--text-muted);
   font-family: var(--font-mono, monospace);
-  flex: 1;
-  letter-spacing: 0.02em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @apply flex-1 tracking-[0.02em] overflow-hidden text-ellipsis whitespace-nowrap;
 }
 
 .memory-delete-btn {
-  background: none;
-  border: none;
-  border-radius: 4px;
   color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  flex-shrink: 0;
-  opacity: 0;
-  padding: 3px 4px;
-  transition:
-    color 0.15s,
-    opacity 0.15s;
+  @apply bg-transparent border-0 rounded cursor-pointer flex shrink-0 opacity-0 p-1 transition-[color,opacity] duration-150;
 }
 
 .memory-card:hover .memory-delete-btn {
-  opacity: 1;
+  @apply opacity-100;
 }
 
 .memory-delete-btn:hover {
@@ -118,9 +81,5 @@
 
 .memory-card-value {
   color: var(--text);
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
+  @apply text-[13px] leading-relaxed m-0 whitespace-pre-wrap wrap-break-word;
 }
