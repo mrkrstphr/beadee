@@ -28,10 +28,6 @@ export default function SearchPalette({ onClose, onSelect }: SearchPaletteProps)
   const issues = includeClosed ? allIssues : allIssues.filter((i) => i.status !== 'closed');
 
   useEffect(() => {
-    setCursor(0);
-  }, [debouncedQuery]);
-
-  useEffect(() => {
     const el = listRef.current?.querySelector(`[data-idx="${cursor}"]`);
     el?.scrollIntoView({ block: 'nearest' });
   }, [cursor]);
@@ -67,7 +63,10 @@ export default function SearchPalette({ onClose, onSelect }: SearchPaletteProps)
             type="search"
             placeholder="Search issues…"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setCursor(0);
+            }}
           />
           <button className="btn btn-secondary modal-close" onClick={onClose}>
             <X size={14} />
