@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { Settings } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import RefreshIndicator from './RefreshIndicator.jsx';
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -74,6 +74,8 @@ export default function Header({
       </div>
 
       <div className="header-right">
+        <RefreshIndicator lastUpdated={lastUpdated} polling={polling} />
+
         {showSearch && (
           <input
             className="header-search"
@@ -83,8 +85,6 @@ export default function Header({
             onChange={(e) => setLocalSearch(e.target.value)}
           />
         )}
-
-        <RefreshIndicator lastUpdated={lastUpdated} polling={polling} />
 
         {showNew && (
           <button className="btn btn-primary" onClick={onNewIssue}>
