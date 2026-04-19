@@ -4,7 +4,7 @@ import Header from '../components/Header/index.jsx';
 import IssueDetail from '../components/IssueDetail/index.jsx';
 import IssueModal from '../components/IssueModal.jsx';
 import ErrorScreen from '../components/ErrorScreen/index.jsx';
-import ToastContainer from '../components/ToastContainer.jsx';
+import ToastContainer from '../components/ToastContainer/index.jsx';
 import ShortcutsHelp from '../components/ShortcutsHelp/index.jsx';
 import SearchPalette from '../components/SearchPalette/index.jsx';
 import Footer from '../components/Footer/index.jsx';

@@ -890,56 +890,6 @@ textarea.field-input {
   color: var(--text);
 }
 
-/* ============================================================
-   TOASTS
-   ============================================================ */
-
-.toast-container {
-  bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
-  position: fixed;
-  right: 24px;
-  z-index: 300;
-}
-
-.toast {
-  align-items: center;
-  animation: toast-in 0.2s ease;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  font-size: 13px;
-  font-weight: 500;
-  gap: 8px;
-  padding: 10px 16px;
-  pointer-events: all;
-}
-
-.toast-success {
-  border-left: 3px solid var(--success);
-}
-.toast-error {
-  border-left: 3px solid var(--danger);
-}
-
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .update-modal {
   width: 600px;
 }

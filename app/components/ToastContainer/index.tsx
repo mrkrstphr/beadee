@@ -1,5 +1,6 @@
 import { CircleCheck, CircleX } from 'lucide-react';
-import type { Toast } from '../types.js';
+import type { Toast } from '../../types.js';
+import './ToastContainer.css';
 
 interface ToastContainerProps {
   toasts: Toast[];
