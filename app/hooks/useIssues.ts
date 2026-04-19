@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
-import type { Comment, HealthData, Issue, LabelItem } from '../types.js';
+import type { HealthData, Issue, LabelItem } from '../types.js';
 import { API, type ApiError, apiFetch } from '../util/apiFetch.js';
 
 interface SSEEvent {
@@ -362,5 +362,3 @@ export async function removeLabel(issueId: string, label: string): Promise<unkno
     body: JSON.stringify({ label }),
   });
 }
-
-export type { Comment };
