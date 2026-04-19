@@ -64,9 +64,15 @@ Mutation via UI → route action → suppressWatch() + broadcast()
   → SSE event → refetch (fs.watch event suppressed for 2s)
 ```
 
+### Styling
+
+**Colocation**: Each component or view lives in its own directory (e.g. `app/components/Footer/`) with a colocated CSS file (`Footer.css`) imported directly by the component. Global styles, shared primitives (buttons, badges, pills, etc.), and design tokens remain in `app/index.css`.
+
+**Tailwind**: Colocated CSS files use `@reference "tailwindcss";` at the top and `@apply` for all standard utilities. Raw CSS is only used for design token values (`var(--*)`), computed values like `color-mix()`, and vendor-prefixed properties that can't go through `@apply`. Prefer named Tailwind colors (e.g. `text-amber-500`) over hardcoded hex/rgba values.
+
 ### Themes
 
-Themes are CSS custom property sets on `[data-theme='X']` in `src/index.css`. Theme is stored in `localStorage('beadee-theme')` and applied before first paint via an inline `<script>` in `app/root.jsx`.
+Themes are CSS custom property sets on `[data-theme='X']` in `app/index.css`. Theme is stored in `localStorage('beadee-theme')` and applied before first paint via an inline `<script>` in `app/root.jsx`.
 
 ### SSR note
 
