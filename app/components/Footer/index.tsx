@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { version } from '../../package.json';
-import UpdateDialog from './UpdateDialog.jsx';
+import { version } from '../../../package.json';
+import UpdateDialog from '../UpdateDialog.jsx';
+import './Footer.css';
 
 const CACHE_KEY = 'beadee-update-check';
 const CACHE_TTL = 4 * 60 * 60 * 1000;

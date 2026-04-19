@@ -6,7 +6,7 @@ import IssueModal from '../components/IssueModal.jsx';
 import ErrorScreen from '../components/ErrorScreen.jsx';
 import ToastContainer from '../components/ToastContainer.jsx';
 import ShortcutsHelp from '../components/ShortcutsHelp.jsx';
-import Footer from '../components/Footer.jsx';
+import Footer from '../components/Footer/index.jsx';
 import { useHealth } from '../hooks/useIssues.js';
 import { useToastProvider } from '../hooks/useToast.js';
 import { useKeyboard } from '../hooks/useKeyboard.js';

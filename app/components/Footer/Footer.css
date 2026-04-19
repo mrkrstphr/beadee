@@ -1,0 +1,45 @@
+@reference "tailwindcss";
+
+.app-footer {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  @apply items-center flex flex-shrink-0 justify-between py-1 px-4;
+}
+
+.footer-version {
+  color: var(--accent);
+  @apply text-[11px] no-underline;
+}
+
+.footer-version:hover {
+  color: var(--accent-hover);
+  @apply underline;
+}
+
+.footer-left {
+  @apply items-center flex gap-2;
+}
+
+.footer-update-btn {
+  @apply rounded cursor-pointer text-[10px] font-semibold py-px px-1.5 transition-[background,border-color] duration-150 bg-amber-400/15 border border-amber-400/40 text-amber-500;
+}
+
+.footer-update-btn:hover {
+  @apply bg-amber-400/25 border-amber-400/60;
+}
+
+.footer-shortcuts-btn {
+  color: var(--text-muted);
+  @apply items-center bg-transparent border-0 cursor-pointer flex text-[11px] gap-1 py-0.5 px-1 rounded transition-[color,background] duration-150;
+}
+
+.footer-shortcuts-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .app-footer {
+    @apply hidden;
+  }
+}

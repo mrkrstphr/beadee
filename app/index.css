@@ -1732,77 +1732,6 @@ textarea.field-input {
 }
 
 /* ============================================================
-   FOOTER
-   ============================================================ */
-
-.app-footer {
-  align-items: center;
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border);
-  display: flex;
-  flex-shrink: 0;
-  justify-content: space-between;
-  padding: 4px 16px;
-}
-
-.footer-version {
-  color: var(--accent);
-  font-size: 11px;
-  text-decoration: none;
-}
-
-.footer-version:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
-}
-
-.footer-left {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-}
-
-.footer-update-btn {
-  background: rgba(255, 180, 0, 0.15);
-  border: 1px solid rgba(255, 180, 0, 0.4);
-  border-radius: 4px;
-  color: #e6a817;
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 1px 6px;
-  transition:
-    background 0.15s,
-    border-color 0.15s;
-}
-
-.footer-update-btn:hover {
-  background: rgba(255, 180, 0, 0.25);
-  border-color: rgba(255, 180, 0, 0.6);
-}
-
-.footer-shortcuts-btn {
-  align-items: center;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  font-size: 11px;
-  gap: 4px;
-  padding: 2px 4px;
-  border-radius: 4px;
-  transition:
-    color 0.15s,
-    background 0.15s;
-}
-
-.footer-shortcuts-btn:hover {
-  background: var(--bg-elevated);
-  color: var(--text);
-}
-
-/* ============================================================
    KEYBOARD SHORTCUTS
    ============================================================ */
 
@@ -2127,10 +2056,5 @@ textarea.field-input {
   /* Make the close/back button easier to tap */
   .detail-close-btn {
     padding: 6px 10px;
-  }
-
-  /* ── Footer: nothing useful on mobile, hide it entirely ─── */
-  .app-footer {
-    display: none;
   }
 }
