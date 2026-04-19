@@ -111,7 +111,6 @@ interface DetailPanelComponent {
 }
 
 interface ListViewProps {
-  search: string;
   selectedIssueId: string | null;
   onSelectIssue: (id: string | null) => void;
   DetailPanel: DetailPanelComponent;
@@ -119,7 +118,6 @@ interface ListViewProps {
 }
 
 export default function ListView({
-  search,
   selectedIssueId,
   onSelectIssue,
   DetailPanel,
@@ -134,7 +132,7 @@ export default function ListView({
   const listPanelWidth = Number(rawPanelWidth) || 320;
 
   const { issues, loading, error } = useIssues(
-    { status: statusFilter, type: typeFilter, search },
+    { status: statusFilter, type: typeFilter },
     { onRefreshed },
   );
 
@@ -273,7 +271,7 @@ export default function ListView({
           {error && <div className="list-state list-error">Error: {error}</div>}
           {!loading && !error && displayedIssues.length === 0 && (
             <div className="list-state list-empty">
-              {search || statusFilter || typeFilter || hideClosed
+              {statusFilter || typeFilter || hideClosed
                 ? 'No issues match your filters'
                 : 'No issues yet'}
             </div>

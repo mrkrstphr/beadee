@@ -7,7 +7,7 @@ const SHORTCUTS = [
     group: 'Global',
     items: [
       { key: 'n', desc: 'New issue' },
-      { key: '/', desc: 'Focus search' },
+      { key: 'f', desc: 'Search issues' },
       { key: '1', desc: 'List view' },
       { key: '2', desc: 'Board view' },
       { key: 'm', desc: 'Memories' },

@@ -1,0 +1,69 @@
+@reference "tailwindcss";
+
+.search-palette-modal {
+  @apply w-[560px] p-0 overflow-hidden;
+}
+
+.search-palette-input-row {
+  border-bottom: 1px solid var(--border);
+  @apply flex items-center gap-2 px-3 py-2.5;
+}
+
+.search-palette-input {
+  @apply flex-1 bg-transparent border-0 outline-none text-[14px] py-1 px-1;
+  color: var(--text);
+}
+
+.search-palette-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-palette-options {
+  border-bottom: 1px solid var(--border);
+  @apply flex items-center gap-2 px-3 py-2;
+}
+
+.search-palette-results {
+  @apply flex flex-col overflow-y-auto max-h-[380px] p-1;
+}
+
+.search-palette-empty {
+  color: var(--text-muted);
+  @apply flex flex-col items-center gap-2.5 text-[13px] text-center py-10;
+}
+
+.search-palette-ghost {
+  color: var(--border);
+  @apply animate-[palette-ghost-bob_3s_ease-in-out_infinite];
+}
+
+@keyframes palette-ghost-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.search-palette-row {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  @apply flex items-center gap-2 w-full text-left rounded-md px-3 py-2 cursor-pointer text-[13px] transition-[background] duration-75;
+}
+
+.search-palette-row:hover,
+.search-palette-row.active {
+  background: var(--bg-elevated);
+}
+
+.search-palette-id {
+  color: var(--text-muted);
+  @apply font-mono text-[11px] flex-shrink-0;
+}
+
+.search-palette-title {
+  @apply truncate flex-1;
+}

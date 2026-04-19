@@ -52,7 +52,6 @@ interface DetailPanelComponent {
 }
 
 interface KanbanViewProps {
-  search: string;
   selectedIssueId: string | null;
   onSelectIssue: (id: string | null) => void;
   DetailPanel: DetailPanelComponent;
@@ -60,14 +59,13 @@ interface KanbanViewProps {
 }
 
 export default function KanbanView({
-  search,
   selectedIssueId,
   onSelectIssue,
   DetailPanel,
   onRefreshed,
 }: KanbanViewProps) {
   const [activeColumn, setActiveColumn] = useState('open');
-  const { issues, loading, error } = useIssues({ search }, { onRefreshed });
+  const { issues, loading, error } = useIssues({}, { onRefreshed });
 
   const byStatus: Record<string, Issue[]> = {};
   for (const col of COLUMNS) byStatus[col.status] = [];

@@ -29,10 +29,6 @@
   @apply text-[12px];
 }
 
-.header-search {
-  @apply w-[200px] text-[13px] py-[5px] px-2.5;
-}
-
 /* ============================================================
    THEME PICKER
    ============================================================ */
@@ -170,10 +166,5 @@
   /* Drop project name — still too cramped even on row 1 */
   .header-project {
     @apply hidden;
-  }
-
-  /* Shrink search input */
-  .header-search {
-    @apply w-[120px];
   }
 }

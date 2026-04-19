@@ -6,6 +6,7 @@ import IssueModal from '../components/IssueModal.jsx';
 import ErrorScreen from '../components/ErrorScreen/index.jsx';
 import ToastContainer from '../components/ToastContainer.jsx';
 import ShortcutsHelp from '../components/ShortcutsHelp/index.jsx';
+import SearchPalette from '../components/SearchPalette/index.jsx';
 import Footer from '../components/Footer/index.jsx';
 import { useHealth } from '../hooks/useIssues.js';
 import { useToastProvider } from '../hooks/useToast.js';
@@ -49,7 +50,6 @@ function DetailPanel({ issueId, onClose }: DetailPanelProps) {
 }
 
 export interface LayoutOutletContext {
-  search: string;
   DetailPanel: (props: DetailPanelProps) => React.ReactElement;
   onRefreshed: (date: Date) => void;
   theme: string;
@@ -64,10 +64,10 @@ export default function Layout() {
   const [theme, setTheme] = useState(
     () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-theme') : null) || 'dark',
   );
-  const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingIssue, setEditingIssue] = useState<Issue | null>(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showSearchPalette, setShowSearchPalette] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [polling, setPolling] = useState(false);
 
@@ -118,7 +118,7 @@ export default function Layout() {
     setEditingIssue(null);
   }
 
-  const modalOpen = showModal || showShortcuts;
+  const modalOpen = showModal || showShortcuts || showSearchPalette;
 
   const handleDelete = useCallback(() => {
     navigate(`/${activeTab}`);
@@ -130,10 +130,7 @@ export default function Layout() {
         setEditingIssue(null);
         setShowModal(true);
       },
-      '/': () => {
-        const el = document.querySelector('.header-search') as HTMLElement | null;
-        el?.focus();
-      },
+      f: () => setShowSearchPalette(true),
       1: () => switchTab('list'),
       2: () => switchTab('kanban'),
       '?': () => setShowShortcuts(true),
@@ -162,8 +159,7 @@ export default function Layout() {
         <Header
           activeTab={activeTab}
           onTabChange={switchTab}
-          search={search}
-          onSearchChange={setSearch}
+          onOpenSearch={() => setShowSearchPalette(true)}
           onNewIssue={() => {
             setEditingIssue(null);
             setShowModal(true);
@@ -177,7 +173,6 @@ export default function Layout() {
           <Outlet
             context={
               {
-                search,
                 DetailPanel,
                 onRefreshed: handleRefreshed,
                 theme,
@@ -201,6 +196,10 @@ export default function Layout() {
         )}
 
         {showShortcuts && <ShortcutsHelp onClose={() => setShowShortcuts(false)} />}
+
+        {showSearchPalette && (
+          <SearchPalette onClose={() => setShowSearchPalette(false)} onSelect={showIssueDetail} />
+        )}
 
         <ToastContainer toasts={toasts} onDismiss={dismiss} />
       </div>

@@ -1,22 +1,11 @@
-import { Settings } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Settings, Search } from 'lucide-react';
 import RefreshIndicator from '../RefreshIndicator/index.jsx';
 import './Header.css';
-
-function useDebounce<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
-}
 
 interface HeaderProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  search: string;
-  onSearchChange: (value: string) => void;
+  onOpenSearch: () => void;
   onNewIssue: () => void;
   lastUpdated: Date | null;
   polling: boolean;
@@ -26,20 +15,12 @@ interface HeaderProps {
 export default function Header({
   activeTab,
   onTabChange,
-  search,
-  onSearchChange,
+  onOpenSearch,
   onNewIssue,
   lastUpdated,
   polling,
   projectName,
 }: HeaderProps) {
-  const [localSearch, setLocalSearch] = useState(search);
-  const debouncedSearch = useDebounce(localSearch, 300);
-
-  useEffect(() => {
-    onSearchChange(debouncedSearch);
-  }, [debouncedSearch, onSearchChange]);
-
   const showSearch = activeTab !== 'settings' && activeTab !== 'memories';
   const showNew = activeTab !== 'settings' && activeTab !== 'memories';
 
@@ -78,13 +59,14 @@ export default function Header({
         <RefreshIndicator lastUpdated={lastUpdated} polling={polling} />
 
         {showSearch && (
-          <input
-            className="header-search"
-            type="search"
-            placeholder="Search issues…"
-            value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
-          />
+          <button
+            className="btn btn-secondary cog-btn"
+            onClick={onOpenSearch}
+            title="Search issues (f)"
+            aria-label="Search issues"
+          >
+            <Search size={15} strokeWidth={1.75} />
+          </button>
         )}
 
         {showNew && (
