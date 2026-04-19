@@ -148,7 +148,7 @@
 
 .detail-kv-wrap {
   border: 1px solid var(--border);
-  @apply rounded-lg mb-5 overflow-hidden;
+  @apply rounded-lg mb-5 overflow-hidden shrink-0;
 }
 
 /* Desktop: two side-by-side key/value pairs per row */
