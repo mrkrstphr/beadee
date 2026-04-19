@@ -1,3 +1,5 @@
+@import 'tailwindcss';
+
 /* ============================================================
    THEME TOKENS
    ============================================================ */
@@ -346,21 +348,12 @@ a:hover {
    ============================================================ */
 
 .tabs {
-  display: flex;
-  gap: 2px;
+  @apply flex gap-0.5;
 }
 
 .tab {
-  background: none;
-  border: none;
   color: var(--text-muted);
-  cursor: pointer;
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  @apply bg-transparent border-0 cursor-pointer text-[13px] py-1.5 px-3 rounded-md transition-[background,color] duration-150;
 }
 
 .tab:hover {
@@ -371,7 +364,7 @@ a:hover {
 .tab.active {
   background: var(--bg-elevated);
   color: var(--text);
-  font-weight: 600;
+  @apply font-semibold;
 }
 
 /* ============================================================
@@ -379,21 +372,12 @@ a:hover {
    ============================================================ */
 
 .btn {
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 5px 12px;
-  transition:
-    background 0.15s,
-    opacity 0.15s;
-  white-space: nowrap;
+  @apply border-0 rounded-md cursor-pointer text-[13px] font-medium px-3 py-1.25 whitespace-nowrap transition-[background,opacity] duration-150;
 }
 
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  @apply text-white;
 }
 
 .btn-primary:hover {
@@ -412,12 +396,11 @@ a:hover {
 
 .btn-danger {
   background: var(--danger);
-  color: #fff;
+  @apply text-white;
 }
 
 .btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @apply opacity-50 cursor-not-allowed;
 }
 
 /* ============================================================
@@ -459,15 +442,7 @@ textarea::placeholder {
    ============================================================ */
 
 .badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  @apply inline-flex items-center gap-1 rounded-[20px] text-[11px] font-semibold py-0.5 px-2 uppercase tracking-[0.04em];
 }
 
 .badge-open {
@@ -500,26 +475,14 @@ textarea::placeholder {
 }
 
 .status-dropdown-wrap {
-  display: inline-flex;
-  padding: 0;
-  position: relative;
+  @apply inline-flex p-0 relative;
 }
 
 .status-dropdown-trigger {
-  align-items: center;
-  background: transparent;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  display: inline-flex;
   font: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  gap: 5px;
   letter-spacing: inherit;
-  outline: none;
-  padding: 3px 6px;
   text-transform: inherit;
+  @apply items-center bg-transparent border-0 text-inherit cursor-pointer inline-flex gap-[5px] outline-none py-[3px] px-1.5;
 }
 
 .status-dropdown-trigger:disabled {
