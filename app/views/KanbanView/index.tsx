@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useIssues } from '../../hooks/useIssues.js';
-import IssueCard from '../../components/IssueCard.jsx';
+import IssueCard from '../../components/IssueCard/index.jsx';
 import type { Issue } from '../../types.js';
 import './KanbanView.css';
 

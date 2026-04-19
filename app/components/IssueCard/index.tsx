@@ -1,5 +1,5 @@
-import type { Issue } from '../types.js';
-import { PRIORITY_LABEL, TYPE_SHORT } from '../constants.js';
+import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
+import type { Issue } from '../../types.js';
 
 function initials(name: string): string {
   if (!name) return '?';
