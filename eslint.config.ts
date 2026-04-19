@@ -68,6 +68,7 @@ export default tseslint.config(
     plugins: { css },
     language: 'css/css',
     languageOptions: {
+      // @ts-expect-error — @eslint/css types don't include customSyntax yet
       customSyntax: tailwind4,
       tolerant: true,
     },
