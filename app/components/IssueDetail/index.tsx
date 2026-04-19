@@ -72,9 +72,12 @@ function LabelAddTrigger({ issueId }: { issueId: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = `label-suggestions-${issueId}`;
 
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
+
   function open() {
     setEditing(true);
-    setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   async function commit() {
@@ -102,7 +105,7 @@ function LabelAddTrigger({ issueId }: { issueId: string }) {
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       e.preventDefault();
-      setTimeout(() => commit(), 0);
+      commit();
     }
     if (e.key === 'Escape') {
       e.preventDefault();

@@ -142,6 +142,7 @@ function IssueTypeahead({ value, onChange }: IssueTypeaheadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const focusAfterClearRef = useRef(false);
 
   const selected: SearchResult | null =
     value && resolvedId === value ? { id: resolvedId, title: resolvedTitle ?? value } : null;
@@ -171,6 +172,13 @@ function IssueTypeahead({ value, onChange }: IssueTypeaheadProps) {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  useEffect(() => {
+    if (focusAfterClearRef.current) {
+      focusAfterClearRef.current = false;
+      inputRef.current?.focus();
+    }
+  });
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const q = e.target.value;
@@ -204,13 +212,13 @@ function IssueTypeahead({ value, onChange }: IssueTypeaheadProps) {
   }
 
   function clear() {
+    focusAfterClearRef.current = true;
     setResolvedId(null);
     setResolvedTitle(null);
     onChange('');
     setInputValue('');
     setResults([]);
     setOpen(false);
-    setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
