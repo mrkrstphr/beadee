@@ -1,7 +1,8 @@
+import { Rocket } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { version } from '../../../package.json';
-import UpdateDialog from '../UpdateDialog.jsx';
 import type { ReleaseEntry } from '../../routes/api.update.js';
+import UpdateDialog from '../UpdateDialog.jsx';
 import './Footer.css';
 
 const CACHE_KEY = 'beadee-update-check';
@@ -84,6 +85,7 @@ export default function Footer({ onShowShortcuts }: FooterProps) {
           {updateInfo && (
             <button className="footer-update-btn" onClick={() => setShowDialog(true)}>
               v{updateInfo.latestVersion} available
+              <Rocket size={14} />
             </button>
           )}
         </div>

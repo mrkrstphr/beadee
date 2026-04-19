@@ -21,7 +21,7 @@
 }
 
 .footer-update-btn {
-  @apply rounded cursor-pointer text-[10px] font-semibold py-px px-1.5 transition-[background,border-color] duration-150 bg-amber-400/15 border border-amber-400/40 text-amber-500;
+  @apply rounded flex items-center gap-1 cursor-pointer text-[10px] font-semibold py-px px-1.5 transition-[background,border-color] duration-150 bg-amber-400/15 border border-amber-400/40 text-amber-500;
 }
 
 .footer-update-btn:hover {
