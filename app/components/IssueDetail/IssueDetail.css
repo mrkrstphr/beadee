@@ -1,0 +1,278 @@
+@reference "tailwindcss";
+
+.issue-detail {
+  @apply flex flex-col gap-0 h-full overflow-y-auto px-6 pt-5 pb-8;
+}
+
+.detail-loading,
+.detail-error {
+  color: var(--text-muted);
+  @apply text-[13px] py-8 px-6;
+}
+
+.detail-error {
+  color: var(--danger);
+}
+
+.detail-not-found {
+  @apply flex flex-col items-center justify-center gap-2.5 px-6 py-16 text-center;
+}
+
+.detail-not-found-icon {
+  color: var(--border);
+  @apply mb-1 animate-[detail-ghost-bob_3s_ease-in-out_infinite];
+}
+
+@keyframes detail-ghost-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.detail-not-found-id {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: ui-monospace, monospace;
+  @apply text-[11px] tracking-[0.08em] rounded px-2 py-px;
+}
+
+.detail-not-found-msg {
+  color: var(--text-muted);
+  @apply text-[13px] max-w-[220px] leading-[1.5];
+}
+
+.detail-header {
+  border-bottom: 1px solid var(--border);
+  @apply mb-3.5 pb-3.5;
+}
+
+.detail-header-top {
+  @apply items-center flex justify-between mb-2;
+}
+
+.detail-id-group {
+  @apply items-center flex gap-1;
+}
+
+.detail-id {
+  color: var(--text-muted);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  @apply text-[12px];
+}
+
+.detail-parent-link {
+  @apply bg-transparent border-0 cursor-pointer p-0 underline underline-offset-2 transition-colors duration-150;
+}
+.detail-parent-link:hover {
+  color: var(--text-primary);
+}
+
+.detail-breadcrumb-sep {
+  @apply opacity-40 select-none;
+}
+
+.btn-copy-id {
+  color: var(--text-muted);
+  @apply bg-transparent border-0 cursor-pointer text-[13px] px-0.5 py-0 leading-none opacity-50 transition-[opacity,color] duration-150;
+}
+.btn-copy-id:hover {
+  color: var(--text-primary);
+  @apply opacity-100;
+}
+.btn-copy-id--failed {
+  color: var(--status-closed, #e05252);
+  @apply opacity-100;
+}
+
+.detail-actions-top {
+  @apply flex gap-1.5;
+}
+
+.detail-close-btn {
+  @apply text-[12px] py-1 px-2;
+}
+
+.btn-split {
+  @apply relative flex;
+}
+
+.btn-split-main {
+  @apply rounded-r-none border-r-0;
+}
+
+.btn-split-chevron {
+  border-left: 1px solid var(--border-strong, color-mix(in srgb, var(--border) 60%, var(--text)));
+  @apply rounded-l-none py-[5px] px-[7px];
+}
+
+.btn-split-menu {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  @apply absolute top-[calc(100%+4px)] right-0 rounded-md p-1 min-w-[120px] z-100 shadow-[0_4px_12px_rgba(0,0,0,0.25)];
+}
+
+.btn-split-menu-item {
+  color: var(--text);
+  @apply flex items-center gap-1.5 w-full px-2.5 py-1.5 border-0 bg-transparent rounded cursor-pointer text-[13px] font-medium text-left;
+}
+
+.btn-split-menu-item:hover {
+  background: var(--border);
+}
+
+.btn-split-menu-danger {
+  color: var(--danger);
+}
+
+.btn-split-menu-danger:hover {
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+}
+
+.detail-title {
+  @apply text-[18px] font-semibold leading-[1.3];
+}
+
+.detail-meta {
+  @apply items-center flex flex-wrap gap-2 mb-5;
+}
+
+.detail-assignee {
+  color: var(--text-muted);
+  @apply text-[12px];
+}
+
+.detail-kv-wrap {
+  border: 1px solid var(--border);
+  @apply rounded-lg mb-5 overflow-hidden;
+}
+
+/* Desktop: two side-by-side key/value pairs per row */
+.detail-kv {
+  @apply grid text-[13px] leading-[1.4] m-0 p-0;
+  grid-template-columns: max-content 1fr max-content 1fr;
+}
+
+.detail-kv dt,
+.detail-kv dd {
+  border-top: 1px solid var(--border);
+  @apply m-0 py-[9px] px-3;
+}
+
+/* Desktop first visual row (4-col grid): no top border */
+.detail-kv dt:nth-child(-n + 4),
+.detail-kv dd:nth-child(-n + 4) {
+  @apply border-t-0;
+}
+
+.detail-kv dt {
+  color: var(--text-muted);
+  @apply text-[12px] font-semibold;
+}
+
+.detail-kv dd {
+  color: var(--text);
+}
+
+.detail-type {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  @apply rounded text-[11px] font-semibold py-px px-[7px] uppercase;
+}
+
+.detail-description {
+  background: var(--bg-surface);
+  color: var(--text);
+  @apply rounded-md text-[13px] leading-relaxed px-3.5 py-3 break-words;
+}
+
+/* Dependencies */
+.dep-group {
+  @apply mb-2.5;
+}
+
+.dep-group-label {
+  color: var(--text-muted);
+  @apply block text-[12px] mb-1.5;
+}
+
+.dep-chips {
+  @apply flex flex-col gap-1;
+}
+
+.dep-chip {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  @apply items-center rounded-md cursor-pointer flex text-[12px] gap-2 px-2.5 py-1.5 text-left transition-[background,border-color] duration-100 w-full;
+}
+
+.dep-chip:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+}
+
+.dep-chip-icon {
+  @apply flex-shrink-0;
+}
+
+.dep-chip-id {
+  color: var(--text-muted);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  @apply flex-shrink-0;
+}
+
+.dep-chip-title {
+  @apply flex-1 overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+/* Close action */
+.detail-actions-bottom {
+}
+
+.detail-btn-row {
+  @apply flex flex-wrap gap-2;
+}
+
+.close-reason-row {
+  @apply flex gap-2 mt-2.5;
+}
+
+.close-reason-input {
+  @apply flex-1;
+}
+
+/* ============================================================
+   RESPONSIVE / MOBILE
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .issue-detail {
+    @apply px-3.5 pt-3.5 pb-6;
+  }
+
+  /* KV grid: single column on mobile */
+  .detail-kv {
+    grid-template-columns: max-content 1fr;
+  }
+
+  /* Mobile: items 3-4 now start a new row — restore top border; keep it off items 1-2 */
+  .detail-kv dt:nth-child(-n + 4),
+  .detail-kv dd:nth-child(-n + 4) {
+    border-top: 1px solid var(--border);
+  }
+  .detail-kv dt:nth-child(-n + 2),
+  .detail-kv dd:nth-child(-n + 2) {
+    @apply border-t-0;
+  }
+
+  /* Make the close/back button easier to tap */
+  .detail-close-btn {
+    @apply py-1.5 px-2.5;
+  }
+}

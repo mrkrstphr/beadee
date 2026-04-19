@@ -9,16 +9,17 @@ import {
   addLabel,
   removeLabel,
   useLabels,
-} from '../hooks/useIssues.js';
-import { toast } from '../hooks/useToast.js';
-import { useKeyboard } from '../hooks/useKeyboard.js';
-import CollapsibleSection from './CollapsibleSection.jsx';
-import CommentThread from './CommentThread.jsx';
-import ConfirmDialog from './ConfirmDialog.jsx';
-import MarkdownContent from './MarkdownContent.jsx';
-import StatusIcon from './StatusIcon.jsx';
-import type { Issue, Dependency, LabelItem } from '../types.js';
-import { PRIORITY_LABEL } from '../constants.js';
+} from '../../hooks/useIssues.js';
+import { toast } from '../../hooks/useToast.js';
+import { useKeyboard } from '../../hooks/useKeyboard.js';
+import CollapsibleSection from '../CollapsibleSection.jsx';
+import CommentThread from '../CommentThread.jsx';
+import ConfirmDialog from '../ConfirmDialog.jsx';
+import MarkdownContent from '../MarkdownContent.jsx';
+import StatusIcon from '../StatusIcon.jsx';
+import type { Issue, Dependency, LabelItem } from '../../types.js';
+import { PRIORITY_LABEL } from '../../constants.js';
+import './IssueDetail.css';
 const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed'];
 
 function formatDate(iso: string | null | undefined): string | null {
