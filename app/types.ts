@@ -54,6 +54,8 @@ export interface Issue {
   parent?: string | null;
   labels?: string[];
   dependencies?: Dependency[];
+  closed_at?: string | null;
+  close_reason?: string | null;
 }
 
 export interface LabelItem {

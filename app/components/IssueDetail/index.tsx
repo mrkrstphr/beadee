@@ -440,7 +440,8 @@ export default function IssueDetail({
 
         {((issue.estimated_minutes != null && issue.estimated_minutes > 0) ||
           issue.due_at ||
-          issue.created_at) && (
+          issue.created_at ||
+          issue.closed_at) && (
           <div className="detail-kv-wrap">
             <dl className="detail-kv">
               {issue.estimated_minutes != null && issue.estimated_minutes > 0 && (
@@ -461,7 +462,19 @@ export default function IssueDetail({
                   <dd>{formatDate(issue.created_at)}</dd>
                 </>
               )}
+              {issue.closed_at && (
+                <>
+                  <dt>Closed</dt>
+                  <dd>{formatDate(issue.closed_at)}</dd>
+                </>
+              )}
             </dl>
+          </div>
+        )}
+        {issue.status === 'closed' && issue.close_reason && issue.close_reason !== 'Closed' && (
+          <div className="detail-close-reason">
+            <span className="detail-close-reason-label">Close reason</span>
+            <span className="detail-close-reason-text">{issue.close_reason}</span>
           </div>
         )}
 

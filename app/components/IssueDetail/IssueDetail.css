@@ -247,6 +247,21 @@
   @apply flex-1;
 }
 
+.detail-close-reason {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  @apply flex gap-2 items-baseline rounded-lg px-3.5 py-2.5 mb-5 text-[13px];
+}
+
+.detail-close-reason-label {
+  color: var(--text-muted);
+  @apply text-[12px] font-semibold flex-shrink-0;
+}
+
+.detail-close-reason-text {
+  color: var(--text);
+}
+
 /* ============================================================
    RESPONSIVE / MOBILE
    ============================================================ */
