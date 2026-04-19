@@ -44,7 +44,7 @@
 
 .comment-text {
   color: var(--text);
-  @apply text-[13px] leading-[1.5] break-words;
+  @apply text-[13px] leading-normal wrap-break-word;
 }
 
 .comment-compose {

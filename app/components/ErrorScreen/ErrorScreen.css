@@ -1,7 +1,7 @@
 @reference "tailwindcss";
 
 .error-screen {
-  @apply items-center flex h-full justify-center w-full;
+  @apply items-center flex size-full justify-center;
 }
 
 .error-screen-box {
@@ -21,7 +21,7 @@
 
 .error-screen-msg {
   color: var(--text-muted);
-  @apply text-[13px] leading-[1.5];
+  @apply text-[13px] leading-normal;
 }
 
 .error-screen-hint {
@@ -46,7 +46,7 @@
 
 .error-screen-steps {
   color: var(--text-muted);
-  @apply flex flex-col text-[13px] gap-3 leading-[1.5] mt-2 pl-5;
+  @apply flex flex-col text-[13px] gap-3 leading-normal mt-2 pl-5;
 }
 
 .error-screen-steps pre {

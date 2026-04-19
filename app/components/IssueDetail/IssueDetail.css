@@ -43,7 +43,7 @@
 
 .detail-not-found-msg {
   color: var(--text-muted);
-  @apply text-[13px] max-w-[220px] leading-[1.5];
+  @apply text-[13px] max-w-[220px] leading-normal;
 }
 
 .detail-header {
@@ -188,7 +188,7 @@
 .detail-description {
   background: var(--bg-surface);
   color: var(--text);
-  @apply rounded-md text-[13px] leading-relaxed px-3.5 py-3 break-words;
+  @apply rounded-md text-[13px] leading-relaxed px-3.5 py-3 wrap-break-word;
 }
 
 /* Dependencies */
@@ -218,17 +218,17 @@
 }
 
 .dep-chip-icon {
-  @apply flex-shrink-0;
+  @apply shrink-0;
 }
 
 .dep-chip-id {
   color: var(--text-muted);
   font-family: 'SFMono-Regular', Consolas, monospace;
-  @apply flex-shrink-0;
+  @apply shrink-0;
 }
 
 .dep-chip-title {
-  @apply flex-1 overflow-hidden text-ellipsis whitespace-nowrap;
+  @apply flex-1 truncate;
 }
 
 /* Close action */
@@ -255,7 +255,7 @@
 
 .detail-close-reason-label {
   color: var(--text-muted);
-  @apply text-[12px] font-semibold flex-shrink-0;
+  @apply text-[12px] font-semibold shrink-0;
 }
 
 .detail-close-reason-text {

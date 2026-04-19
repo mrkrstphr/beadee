@@ -29,7 +29,7 @@
 
 .section-chevron {
   color: var(--text-muted);
-  @apply flex-shrink-0 transition-transform duration-150 ease-[ease];
+  @apply shrink-0 transition-transform duration-150 ease-[ease];
 }
 
 .section-chevron.is-up {

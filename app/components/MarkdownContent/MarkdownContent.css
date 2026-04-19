@@ -53,7 +53,7 @@
   @apply rounded-md overflow-x-auto;
 }
 .md-content pre code {
-  @apply bg-transparent border-0 text-[inherit] p-0;
+  @apply bg-transparent border-0 text-inherit p-0;
 }
 .md-content blockquote {
   border-left: 3px solid var(--border);

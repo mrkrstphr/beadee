@@ -10,7 +10,7 @@
 }
 
 .search-palette-input {
-  @apply flex-1 bg-transparent border-0 outline-none text-[14px] py-1 px-1;
+  @apply flex-1 bg-transparent border-0 outline-none text-[14px] p-1;
   color: var(--text);
 }
 
@@ -61,7 +61,7 @@
 
 .search-palette-id {
   color: var(--text-muted);
-  @apply font-mono text-[11px] flex-shrink-0;
+  @apply font-mono text-[11px] shrink-0;
 }
 
 .search-palette-title {

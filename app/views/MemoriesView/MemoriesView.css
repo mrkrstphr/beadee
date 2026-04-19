@@ -63,7 +63,7 @@
 .memory-card-key {
   color: var(--text-muted);
   font-family: var(--font-mono, monospace);
-  @apply flex-1 tracking-[0.02em] overflow-hidden text-ellipsis whitespace-nowrap;
+  @apply flex-1 tracking-[0.02em] truncate;
 }
 
 .memory-delete-btn {

@@ -3,7 +3,7 @@
 .app-footer {
   background: var(--bg-surface);
   border-top: 1px solid var(--border);
-  @apply items-center flex flex-shrink-0 justify-between py-1 px-4;
+  @apply items-center flex shrink-0 justify-between py-1 px-4;
 }
 
 .footer-version {

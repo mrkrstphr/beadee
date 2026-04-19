@@ -2,7 +2,7 @@
 
 .modal-backdrop {
   background: rgb(0 0 0 / 0.6);
-  @apply fixed inset-0 z-[200] flex items-center justify-center backdrop-blur-sm;
+  @apply fixed inset-0 z-200 flex items-center justify-center backdrop-blur-sm;
 }
 
 .modal {
@@ -55,6 +55,6 @@
   }
 
   .modal {
-    @apply w-full max-h-[92dvh] rounded-b-none border-l-0 border-r-0 border-b-0;
+    @apply w-full max-h-[92dvh] rounded-b-none border-x-0 border-b-0;
   }
 }

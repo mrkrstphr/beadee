@@ -24,7 +24,7 @@
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   color: var(--text-muted);
-  @apply rounded-full text-[10px] font-bold h-5 leading-5 ml-auto text-center w-5;
+  @apply rounded-full text-[10px]/5 font-bold size-5  ml-auto text-center;
 }
 
 .issue-card-title {
