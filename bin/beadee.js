@@ -13,7 +13,7 @@ Usage:
   beadee [options]
 
 Options:
-  -p, --port <n>   Port to listen on (default: 0 = OS picks a free port)
+  -p, --port <n>   Port to listen on (default: 55055)
   -H, --host <h>   Host to bind to (default: 127.0.0.1)
   -o, --open       Open browser automatically after start
   -v, --version    Print version and exit
@@ -24,14 +24,14 @@ For development, use: npm run dev
 Run from a directory with .beads/ to start the GUI.
 
 Examples:
-  beadee                  # Start on a random free port
+  beadee                  # Start on port 55055
   beadee --port 4000      # Start on port 4000
   beadee --open           # Start and open browser
 `.trim();
 
 function parseArgs(argv) {
   const args = argv.slice(2);
-  const opts = { port: 0, host: '127.0.0.1', open: false };
+  const opts = { port: 55055, host: '127.0.0.1', open: false };
 
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
