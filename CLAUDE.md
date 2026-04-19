@@ -32,9 +32,14 @@ Common types: `feat`, `fix`, `chore`, `refactor`, `docs`, `style`, `test`
 npm run dev      # Start dev server (React Router + Vite, http://localhost:5173)
 npm run build    # Production build → build/client/ + build/server/
 npm start        # Run production server (requires npm run build first)
+npm test         # Run tests (vitest, watch mode; CI runs a single pass automatically)
 ```
 
-No test runner or linter is configured yet.
+## Testing
+
+Tests use **vitest** with `@testing-library/react`. Test files live colocated with their source (`useDebounce.test.ts` next to `useDebounce.ts`).
+
+Write tests for what matters — real behavior, edge cases, and contracts that would silently break. Don't chase coverage numbers, test every code path, or write tests that just restate the implementation. If a test wouldn't catch a real bug, it probably isn't worth writing.
 
 ## Architecture
 
