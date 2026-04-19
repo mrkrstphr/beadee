@@ -1,18 +1,14 @@
 import { CircleCheck, CircleX } from 'lucide-react';
-import type { Toast } from '../../types.js';
+import { useToast } from '../../hooks/useToast.js';
 import './ToastContainer.css';
 
-interface ToastContainerProps {
-  toasts: Toast[];
-  onDismiss: (id: number) => void;
-}
-
-export default function ToastContainer({ toasts, onDismiss }: ToastContainerProps) {
+export default function ToastContainer() {
+  const { toasts, dismiss } = useToast();
   if (!toasts.length) return null;
   return (
     <div className="toast-container">
       {toasts.map((t) => (
-        <div key={t.id} className={`toast toast-${t.type}`} onClick={() => onDismiss(t.id)}>
+        <div key={t.id} className={`toast toast-${t.type}`} onClick={() => dismiss(t.id)}>
           {t.type === 'success' ? (
             <CircleCheck size={14} strokeWidth={2} />
           ) : (

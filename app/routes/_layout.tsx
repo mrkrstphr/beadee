@@ -9,7 +9,7 @@ import ShortcutsHelp from '../components/ShortcutsHelp/index.jsx';
 import SearchPalette from '../components/SearchPalette/index.jsx';
 import Footer from '../components/Footer/index.jsx';
 import { useHealth } from '../hooks/useIssues.js';
-import { useToastProvider } from '../hooks/useToast.js';
+import { ToastContext, useToastProvider } from '../hooks/useToast.js';
 import { useKeyboard } from '../hooks/useKeyboard.js';
 import type { Issue } from '../types.js';
 
@@ -72,7 +72,7 @@ export default function Layout() {
   const [polling, setPolling] = useState(false);
 
   const { health, error: healthError, loading: healthLoading } = useHealth();
-  const { toasts, dismiss } = useToastProvider();
+  const toastValue = useToastProvider();
 
   const activeTab = location.pathname.startsWith('/kanban')
     ? 'kanban'
@@ -148,61 +148,63 @@ export default function Layout() {
   if (healthError) return <ErrorScreen error={healthError} />;
 
   return (
-    <DetailPanelContext.Provider
-      value={{
-        onSelectIssue: showIssueDetail,
-        onEdit: openEdit,
-        onDelete: handleDelete,
-      }}
-    >
-      <div className="app">
-        <Header
-          activeTab={activeTab}
-          onTabChange={switchTab}
-          onOpenSearch={() => setShowSearchPalette(true)}
-          onNewIssue={() => {
-            setEditingIssue(null);
-            setShowModal(true);
-          }}
-          lastUpdated={lastUpdated}
-          polling={polling}
-          projectName={health?.projectName}
-        />
-
-        <main className="main">
-          <Outlet
-            context={
-              {
-                DetailPanel,
-                onRefreshed: handleRefreshed,
-                theme,
-                onThemeChange: handleThemeChange,
-              } satisfies LayoutOutletContext
-            }
-          />
-        </main>
-
-        <Footer onShowShortcuts={() => setShowShortcuts(true)} />
-
-        {showModal && (
-          <IssueModal
-            issue={editingIssue}
-            onClose={() => {
-              setShowModal(false);
+    <ToastContext.Provider value={toastValue}>
+      <DetailPanelContext.Provider
+        value={{
+          onSelectIssue: showIssueDetail,
+          onEdit: openEdit,
+          onDelete: handleDelete,
+        }}
+      >
+        <div className="app">
+          <Header
+            activeTab={activeTab}
+            onTabChange={switchTab}
+            onOpenSearch={() => setShowSearchPalette(true)}
+            onNewIssue={() => {
               setEditingIssue(null);
+              setShowModal(true);
             }}
-            onSaved={handleModalSaved}
+            lastUpdated={lastUpdated}
+            polling={polling}
+            projectName={health?.projectName}
           />
-        )}
 
-        {showShortcuts && <ShortcutsHelp onClose={() => setShowShortcuts(false)} />}
+          <main className="main">
+            <Outlet
+              context={
+                {
+                  DetailPanel,
+                  onRefreshed: handleRefreshed,
+                  theme,
+                  onThemeChange: handleThemeChange,
+                } satisfies LayoutOutletContext
+              }
+            />
+          </main>
 
-        {showSearchPalette && (
-          <SearchPalette onClose={() => setShowSearchPalette(false)} onSelect={showIssueDetail} />
-        )}
+          <Footer onShowShortcuts={() => setShowShortcuts(true)} />
 
-        <ToastContainer toasts={toasts} onDismiss={dismiss} />
-      </div>
-    </DetailPanelContext.Provider>
+          {showModal && (
+            <IssueModal
+              issue={editingIssue}
+              onClose={() => {
+                setShowModal(false);
+                setEditingIssue(null);
+              }}
+              onSaved={handleModalSaved}
+            />
+          )}
+
+          {showShortcuts && <ShortcutsHelp onClose={() => setShowShortcuts(false)} />}
+
+          {showSearchPalette && (
+            <SearchPalette onClose={() => setShowSearchPalette(false)} onSelect={showIssueDetail} />
+          )}
+
+          <ToastContainer />
+        </div>
+      </DetailPanelContext.Provider>
+    </ToastContext.Provider>
   );
 }
