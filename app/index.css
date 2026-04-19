@@ -555,6 +555,228 @@ textarea::placeholder {
 }
 
 /* ============================================================
+   COLLAPSIBLE SECTION  (used by CollapsibleSection — shared)
+   ============================================================ */
+
+.detail-section {
+  border-top: 1px solid var(--border);
+  padding: 14px 0;
+}
+
+.detail-section.is-collapsed {
+  padding-bottom: 10px;
+}
+
+.detail-section-toggle {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 0;
+  width: 100%;
+}
+
+.detail-section-toggle:hover .detail-section-label {
+  color: var(--text);
+}
+
+.detail-section.is-collapsed .detail-section-toggle {
+  margin-bottom: 0;
+}
+
+.detail-section-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.section-chevron {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.section-chevron.is-up {
+  transform: rotate(-90deg);
+}
+
+.detail-section-body {
+  /* no extra styles needed, children provide their own spacing */
+}
+
+/* ============================================================
+   MARKDOWN CONTENT  (used by MarkdownContent — shared)
+   ============================================================ */
+
+.md-content p {
+  margin: 0 0 0.6em;
+}
+.md-content p:last-child {
+  margin-bottom: 0;
+}
+.md-content ul,
+.md-content ol {
+  margin: 0 0 0.6em 1.2em;
+  padding: 0;
+}
+.md-content li {
+  margin-bottom: 0.2em;
+}
+.md-content h1,
+.md-content h2,
+.md-content h3,
+.md-content h4,
+.md-content h5,
+.md-content h6 {
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0.8em 0 0.3em;
+}
+.md-content h1 {
+  font-size: 1.1em;
+}
+.md-content h2 {
+  font-size: 1.05em;
+}
+.md-content h3,
+.md-content h4,
+.md-content h5,
+.md-content h6 {
+  font-size: 1em;
+}
+.md-content code {
+  background: var(--bg-elevated, var(--bg-surface));
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+}
+.md-content pre {
+  background: var(--bg-elevated, var(--bg-surface));
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 0.88em;
+  margin: 0 0 0.6em;
+  overflow-x: auto;
+  padding: 10px 12px;
+}
+.md-content pre code {
+  background: none;
+  border: none;
+  font-size: inherit;
+  padding: 0;
+}
+.md-content blockquote {
+  border-left: 3px solid var(--border);
+  color: var(--text-muted);
+  margin: 0 0 0.6em;
+  padding: 0 0 0 10px;
+}
+.md-content a {
+  color: var(--accent, #5b8af0);
+  text-decoration: underline;
+}
+.md-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0.8em 0;
+}
+.md-content strong,
+.md-content b {
+  font-weight: 600;
+}
+.md-content em,
+.md-content i {
+  font-style: italic;
+}
+.md-content del,
+.md-content s {
+  text-decoration: line-through;
+}
+
+/* ============================================================
+   LABEL CHIPS  (used by IssueDetail + IssueModal — shared)
+   ============================================================ */
+
+.label-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.label-chip {
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 500;
+  gap: 4px;
+  padding: 2px 8px 2px 10px;
+}
+
+.label-chip-remove {
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.1s;
+}
+
+.label-chip-remove:hover {
+  color: var(--danger);
+}
+
+.label-add-trigger {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 10px;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.label-add-trigger:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.label-chip-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 11px;
+  outline: none;
+  padding: 2px 10px;
+  width: 100px;
+}
+
+.label-chip-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ============================================================
    MODAL
    ============================================================ */
 
