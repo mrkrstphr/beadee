@@ -1,5 +1,5 @@
 import { ChevronRight, Inbox } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ResizableDivider from '../../components/ResizableDivider/index.jsx';
 import StatusIcon from '../../components/StatusIcon/index.jsx';
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
@@ -9,6 +9,8 @@ import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
 import type { DetailPanelComponent } from '../../components/DetailPanel/index.js';
 import type { Issue } from '../../types.js';
 import './ListView.css';
+
+let savedScrollTop = 0;
 
 const STATUS_FILTERS = [
   { label: 'All', value: '' },
@@ -128,10 +130,25 @@ export default function ListView({
   const [rawPanelWidth, setListPanelWidth] = useLocalStorageState('beadee-list-panel-width', 320);
   const listPanelWidth = Number(rawPanelWidth) || 320;
 
+  const listRef = useRef<HTMLDivElement>(null);
+
   const { issues, loading, error } = useIssues(
     { status: statusFilter, type: typeFilter },
     { onRefreshed },
   );
+
+  useEffect(() => {
+    const el = listRef.current;
+    return () => {
+      if (el) savedScrollTop = el.scrollTop;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!loading && listRef.current && savedScrollTop > 0) {
+      listRef.current.scrollTop = savedScrollTop;
+    }
+  }, [loading]);
 
   const displayedIssues = useMemo(() => {
     if (!hideClosed || statusFilter === 'closed') return issues;
@@ -263,7 +280,7 @@ export default function ListView({
           </div>
         </div>
 
-        <div className="issue-list">
+        <div className="issue-list" ref={listRef}>
           {loading && [1, 2, 3, 4].map((i) => <SkeletonRow key={i} />)}
           {error && <div className="list-state list-error">Error: {error}</div>}
           {!loading && !error && displayedIssues.length === 0 && (
