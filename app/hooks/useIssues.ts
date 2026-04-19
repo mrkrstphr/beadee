@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Issue, Comment, HealthData, LabelItem } from '../types.js';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useRef } from 'react';
+import type { Comment, HealthData, Issue, LabelItem } from '../types.js';
 
 const API = '/api';
-const FALLBACK_POLL_INTERVAL = 300000;
 
 interface SSEEvent {
   type: string;
@@ -46,6 +46,8 @@ let sseInstance: EventSource | null = null;
 let fallbackInterval: ReturnType<typeof setInterval> | null = null;
 let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null;
 let globalVisibilityListener: (() => void) | null = null;
+
+const FALLBACK_POLL_INTERVAL = 300000;
 
 function ensureSSE() {
   if (sseInstance) return;
@@ -126,6 +128,22 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
   return res.json() as Promise<T>;
 }
 
+// SSE → QueryClient invalidation bridge (call once at app init)
+let sseInvalidationSetup = false;
+export function setupSSEInvalidation(invalidate: (event: SSEEvent) => void) {
+  if (sseInvalidationSetup) return;
+  sseInvalidationSetup = true;
+  subscribeTick((event) => {
+    if (document.visibilityState === 'visible') invalidate(event);
+  });
+}
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    sseInvalidationSetup = false;
+  });
+}
+
 interface UseIssuesFilters {
   status?: string;
   type?: string;
@@ -149,61 +167,72 @@ export function useIssues(
   filters: UseIssuesFilters = {},
   { onRefreshed }: UseIssuesOptions = {},
 ): UseIssuesResult {
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [polling, setPolling] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const onRefreshedRef = useRef(onRefreshed);
+  const queryClient = useQueryClient();
 
+  useEffect(() => {
+    setupSSEInvalidation((event) => {
+      if (event.affectsAll || event.affectsListView) {
+        void queryClient.invalidateQueries({ queryKey: ['issues'] });
+      }
+      if (event.affectedIds?.length) {
+        for (const id of event.affectedIds) {
+          void queryClient.invalidateQueries({ queryKey: ['issue', id] });
+          void queryClient.invalidateQueries({ queryKey: ['children', id] });
+          void queryClient.invalidateQueries({ queryKey: ['comments', id] });
+        }
+      }
+      if (event.affectsAll) {
+        void queryClient.invalidateQueries({ queryKey: ['issue'] });
+        void queryClient.invalidateQueries({ queryKey: ['children'] });
+      }
+    });
+  }, [queryClient]);
+
+  const params = new URLSearchParams();
+  if (filters.status) params.set('status', filters.status);
+  if (filters.type) params.set('type', filters.type);
+  if (filters.search) params.set('search', filters.search);
+  const qs = params.toString();
+  const url = qs ? `/issues?${qs}` : '/issues';
+
+  const {
+    data,
+    isFetching,
+    isLoading,
+    error,
+    dataUpdatedAt,
+    refetch: rqRefetch,
+  } = useQuery<Issue[]>({
+    queryKey: ['issues', filters.status ?? '', filters.type ?? '', filters.search ?? ''],
+    queryFn: () => apiFetch<Issue[]>(url),
+    placeholderData: (prev) => prev,
+    notifyOnChangeProps: ['data', 'error', 'status', 'isFetching'],
+  });
+
+  const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : null;
+  const onRefreshedRef = useRef(onRefreshed);
   useEffect(() => {
     onRefreshedRef.current = onRefreshed;
   });
 
-  const buildUrl = useCallback(() => {
-    const params = new URLSearchParams();
-    if (filters.status) params.set('status', filters.status);
-    if (filters.type) params.set('type', filters.type);
-    if (filters.search) params.set('search', filters.search);
-    const qs = params.toString();
-    return qs ? `/issues?${qs}` : '/issues';
-  }, [filters.status, filters.type, filters.search]);
-
-  const fetchIssues = useCallback(
-    async (isPoll = false) => {
-      if (isPoll) setPolling(true);
-      else setLoading(true);
-      try {
-        const data = await apiFetch<Issue[]>(buildUrl());
-        setIssues(data);
-        const now = new Date();
-        setLastUpdated(now);
-        onRefreshedRef.current?.(now);
-        setError(null);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
-        setPolling(false);
-      }
-    },
-    [buildUrl],
-  );
-
-  const refetch = useCallback(() => fetchIssues(), [fetchIssues]);
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchIssues();
+    if (dataUpdatedAt && onRefreshedRef.current) {
+      onRefreshedRef.current(new Date(dataUpdatedAt));
+    }
+  }, [dataUpdatedAt]);
 
-    return subscribeTick((event) => {
-      if (document.visibilityState === 'visible' && (event.affectsAll || event.affectsListView)) {
-        fetchIssues(true);
-      }
-    });
-  }, [fetchIssues]);
+  const refetch = useCallback(() => {
+    void rqRefetch();
+  }, [rqRefetch]);
 
-  return { issues, loading, polling, error, refetch, lastUpdated };
+  return {
+    issues: data ?? [],
+    loading: isLoading,
+    polling: isFetching && !isLoading,
+    error: error ? (error as Error).message : null,
+    refetch,
+    lastUpdated,
+  };
 }
 
 interface UseIssueResult {
@@ -214,52 +243,23 @@ interface UseIssueResult {
 }
 
 export function useIssue(id: string | null | undefined): UseIssueResult {
-  const [issue, setIssue] = useState<Issue | null>(null);
-  const [loading, setLoading] = useState(!!id);
-  const [error, setError] = useState<string | null>(null);
-  const [notFound, setNotFound] = useState(false);
+  const { data, isLoading, error } = useQuery<Issue>({
+    queryKey: ['issue', id],
+    queryFn: () => apiFetch<Issue>(`/issues/${id}`),
+    enabled: !!id,
+    retry: (failureCount, err) => {
+      if ((err as ApiError).status === 404) return false;
+      return failureCount < 1;
+    },
+  });
 
-  const fetchIssue = useCallback(async () => {
-    if (!id) {
-      setIssue(null);
-      setNotFound(false);
-      return;
-    }
-    setLoading(true);
-    try {
-      const data = await apiFetch<Issue>(`/issues/${id}`);
-      setIssue(data);
-      setError(null);
-      setNotFound(false);
-    } catch (err) {
-      const apiErr = err as ApiError;
-      if (apiErr.status === 404) {
-        setNotFound(true);
-        setError(null);
-      } else {
-        setError(apiErr.message);
-        setNotFound(false);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchIssue();
-    if (!id) return;
-    return subscribeTick((event) => {
-      if (
-        document.visibilityState === 'visible' &&
-        (event.affectsAll || event.affectedIds?.includes(id))
-      ) {
-        fetchIssue();
-      }
-    });
-  }, [id, fetchIssue]);
-
-  return { issue, loading, error, notFound };
+  const apiErr = error as ApiError | null;
+  return {
+    issue: data ?? null,
+    loading: isLoading && !!id,
+    error: apiErr && apiErr.status !== 404 ? apiErr.message : null,
+    notFound: apiErr?.status === 404,
+  };
 }
 
 interface UseChildrenResult {
@@ -268,40 +268,17 @@ interface UseChildrenResult {
 }
 
 export function useChildren(id: string | null | undefined): UseChildrenResult {
-  const [children, setChildren] = useState<Issue[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data, isLoading } = useQuery<Issue[]>({
+    queryKey: ['children', id],
+    queryFn: () => apiFetch<Issue[]>(`/issues/${id}/children`),
+    enabled: !!id,
+    placeholderData: (prev) => prev,
+  });
 
-  const fetchChildren = useCallback(async () => {
-    if (!id) {
-      setChildren([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const data = await apiFetch<Issue[]>(`/issues/${id}/children`);
-      setChildren(Array.isArray(data) ? data : []);
-    } catch {
-      setChildren([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchChildren();
-    if (!id) return;
-    return subscribeTick((event) => {
-      if (
-        document.visibilityState === 'visible' &&
-        (event.affectsAll || event.affectedIds?.includes(id))
-      ) {
-        fetchChildren();
-      }
-    });
-  }, [id, fetchChildren]);
-
-  return { children, loading };
+  return {
+    children: data ?? [],
+    loading: isLoading && !!id,
+  };
 }
 
 interface UseHealthResult {
@@ -311,21 +288,26 @@ interface UseHealthResult {
 }
 
 export function useHealth(): UseHealthResult {
-  const [health, setHealth] = useState<HealthData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, error } = useQuery<HealthData>({
+    queryKey: ['health'],
+    queryFn: () => apiFetch<HealthData>('/health'),
+    staleTime: 60_000,
+  });
 
-  useEffect(() => {
-    apiFetch<HealthData>('/health')
-      .then((data) => {
-        setHealth(data);
-        setError(null);
-      })
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+  return {
+    health: data ?? null,
+    error: error ? (error as Error).message : null,
+    loading: isLoading,
+  };
+}
 
-  return { health, error, loading };
+export function useLabels(): LabelItem[] {
+  const { data } = useQuery<LabelItem[]>({
+    queryKey: ['labels'],
+    queryFn: () => apiFetch<LabelItem[]>('/labels'),
+    staleTime: 60_000,
+  });
+  return data ?? [];
 }
 
 interface CreateIssueData {
@@ -399,18 +381,6 @@ export async function removeLabel(issueId: string, label: string): Promise<unkno
     method: 'DELETE',
     body: JSON.stringify({ label }),
   });
-}
-
-export function useLabels(): LabelItem[] {
-  const [labels, setLabels] = useState<LabelItem[]>([]);
-
-  useEffect(() => {
-    apiFetch<LabelItem[]>('/labels')
-      .then((data) => setLabels(data))
-      .catch(() => {});
-  }, []);
-
-  return labels;
 }
 
 export type { Comment };

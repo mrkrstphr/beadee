@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { toast } from './useToast.js';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import type { Comment } from '../types.js';
+import { toast } from './useToast.js';
 
 const API = '/api';
 
@@ -31,67 +32,55 @@ interface UseCommentsResult {
 }
 
 export function useComments(issueId: string | null | undefined): UseCommentsResult {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchComments = useCallback(
-    async (signal: { aborted: boolean }) => {
-      if (!issueId) {
-        setComments([]);
-        return;
-      }
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await apiFetch<Comment[]>(`/issues/${issueId}/comments`);
-        if (!signal.aborted) setComments(data);
-      } catch (err) {
-        if (!signal.aborted) setError((err as Error).message);
-      } finally {
-        if (!signal.aborted) setLoading(false);
-      }
-    },
-    [issueId],
-  );
-
-  useEffect(() => {
-    const signal = { aborted: false };
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchComments(signal);
-    return () => {
-      signal.aborted = true;
-    };
-  }, [fetchComments]);
+  const { data, isLoading, error } = useQuery<Comment[]>({
+    queryKey: ['comments', issueId],
+    queryFn: () => apiFetch<Comment[]>(`/issues/${issueId}/comments`),
+    enabled: !!issueId,
+  });
 
   const addComment = useCallback(
     async (text: string) => {
-      if (!text?.trim()) return;
+      if (!text?.trim() || !issueId) return;
 
       const optimistic: Comment = {
         id: `optimistic-${Date.now()}`,
-        issue_id: issueId!,
+        issue_id: issueId,
         author: 'You',
         text: text.trim(),
         created_at: new Date().toISOString(),
         optimistic: true,
       };
-      setComments((cs) => [...cs, optimistic]);
+
+      queryClient.setQueryData<Comment[]>(['comments', issueId], (prev = []) => [
+        ...prev,
+        optimistic,
+      ]);
 
       try {
         const saved = await apiFetch<Comment>(`/issues/${issueId}/comments`, {
           method: 'POST',
           body: JSON.stringify({ text: text.trim() }),
         });
-        setComments((cs) => cs.map((c) => (c.id === optimistic.id ? saved : c)));
+        queryClient.setQueryData<Comment[]>(['comments', issueId], (prev = []) =>
+          prev.map((c) => (c.id === optimistic.id ? saved : c)),
+        );
       } catch (err) {
-        setComments((cs) => cs.filter((c) => c.id !== optimistic.id));
+        queryClient.setQueryData<Comment[]>(['comments', issueId], (prev = []) =>
+          prev.filter((c) => c.id !== optimistic.id),
+        );
         toast((err as Error).message, 'error');
         throw err;
       }
     },
-    [issueId],
+    [issueId, queryClient],
   );
 
-  return { comments, loading, error, addComment };
+  return {
+    comments: data ?? [],
+    loading: isLoading && !!issueId,
+    error: error ? (error as Error).message : null,
+    addComment,
+  };
 }
