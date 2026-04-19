@@ -87,8 +87,21 @@ export interface Memory {
   updated_at?: string;
 }
 
+export interface StatsSummary {
+  total_issues: number;
+  open_issues: number;
+  in_progress_issues: number;
+  closed_issues: number;
+  blocked_issues: number;
+  deferred_issues: number;
+  ready_issues: number;
+  pinned_issues: number;
+  epics_eligible_for_closure: number;
+  average_lead_time_hours: number;
+}
+
 export interface StatsData {
-  [key: string]: unknown;
+  summary: StatsSummary;
 }
 
 export interface Toast {
