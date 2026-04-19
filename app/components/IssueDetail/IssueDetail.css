@@ -143,7 +143,7 @@
 
 .detail-assignee {
   color: var(--text-muted);
-  @apply text-[12px];
+  @apply text-[12px] flex items-center gap-1;
 }
 
 .detail-kv-wrap {
