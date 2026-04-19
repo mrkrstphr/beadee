@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useIssues } from '../hooks/useIssues.js';
-import IssueCard from '../components/IssueCard.jsx';
-import type { Issue } from '../types.js';
+import { useIssues } from '../../hooks/useIssues.js';
+import IssueCard from '../../components/IssueCard.jsx';
+import type { Issue } from '../../types.js';
+import './KanbanView.css';
 
 const COLUMNS = [
   { id: 'open', label: 'Open', status: 'open' },

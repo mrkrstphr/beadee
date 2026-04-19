@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router';
-import SettingsView from '../views/SettingsView.jsx';
+import SettingsView from '../views/SettingsView/index.jsx';
 import type { LayoutOutletContext } from './_layout.jsx';
 
 export default function SettingsRoute() {

@@ -1,5 +1,5 @@
 import { useParams, useNavigate, useOutletContext } from 'react-router';
-import KanbanView from '../views/KanbanView.jsx';
+import KanbanView from '../views/KanbanView/index.jsx';
 import type { LayoutOutletContext } from './_layout.jsx';
 
 export default function KanbanIdRoute() {

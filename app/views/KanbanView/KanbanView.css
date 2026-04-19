@@ -1,0 +1,230 @@
+/* ============================================================
+   KANBAN VIEW
+   ============================================================ */
+
+.kanban-view {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.kanban-board {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  padding: 16px;
+  gap: 12px;
+}
+
+.kanban-state {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 32px;
+}
+
+.kanban-error {
+  color: var(--danger);
+}
+
+.kanban-col {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  width: 260px;
+}
+
+.kanban-col-open {
+  border-top: 3px solid var(--text-muted);
+}
+.kanban-col-in_progress {
+  border-top: 3px solid var(--accent);
+}
+.kanban-col-blocked {
+  border-top: 3px solid var(--danger);
+}
+.kanban-col-done {
+  border-top: 3px solid var(--success);
+}
+
+.kanban-col-header {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.kanban-col-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.kanban-col-count {
+  background: var(--bg-elevated);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 20px;
+  padding: 1px 7px;
+  text-align: center;
+}
+
+.kanban-col-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.kanban-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: italic;
+  padding: 12px 6px;
+  text-align: center;
+}
+
+/* Issue card */
+.issue-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+  width: 100%;
+}
+
+.issue-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.issue-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.issue-card-top {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.card-avatar {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  height: 20px;
+  line-height: 20px;
+  margin-left: auto;
+  text-align: center;
+  width: 20px;
+}
+
+.issue-card-title {
+  color: var(--text);
+  display: -webkit-box;
+  font-size: 13px;
+  font-weight: 500;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.4;
+  overflow: hidden;
+}
+
+.issue-card-id {
+  color: var(--text-muted);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 11px;
+}
+
+/* Column picker (mobile only — hidden on desktop) */
+.kanban-col-picker {
+  display: none;
+}
+
+.kanban-picker-count {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 4px;
+  padding: 1px 5px;
+}
+
+/* Kanban detail slide-in */
+.kanban-detail {
+  border-left: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-y: auto;
+  width: 360px;
+}
+
+/* ============================================================
+   RESPONSIVE / MOBILE
+   ============================================================ */
+
+@media (max-width: 640px) {
+  /* ── Kanban: one column at a time ───────────────────────── */
+  .kanban-col-picker {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+
+  .kanban-view {
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .kanban-board {
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 12px;
+    gap: 0;
+  }
+
+  /* Active column fills the full width */
+  .kanban-col {
+    width: 100%;
+  }
+  .kanban-col.kanban-col-hidden {
+    display: none;
+  }
+
+  /* ── Kanban: detail slides over board as full-screen panel ─ */
+  .kanban-detail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 50;
+    background: var(--bg);
+    border-left: none;
+    overflow-y: auto;
+  }
+}

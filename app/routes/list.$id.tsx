@@ -1,5 +1,5 @@
 import { useParams, useNavigate, useOutletContext } from 'react-router';
-import ListView from '../views/ListView.jsx';
+import ListView from '../views/ListView/index.jsx';
 import type { LayoutOutletContext } from './_layout.jsx';
 
 export default function ListIdRoute() {

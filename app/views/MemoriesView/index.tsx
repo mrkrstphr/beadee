@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Brain, Trash2 } from 'lucide-react';
-import ConfirmDialog from '../components/ConfirmDialog.jsx';
+import ConfirmDialog from '../../components/ConfirmDialog.jsx';
+import './MemoriesView.css';
 
 export default function MemoriesView() {
   const [memories, setMemories] = useState<Record<string, string> | null>(null);

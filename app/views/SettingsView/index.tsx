@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import './SettingsView.css';
 
 const THEMES = [
   { id: 'dark', label: 'Dark', swatch: '#0d1117', desc: 'GitHub-style dark' },
