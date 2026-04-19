@@ -1,8 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
 import type { Comment, HealthData, Issue, LabelItem } from '../types.js';
-
-const API = '/api';
+import { API, type ApiError, apiFetch } from '../util/apiFetch.js';
 
 interface SSEEvent {
   type: string;
@@ -107,25 +106,6 @@ if (import.meta.hot) {
     pendingEvent = null;
     globalVisibilityListener = null;
   });
-}
-
-interface ApiError extends Error {
-  status?: number;
-}
-
-async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${API}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
-    const err: ApiError = Object.assign(new Error(body.error || `HTTP ${res.status}`), {
-      status: res.status,
-    });
-    throw err;
-  }
-  return res.json() as Promise<T>;
 }
 
 // SSE → QueryClient invalidation bridge (call once at app init)

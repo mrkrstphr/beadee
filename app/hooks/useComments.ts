@@ -1,28 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import type { Comment } from '../types.js';
+import { apiFetch } from '../util/apiFetch.js';
 import { toast } from './useToast.js';
-
-const API = '/api';
-
-interface ApiError extends Error {
-  status?: number;
-}
-
-async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${API}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
-    const err: ApiError = Object.assign(new Error(body.error || `HTTP ${res.status}`), {
-      status: res.status,
-    });
-    throw err;
-  }
-  return res.json() as Promise<T>;
-}
 
 interface UseCommentsResult {
   comments: Comment[];
