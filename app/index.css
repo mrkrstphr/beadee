@@ -898,11 +898,52 @@ textarea.field-input {
   width: 380px;
 }
 
+.update-modal-body {
+  overflow-y: hidden;
+}
+
+.update-releases {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.update-release {
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 16px;
+}
+
+.update-release:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.update-release-heading {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.update-release-heading a {
+  align-items: center;
+  color: var(--accent);
+  display: inline-flex;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.update-release-heading a:hover {
+  text-decoration: underline;
+}
+
 .update-changelog {
   border: 1px solid var(--border);
   border-radius: 6px;
-  max-height: 400px;
-  overflow-y: auto;
   padding: 12px 16px;
 }
 

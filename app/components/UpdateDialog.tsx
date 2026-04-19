@@ -1,20 +1,15 @@
 import { useEffect } from 'react';
-import { X } from 'lucide-react';
+import { ExternalLink, X } from 'lucide-react';
 import MarkdownContent from './MarkdownContent/index.jsx';
+import type { ReleaseEntry } from '../routes/api.update.js';
 
 interface UpdateDialogProps {
   latestVersion: string;
-  changelog: string | null;
-  releaseUrl: string | null;
+  releases: ReleaseEntry[];
   onClose: () => void;
 }
 
-export default function UpdateDialog({
-  latestVersion,
-  changelog,
-  releaseUrl,
-  onClose,
-}: UpdateDialogProps) {
+export default function UpdateDialog({ latestVersion, releases, onClose }: UpdateDialogProps) {
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
@@ -27,26 +22,32 @@ export default function UpdateDialog({
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal update-modal">
         <div className="modal-header">
-          <h3 className="modal-title">
-            Update Available —{' '}
-            {releaseUrl ? (
-              <a href={releaseUrl} target="_blank" rel="noreferrer">
-                v{latestVersion}
-              </a>
-            ) : (
-              `v${latestVersion}`
-            )}
-          </h3>
+          <h3 className="modal-title">Update Available — v{latestVersion}</h3>
           <button className="btn btn-secondary modal-close" onClick={onClose}>
             <X size={14} />
           </button>
         </div>
-        <div className="modal-body">
-          {changelog && (
-            <div className="update-changelog">
-              <MarkdownContent text={changelog} />
-            </div>
-          )}
+        <div className="modal-body update-modal-body">
+          <div className="update-releases">
+            {releases.map((release) => (
+              <div key={release.version} className="update-release">
+                <h4 className="update-release-heading">
+                  {release.releaseUrl ? (
+                    <a href={release.releaseUrl} target="_blank" rel="noreferrer">
+                      v{release.version} <ExternalLink size={12} />
+                    </a>
+                  ) : (
+                    `v${release.version}`
+                  )}
+                </h4>
+                {release.changelog && (
+                  <div className="update-changelog">
+                    <MarkdownContent text={release.changelog} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
           <div className="update-instructions">
             <p>
               <strong>To upgrade:</strong>

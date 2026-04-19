@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { version } from '../../../package.json';
 import UpdateDialog from '../UpdateDialog.jsx';
+import type { ReleaseEntry } from '../../routes/api.update.js';
 import './Footer.css';
 
 const CACHE_KEY = 'beadee-update-check';
@@ -9,8 +10,7 @@ const CACHE_TTL = 4 * 60 * 60 * 1000;
 interface UpdateInfo {
   hasUpdate: boolean;
   latestVersion: string;
-  changelog: string | null;
-  releaseUrl: string | null;
+  releases: ReleaseEntry[];
 }
 
 interface CacheEntry {
@@ -24,6 +24,7 @@ function getCached(): UpdateInfo | null {
     if (!raw) return null;
     const { data, ts } = JSON.parse(raw) as CacheEntry;
     if (Date.now() - ts > CACHE_TTL) return null;
+    if (!Array.isArray(data.releases)) return null;
     return data;
   } catch {
     return null;
@@ -98,8 +99,7 @@ export default function Footer({ onShowShortcuts }: FooterProps) {
       {showDialog && updateInfo && (
         <UpdateDialog
           latestVersion={updateInfo.latestVersion}
-          changelog={updateInfo.changelog}
-          releaseUrl={updateInfo.releaseUrl}
+          releases={updateInfo.releases}
           onClose={() => setShowDialog(false)}
         />
       )}
