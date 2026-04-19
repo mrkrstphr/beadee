@@ -33,12 +33,12 @@ Before claiming anything, assess whether the issue is workable:
 
 If the issue **fails any check**, do NOT proceed. Instead:
 
-1. Post a comment: `bd comment <id> "Verification failed: <specific reason>. Needs: <what is missing or unclear>."`
+1. Post a comment: `bd comment <id> --actor "Claude" "Verification failed: <specific reason>. Needs: <what is missing or unclear>."`
 2. Report to the user what was wrong and stop.
 
 If the issue **needs clarification** but is otherwise sound, do NOT proceed. Instead:
 
-1. Post a comment: `bd comment <id> "Question before starting: <specific question>"`
+1. Post a comment: `bd comment <id> --actor "Claude" "Question before starting: <specific question>"`
 2. Report to the user and stop.
 
 ### 3. Claim the issue and enrich it
@@ -102,7 +102,7 @@ Valid types: `feat`, `fix`, `refactor`, `chore`, `docs`, `style`, `test`.
 ### 8. Leave a completion comment
 
 ```
-bd comment <id> "Implemented and committed on branch <branch-name>. Ready for review."
+bd comment <id> --actor "Claude" "Implemented and committed on branch <branch-name>. Ready for review."
 ```
 
 Then report to the user: what was done, what branch, and the commit hash.
