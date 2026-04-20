@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "skipLibCheck": true,
+    "noEmit": false,
+    "declaration": false,
+    "types": ["node"],
+    "outDir": ".",
+    "rootDir": "."
+  },
+  "include": ["server/bd.ts"],
+  "exclude": ["node_modules"]
+}
