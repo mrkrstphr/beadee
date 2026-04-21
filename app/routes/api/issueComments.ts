@@ -25,8 +25,8 @@ export async function action({
   const text = body.text?.trim();
   if (!text) return Response.json({ error: 'text is required' }, { status: 400 });
 
-  const result = (await bdRun(['comment', id, text], process.cwd())) as Comment[];
   suppressWatch();
+  const result = (await bdRun(['comment', id, text], process.cwd())) as Comment[];
   broadcast({ affectsListView: false, affectedIds: [id] });
   return Response.json(Array.isArray(result) ? result[result.length - 1] : result);
 }

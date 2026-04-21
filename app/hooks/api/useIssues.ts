@@ -164,6 +164,7 @@ export function useIssues(
       if (event.affectsAll) {
         void queryClient.invalidateQueries({ queryKey: ['issue'] });
         void queryClient.invalidateQueries({ queryKey: ['children'] });
+        void queryClient.invalidateQueries({ queryKey: ['comments'] });
       }
     });
   }, [queryClient]);
