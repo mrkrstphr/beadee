@@ -104,6 +104,14 @@ export interface StatsData {
   summary: StatsSummary;
 }
 
+export interface EpicStatus {
+  epic_id: string;
+  title: string;
+  total_children: number;
+  closed_children: number;
+  eligible_for_close: boolean;
+}
+
 export interface Toast {
   id: number;
   message: string;

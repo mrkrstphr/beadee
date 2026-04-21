@@ -82,29 +82,52 @@ interface EpicGroupHeaderProps {
   onToggle: () => void;
   onSelect: () => void;
   selected: boolean;
+  progress: { done: number; total: number };
 }
 
-function EpicGroupHeader({ epic, collapsed, onToggle, onSelect, selected }: EpicGroupHeaderProps) {
+function EpicGroupHeader({
+  epic,
+  collapsed,
+  onToggle,
+  onSelect,
+  selected,
+  progress,
+}: EpicGroupHeaderProps) {
   return (
     <div className={`epic-group-header ${selected ? 'selected' : ''}`}>
-      <button
-        className="epic-chevron-btn"
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggle();
-        }}
-        aria-label={collapsed ? 'Expand' : 'Collapse'}
-      >
-        <ChevronRight size={12} className={`epic-chevron ${collapsed ? '' : 'expanded'}`} />
-      </button>
-      <button className="epic-group-body" onClick={onSelect}>
-        <StatusIcon status={epic.status} />
-        <span className="badge-type type-epic">EPIC</span>
-        <span className="epic-group-title">{epic.title}</span>
-        <span className={`priority-badge p${epic.priority ?? 2}`}>
-          {PRIORITY_LABEL[epic.priority] ?? 'P2'}
-        </span>
-      </button>
+      <div className="epic-group-header-row">
+        <button
+          className="epic-chevron-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+          aria-label={collapsed ? 'Expand' : 'Collapse'}
+        >
+          <ChevronRight size={12} className={`epic-chevron ${collapsed ? '' : 'expanded'}`} />
+        </button>
+        <button className="epic-group-body" onClick={onSelect}>
+          <StatusIcon status={epic.status} />
+          <span className="badge-type type-epic">EPIC</span>
+          <span className="epic-group-title">{epic.title}</span>
+          <span className={`priority-badge p${epic.priority ?? 2}`}>
+            {PRIORITY_LABEL[epic.priority] ?? 'P2'}
+          </span>
+        </button>
+      </div>
+      {progress.total > 0 && (
+        <div className="epic-progress">
+          <div className="epic-progress-track">
+            <div
+              className="epic-progress-fill"
+              style={{ width: `${Math.round((progress.done / progress.total) * 100)}%` }}
+            />
+          </div>
+          <span className="epic-progress-label">
+            {progress.done}/{progress.total}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -178,8 +201,18 @@ export default function ListView({
     }
     const epicIds = new Set(epics.map((e) => e.id));
     const orphans = displayedIssues.filter((i) => !epicIds.has(i.id) && !i.parent);
-    return { epics, byParent, orphans };
-  }, [displayedIssues, groupByEpic]);
+    const progress: Record<string, { done: number; total: number }> = {};
+    for (const epic of epics) {
+      progress[epic.id] = { done: 0, total: 0 };
+    }
+    for (const issue of issues) {
+      if (issue.parent && progress[issue.parent]) {
+        progress[issue.parent].total++;
+        if (issue.status === 'closed') progress[issue.parent].done++;
+      }
+    }
+    return { epics, byParent, orphans, progress };
+  }, [displayedIssues, groupByEpic, issues]);
 
   const visibleIssues = useMemo(() => {
     if (!epicGroups) return displayedIssues;
@@ -311,6 +344,7 @@ export default function ListView({
                       onToggle={() => toggleEpic(epic.id)}
                       onSelect={() => onSelectIssue(epic.id === selectedIssueId ? null : epic.id)}
                       selected={epic.id === selectedIssueId}
+                      progress={epicGroups.progress[epic.id]}
                     />
                     {!collapsedEpics.has(epic.id) &&
                       (epicGroups.byParent[epic.id] ?? []).map((issue) => (

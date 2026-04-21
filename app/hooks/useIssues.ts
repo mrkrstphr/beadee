@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
-import type { HealthData, Issue, LabelItem } from '../types.js';
+import type { EpicStatus, HealthData, Issue, LabelItem } from '../types.js';
 import { API, type ApiError, apiFetch } from '../util/apiFetch.js';
 
 interface SSEEvent {
@@ -361,4 +361,20 @@ export async function removeLabel(issueId: string, label: string): Promise<unkno
     method: 'DELETE',
     body: JSON.stringify({ label }),
   });
+}
+
+export function useEpicStatuses(): Map<string, EpicStatus> {
+  const { data } = useQuery<EpicStatus[]>({
+    queryKey: ['epicStatuses'],
+    queryFn: () => apiFetch<EpicStatus[]>('/epic-status'),
+    staleTime: 30_000,
+  });
+
+  const map = new Map<string, EpicStatus>();
+  if (data) {
+    for (const status of data) {
+      map.set(status.epic_id, status);
+    }
+  }
+  return map;
 }

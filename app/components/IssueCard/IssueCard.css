@@ -20,6 +20,26 @@
   @apply items-center flex gap-1.5;
 }
 
+.epic-progress-badge {
+  background: var(--border);
+  @apply rounded-full relative overflow-hidden h-3 text-[9px] font-mono flex items-center px-1.5 gap-1;
+}
+
+.epic-progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--accent);
+  opacity: 0.4;
+}
+
+.epic-progress-text {
+  position: relative;
+  color: var(--text);
+  @apply font-bold tabular-nums;
+}
+
 .card-avatar {
   background: var(--bg-elevated);
   border: 1px solid var(--border);

@@ -9,6 +9,7 @@ import {
   addLabel,
   removeLabel,
   useLabels,
+  useEpicStatuses,
 } from '../../hooks/useIssues.js';
 import { toast } from '../../hooks/useToast.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
@@ -17,7 +18,7 @@ import CommentThread from '../CommentThread/index.jsx';
 import ConfirmDialog from '../ConfirmDialog.jsx';
 import MarkdownContent from '../MarkdownContent/index.jsx';
 import StatusIcon from '../StatusIcon/index.jsx';
-import type { Issue, Dependency, LabelItem } from '../../types.js';
+import type { EpicStatus, Issue, Dependency, LabelItem } from '../../types.js';
 import { PRIORITY_LABEL } from '../../constants.js';
 import './IssueDetail.css';
 const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed'];
@@ -251,6 +252,7 @@ export default function IssueDetail({
   const { issue, loading, error, notFound } = useIssue(issueId);
   const { children } = useChildren(issueId);
   const { issue: parentIssue } = useIssue(issue?.parent ?? null);
+  const epicStatuses = useEpicStatuses();
   const [pendingClose, setPendingClose] = useState(false);
   const [closeReason, setCloseReason] = useState('');
   const [actionPending, setActionPending] = useState(false);
@@ -570,6 +572,25 @@ export default function IssueDetail({
             </div>
           </CollapsibleSection>
         )}
+
+        {issue.issue_type === 'epic' &&
+          (() => {
+            const status: EpicStatus | undefined = epicStatuses.get(issue.id);
+            if (!status || status.total_children === 0) return null;
+            const pct = Math.round((status.closed_children / status.total_children) * 100);
+            return (
+              <CollapsibleSection name="Progress">
+                <div className="epic-detail-progress">
+                  <div className="epic-detail-progress-track">
+                    <div className="epic-detail-progress-fill" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="epic-detail-progress-label">
+                    {status.closed_children}/{status.total_children} children closed ({pct}%)
+                  </span>
+                </div>
+              </CollapsibleSection>
+            );
+          })()}
 
         {children.length > 0 && (
           <CollapsibleSection name="Children">

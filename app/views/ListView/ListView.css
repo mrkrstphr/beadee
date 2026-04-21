@@ -63,11 +63,15 @@
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border);
   color: var(--text);
-  @apply items-stretch flex text-[12px] font-semibold;
+  @apply flex flex-col text-[12px] font-semibold;
 }
 
 .epic-group-header.selected {
   background: color-mix(in srgb, var(--accent) 12%, var(--bg-elevated));
+}
+
+.epic-group-header-row {
+  @apply items-stretch flex;
 }
 
 .epic-chevron-btn {
@@ -95,6 +99,28 @@
 
 .epic-group-title {
   @apply flex-1 truncate;
+}
+
+.epic-progress {
+  @apply flex items-center gap-2 pr-3 pb-1.5 pl-[50px];
+}
+
+.epic-progress-track {
+  background: var(--border);
+  @apply flex-1 rounded-full overflow-hidden;
+  height: 2px;
+}
+
+.epic-progress-fill {
+  background: var(--accent);
+  height: 2px;
+  @apply transition-[width] duration-300;
+}
+
+.epic-progress-label {
+  color: var(--text-muted);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  @apply text-[10px] shrink-0 tabular-nums;
 }
 
 /* Issue row */

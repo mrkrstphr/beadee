@@ -262,6 +262,28 @@
   color: var(--text);
 }
 
+/* Epic progress in detail panel */
+.epic-detail-progress {
+  @apply flex flex-col gap-2;
+}
+
+.epic-detail-progress-track {
+  background: var(--border);
+  @apply rounded-full overflow-hidden h-2;
+}
+
+.epic-detail-progress-fill {
+  background: var(--accent);
+  height: 100%;
+  @apply transition-[width] duration-300;
+}
+
+.epic-detail-progress-label {
+  color: var(--text-muted);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  @apply text-[12px] tabular-nums;
+}
+
 /* ============================================================
    RESPONSIVE / MOBILE
    ============================================================ */
