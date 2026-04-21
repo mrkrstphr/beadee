@@ -178,13 +178,6 @@
   color: var(--text);
 }
 
-.detail-type {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  @apply rounded text-[11px] font-semibold py-px px-[7px] uppercase;
-}
-
 .detail-description {
   background: var(--bg-surface);
   color: var(--text);

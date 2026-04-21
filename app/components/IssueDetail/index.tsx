@@ -1,15 +1,15 @@
 import { Check, ChevronDown, Copy, Ghost, Trash2, User, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { PRIORITY_LABEL } from '../../constants.js';
+import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
 import { useAddLabel } from '../../hooks/api/useAddLabel.js';
 import { useChildren } from '../../hooks/api/useChildren.js';
 import { useCloseIssue } from '../../hooks/api/useCloseIssue.js';
 import { useDeleteIssue } from '../../hooks/api/useDeleteIssue.js';
 import { useEpicStatuses } from '../../hooks/api/useEpicStatuses.js';
+import { useIssue } from '../../hooks/api/useIssues.js';
 import { useLabels } from '../../hooks/api/useLabels.js';
 import { useRemoveLabel } from '../../hooks/api/useRemoveLabel.js';
 import { useUpdateIssue } from '../../hooks/api/useUpdateIssue.js';
-import { useIssue } from '../../hooks/api/useIssues.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
 import { toast } from '../../hooks/useToast.js';
 import type { Dependency, EpicStatus, Issue, LabelItem } from '../../types.js';
@@ -449,7 +449,11 @@ export default function IssueDetail({
               {PRIORITY_LABEL[issue.priority]}
             </span>
           )}
-          {issue.issue_type && <span className="detail-type">{issue.issue_type}</span>}
+          {issue.issue_type && (
+            <span className={`badge-type type-${issue.issue_type}`}>
+              {TYPE_SHORT[issue.issue_type] ?? issue.issue_type.toUpperCase()}
+            </span>
+          )}
           {issue.assignee && (
             <span className="detail-assignee">
               <User size={12} strokeWidth={1.75} /> {issue.assignee}
