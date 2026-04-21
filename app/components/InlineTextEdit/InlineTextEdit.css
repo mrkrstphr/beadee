@@ -1,0 +1,44 @@
+@reference "tailwindcss";
+
+.inline-text-edit-wrap {
+  @apply flex flex-col gap-2;
+}
+
+.inline-text-edit-textarea {
+  background: var(--bg-surface);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  @apply rounded-md text-[13px] leading-relaxed px-3.5 py-3 w-full resize-none min-h-[80px] outline-none;
+}
+
+.inline-text-edit-actions {
+  @apply flex gap-2;
+}
+
+.inline-text-edit-view {
+  background: var(--bg-surface);
+  border: 1px solid transparent;
+  color: var(--text);
+  @apply rounded-md text-left w-full cursor-pointer p-0 transition-[border-color,background] duration-150;
+}
+
+.inline-text-edit-view:hover {
+  border-color: var(--border);
+  background: var(--bg-elevated);
+}
+
+.inline-text-edit-content {
+  @apply text-[13px] leading-relaxed px-3.5 py-3 wrap-break-word;
+}
+
+.inline-text-edit-empty {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  @apply rounded-md text-[13px] px-3.5 py-3 w-full text-left cursor-pointer transition-[border-color,color] duration-150;
+}
+
+.inline-text-edit-empty:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}

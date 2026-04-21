@@ -16,7 +16,7 @@ import type { Dependency, EpicStatus, Issue, LabelItem } from '../../types.js';
 import CollapsibleSection from '../CollapsibleSection/index.jsx';
 import CommentThread from '../CommentThread/index.jsx';
 import ConfirmDialog from '../ConfirmDialog.jsx';
-import MarkdownContent from '../MarkdownContent/index.jsx';
+import InlineTextEdit from '../InlineTextEdit/index.jsx';
 import StatusIcon from '../StatusIcon/index.jsx';
 import './IssueDetail.css';
 const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed'];
@@ -555,23 +555,37 @@ export default function IssueDetail({
           </div>
         )}
 
-        {issue.description && (
-          <CollapsibleSection name="Description">
-            <MarkdownContent text={issue.description} className="detail-description" />
-          </CollapsibleSection>
-        )}
+        <CollapsibleSection name="Description">
+          <InlineTextEdit
+            value={issue.description}
+            onSave={(v) => handleAction(() => updateIssue(issueId, { description: v }), null)}
+            placeholder="Click to add description…"
+          />
+        </CollapsibleSection>
 
-        {issue.notes && (
-          <CollapsibleSection name="Notes">
-            <MarkdownContent text={issue.notes} className="detail-description" />
-          </CollapsibleSection>
-        )}
+        <CollapsibleSection name="Notes">
+          <InlineTextEdit
+            value={issue.notes}
+            onSave={(v) => handleAction(() => updateIssue(issueId, { notes: v }), null)}
+            placeholder="Click to add notes…"
+          />
+        </CollapsibleSection>
 
-        {issue.design && (
-          <CollapsibleSection name="Design">
-            <MarkdownContent text={issue.design} className="detail-description" />
-          </CollapsibleSection>
-        )}
+        <CollapsibleSection name="Design">
+          <InlineTextEdit
+            value={issue.design}
+            onSave={(v) => handleAction(() => updateIssue(issueId, { design: v }), null)}
+            placeholder="Click to add design notes…"
+          />
+        </CollapsibleSection>
+
+        <CollapsibleSection name="Acceptance Criteria">
+          <InlineTextEdit
+            value={issue.acceptance_criteria}
+            onSave={(v) => handleAction(() => updateIssue(issueId, { acceptance: v }), null)}
+            placeholder="Click to add acceptance criteria…"
+          />
+        </CollapsibleSection>
 
         {blockedBy.length > 0 && (
           <CollapsibleSection name="Dependencies">
