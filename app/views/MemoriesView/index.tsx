@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Brain, Trash2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Brain, Trash2, Plus } from 'lucide-react';
 import ConfirmDialog from '../../components/ConfirmDialog.jsx';
+import Modal from '../../components/Modal/index.jsx';
 import './MemoriesView.css';
 
 export default function MemoriesView() {
@@ -8,6 +9,12 @@ export default function MemoriesView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
+  const [showNew, setShowNew] = useState(false);
+  const [newValue, setNewValue] = useState('');
+  const [newKey, setNewKey] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const valueRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -28,6 +35,50 @@ export default function MemoriesView() {
       cancelled = true;
     };
   }, []);
+
+  function openNew() {
+    setNewValue('');
+    setNewKey('');
+    setSaveError(null);
+    setShowNew(true);
+  }
+
+  function closeNew() {
+    setShowNew(false);
+  }
+
+  const keyTrimmed = newKey.trim();
+  const valueTrimmed = newValue.trim();
+  const keyInvalid = keyTrimmed.length > 0 && keyTrimmed.length < 3;
+  const valueInvalid = valueTrimmed.length > 0 && valueTrimmed.length < 10;
+  const canSubmit = valueTrimmed.length >= 10 && !keyInvalid && !saving;
+
+  async function handleCreate(e: React.FormEvent) {
+    e.preventDefault();
+    if (!canSubmit) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const body: { value: string; key?: string } = { value: valueTrimmed };
+      if (keyTrimmed) body.key = keyTrimmed;
+      const res = await fetch('/api/memories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+      const created = (await res.json()) as { key: string; value: string };
+      setMemories((prev) => ({ [created.key]: created.value, ...(prev ?? {}) }));
+      closeNew();
+    } catch (e) {
+      setSaveError((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function handleDelete() {
     const key = confirmKey;
@@ -58,6 +109,10 @@ export default function MemoriesView() {
         <div className="memories-page-heading">
           <Brain size={16} className="memories-page-icon" />
           <h2 className="memories-page-title">Memories</h2>
+          <button className="btn btn-primary memories-new-btn" onClick={openNew}>
+            <Plus size={13} />
+            New
+          </button>
         </div>
         <p className="memories-page-hint">
           Stored via <code>bd remember</code> · injected into every AI session
@@ -69,9 +124,7 @@ export default function MemoriesView() {
       {error && <div className="memories-status memories-status-error">{error}</div>}
 
       {!loading && !error && entries.length === 0 && (
-        <div className="memories-status">
-          No memories yet. Run <code>bd remember "…"</code> in your project to add one.
-        </div>
+        <div className="memories-status">No memories yet.</div>
       )}
 
       {entries.length > 0 && (
@@ -103,6 +156,57 @@ export default function MemoriesView() {
           onConfirm={handleDelete}
           onCancel={() => setConfirmKey(null)}
         />
+      )}
+
+      {showNew && (
+        <Modal title="New Memory" onClose={closeNew}>
+          <form className="modal-body" onSubmit={handleCreate}>
+            <div className="memory-field">
+              <label className="memory-field-label" htmlFor="memory-value">
+                Content
+              </label>
+              <textarea
+                ref={valueRef}
+                id="memory-value"
+                className={`memory-field-textarea${valueInvalid ? ' memory-field-invalid' : ''}`}
+                placeholder="What should be remembered…"
+                value={newValue}
+                onChange={(e) => setNewValue(e.target.value)}
+                rows={4}
+                disabled={saving}
+                autoFocus
+              />
+              {valueInvalid && (
+                <span className="memory-field-hint">Must be at least 10 characters.</span>
+              )}
+            </div>
+            <div className="memory-field">
+              <label className="memory-field-label" htmlFor="memory-key">
+                Key <span className="memory-field-optional">(optional)</span>
+              </label>
+              <input
+                id="memory-key"
+                className={`memory-field-input${keyInvalid ? ' memory-field-invalid' : ''}`}
+                placeholder="auto-generated from content"
+                value={newKey}
+                onChange={(e) => setNewKey(e.target.value)}
+                disabled={saving}
+              />
+              {keyInvalid && (
+                <span className="memory-field-hint">Must be at least 3 characters.</span>
+              )}
+            </div>
+            {saveError && <div className="modal-error">{saveError}</div>}
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={closeNew}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
+                {saving ? 'Saving…' : 'Remember'}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
     </div>
   );

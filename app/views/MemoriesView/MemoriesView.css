@@ -12,6 +12,10 @@
   @apply flex items-center gap-2.5 mb-1.5;
 }
 
+.memories-new-btn {
+  @apply ml-auto px-2.5 py-1 whitespace-nowrap shrink-0 flex items-center gap-1;
+}
+
 .memories-page-icon {
   color: var(--text-muted);
   @apply shrink-0;
@@ -45,6 +49,59 @@
 
 .memories-status-error {
   color: var(--danger, #f85149);
+}
+
+.memory-field {
+  @apply flex flex-col gap-1.5;
+}
+
+.memory-field-label {
+  @apply text-[13px] font-medium;
+}
+
+.memory-field-optional {
+  color: var(--text-muted);
+  @apply font-normal;
+}
+
+.memory-field-textarea {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  @apply rounded-md px-3 py-2 text-[13px] leading-relaxed w-full resize-none outline-none font-[inherit] transition-[border-color] duration-150;
+}
+
+.memory-field-textarea:focus {
+  border-color: var(--accent, #2d7ff9);
+}
+
+.memory-field-invalid {
+  border-color: var(--danger, #f85149) !important;
+}
+
+.memory-field-hint {
+  color: var(--danger, #f85149);
+  @apply text-[12px];
+}
+
+.memory-field-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.memory-field-input {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono, monospace);
+  @apply rounded-md px-3 py-2 text-[12px] w-full outline-none transition-[border-color] duration-150;
+}
+
+.memory-field-input:focus {
+  border-color: var(--accent, #2d7ff9);
+}
+
+.memory-field-input::placeholder {
+  color: var(--text-muted);
 }
 
 .memories-cards {
