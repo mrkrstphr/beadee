@@ -1,6 +1,6 @@
 import { bdRun } from '../../server/bd.js';
 import { suppressWatch } from '../../server/sse.js';
-import type { EpicStatus } from '../../types.js';
+import type { EpicStatus } from '../types.js';
 
 export async function loader() {
   suppressWatch();
