@@ -1,4 +1,4 @@
-import { addController, removeController } from '../../server/sse.js';
+import { addController, removeController } from '../../../server/sse.js';
 
 const encoder = new TextEncoder();
 

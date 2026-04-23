@@ -1,5 +1,5 @@
-import { bdRun } from '../../server/bd.js';
-import { suppressWatch, broadcast } from '../../server/sse.js';
+import { bdRun } from '../../../server/bd.js';
+import { broadcast, suppressWatch } from '../../../server/sse.js';
 
 export async function action({ request }: { request: Request }) {
   const body = (await request.json().catch(() => ({}))) as {

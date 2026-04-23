@@ -1,4 +1,4 @@
-import { bdRun } from '../../server/bd.js';
+import { bdRun } from '../../../server/bd.js';
 
 export async function loader() {
   const result = await bdRun(['label', 'list-all', '--readonly'], process.cwd());

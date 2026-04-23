@@ -1,6 +1,6 @@
-import { useParams, useNavigate, useOutletContext } from 'react-router';
-import ListView from '../views/ListView/index.jsx';
-import type { LayoutOutletContext } from './_layout.jsx';
+import { useNavigate, useOutletContext, useParams } from 'react-router';
+import ListView from '../views/ListView/index.js';
+import type { LayoutOutletContext } from './_layout.js';
 
 export default function ListIdRoute() {
   const { id } = useParams();

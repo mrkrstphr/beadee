@@ -1,5 +1,5 @@
-import { bdRun } from '../../server/bd.js';
-import { suppressWatch } from '../../server/sse.js';
+import { bdRun } from '../../../server/bd.js';
+import { suppressWatch } from '../../../server/sse.js';
 
 export async function loader() {
   suppressWatch();

@@ -1,6 +1,6 @@
-import { bdRun } from '../../server/bd.js';
-import { suppressWatch, broadcast } from '../../server/sse.js';
-import type { Issue } from '../types.js';
+import { bdRun } from '../../../server/bd.js';
+import { broadcast, suppressWatch } from '../../../server/sse.js';
+import type { Issue } from '../../types.js';
 
 export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url);

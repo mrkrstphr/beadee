@@ -1,6 +1,6 @@
-import { bdRun } from '../../server/bd.js';
-import { suppressWatch, broadcast } from '../../server/sse.js';
-import type { Comment } from '../types.js';
+import { bdRun } from '../../../server/bd.js';
+import { broadcast, suppressWatch } from '../../../server/sse.js';
+import type { Comment } from '../../types.js';
 
 export async function loader({ params }: { params: Record<string, string> }) {
   const { id } = params;

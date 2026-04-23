@@ -1,5 +1,5 @@
 import { basename } from 'node:path';
-import { bdCheck, bdModeCheck, bdVersion } from '../../server/bd.js';
+import { bdCheck, bdModeCheck, bdVersion } from '../../../server/bd.js';
 
 export async function loader() {
   const cwd = process.cwd();

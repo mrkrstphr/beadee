@@ -1,4 +1,4 @@
-import { version as currentVersion } from '../../package.json';
+import { version as currentVersion } from '../../../package.json';
 
 interface NpmPackageInfo {
   version: string;
