@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useComments } from '../../hooks/useComments.js';
+import { useAddComment } from '../../hooks/api/useAddComment.js';
+import { useComments } from '../../hooks/api/useComments.js';
 import MarkdownContent from '../MarkdownContent/index.jsx';
 import CollapsibleSection from '../CollapsibleSection/index.jsx';
 import type { Comment } from '../../types.js';
@@ -32,7 +33,8 @@ interface CommentThreadProps {
 }
 
 export default function CommentThread({ issueId }: CommentThreadProps) {
-  const { comments, loading, error, addComment } = useComments(issueId);
+  const { comments, loading, error } = useComments(issueId);
+  const addComment = useAddComment(issueId);
   const [text, setText] = useState('');
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
@@ -50,7 +52,7 @@ export default function CommentThread({ issueId }: CommentThreadProps) {
     setPosting(true);
     setPostError(null);
     try {
-      await addComment(text);
+      await addComment.mutateAsync(text);
       setText('');
     } catch (err) {
       setPostError((err as Error).message);

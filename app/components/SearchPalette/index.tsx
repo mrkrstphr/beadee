@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { X, Ghost } from 'lucide-react';
-import { useIssues } from '../../hooks/useIssues.js';
+import { useIssues } from '../../hooks/api/useIssues.js';
 import { useDebounce } from '../../hooks/useDebounce.js';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
 import StatusIcon from '../StatusIcon/index.jsx';

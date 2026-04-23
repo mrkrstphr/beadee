@@ -1,6 +1,9 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { createIssue, updateIssue, useLabels } from '../hooks/useIssues.js';
-import type { CreateIssueData, UpdateIssueData } from '../hooks/useIssues.js';
+import { useLabels } from '../hooks/api/useLabels.js';
+import { useCreateIssue } from '../hooks/api/useCreateIssue.js';
+import type { CreateIssueData } from '../hooks/api/useCreateIssue.js';
+import { useUpdateIssue } from '../hooks/api/useUpdateIssue.js';
+import type { UpdateIssueData } from '../hooks/api/useUpdateIssue.js';
 import { toast } from '../hooks/useToast.js';
 import type { Issue, LabelItem } from '../types.js';
 import Modal from './Modal/index.jsx';
@@ -338,6 +341,8 @@ export default function IssueModal({ issue, onClose, onSaved }: IssueModalProps)
     parent: issue?.parent ?? '',
     labels: issue?.labels ?? [],
   }));
+  const createIssue = useCreateIssue();
+  const updateIssue = useUpdateIssue();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(!!(issue?.external_ref || issue?.parent));
@@ -396,7 +401,7 @@ export default function IssueModal({ issue, onClose, onSaved }: IssueModalProps)
           payload.due = dueTrim;
         }
 
-        saved = await updateIssue(issue!.id, payload);
+        saved = await updateIssue.mutateAsync({ id: issue!.id, data: payload });
       } else {
         const payload: CreateIssueData = {
           title: form.title.trim(),
@@ -414,7 +419,7 @@ export default function IssueModal({ issue, onClose, onSaved }: IssueModalProps)
         if (est.value !== null) payload.estimate = est.value;
         if (dueTrim) payload.due = dueTrim;
 
-        saved = await createIssue(payload);
+        saved = await createIssue.mutateAsync(payload);
       }
       toast(isEdit ? 'Issue updated' : 'Issue created', 'success');
       onSaved?.(saved, { created: !isEdit });

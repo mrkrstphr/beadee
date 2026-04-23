@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useIssues } from '../../hooks/useIssues.js';
+import { useIssues } from '../../hooks/api/useIssues.js';
 import IssueCard from '../../components/IssueCard/index.jsx';
 import type { DetailPanelComponent } from '../../components/DetailPanel/index.js';
 import type { Issue } from '../../types.js';

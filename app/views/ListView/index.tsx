@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import ResizableDivider from '../../components/ResizableDivider/index.jsx';
 import StatusIcon from '../../components/StatusIcon/index.jsx';
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
-import { useIssues } from '../../hooks/useIssues.js';
+import { useIssues } from '../../hooks/api/useIssues.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
 import type { DetailPanelComponent } from '../../components/DetailPanel/index.js';

@@ -1,5 +1,5 @@
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
-import { useEpicStatuses } from '../../hooks/useIssues.js';
+import { useEpicStatuses } from '../../hooks/api/useEpicStatuses.js';
 import './IssueCard.css';
 import type { EpicStatus, Issue } from '../../types.js';
 

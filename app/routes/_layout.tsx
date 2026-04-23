@@ -9,7 +9,7 @@ import ToastContainer from '../components/ToastContainer/index.jsx';
 import ShortcutsHelp from '../components/ShortcutsHelp/index.jsx';
 import SearchPalette from '../components/SearchPalette/index.jsx';
 import Footer from '../components/Footer/index.jsx';
-import { useHealth } from '../hooks/useIssues.js';
+import { useHealth } from '../hooks/api/useHealth.js';
 import { ToastContext, useToastProvider } from '../hooks/useToast.js';
 import { useKeyboard } from '../hooks/useKeyboard.js';
 import type { Issue } from '../types.js';

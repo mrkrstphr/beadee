@@ -1,25 +1,23 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
-import { Check, Copy, ChevronDown, User, X, Trash2, Ghost } from 'lucide-react';
-import {
-  useIssue,
-  useChildren,
-  updateIssue,
-  closeIssue,
-  deleteIssue,
-  addLabel,
-  removeLabel,
-  useLabels,
-  useEpicStatuses,
-} from '../../hooks/useIssues.js';
-import { toast } from '../../hooks/useToast.js';
+import { Check, ChevronDown, Copy, Ghost, Trash2, User, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { PRIORITY_LABEL } from '../../constants.js';
+import { useAddLabel } from '../../hooks/api/useAddLabel.js';
+import { useChildren } from '../../hooks/api/useChildren.js';
+import { useCloseIssue } from '../../hooks/api/useCloseIssue.js';
+import { useDeleteIssue } from '../../hooks/api/useDeleteIssue.js';
+import { useEpicStatuses } from '../../hooks/api/useEpicStatuses.js';
+import { useLabels } from '../../hooks/api/useLabels.js';
+import { useRemoveLabel } from '../../hooks/api/useRemoveLabel.js';
+import { useUpdateIssue } from '../../hooks/api/useUpdateIssue.js';
+import { useIssue } from '../../hooks/api/useIssues.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
+import { toast } from '../../hooks/useToast.js';
+import type { Dependency, EpicStatus, Issue, LabelItem } from '../../types.js';
 import CollapsibleSection from '../CollapsibleSection/index.jsx';
 import CommentThread from '../CommentThread/index.jsx';
 import ConfirmDialog from '../ConfirmDialog.jsx';
 import MarkdownContent from '../MarkdownContent/index.jsx';
 import StatusIcon from '../StatusIcon/index.jsx';
-import type { EpicStatus, Issue, Dependency, LabelItem } from '../../types.js';
-import { PRIORITY_LABEL } from '../../constants.js';
 import './IssueDetail.css';
 const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed'];
 
@@ -67,6 +65,7 @@ function LabelChip({
 
 function LabelAddTrigger({ issueId }: { issueId: string }) {
   const allLabels = useLabels();
+  const addLabel = useAddLabel(issueId);
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState('');
   const [busy, setBusy] = useState(false);
@@ -89,7 +88,7 @@ function LabelAddTrigger({ issueId }: { issueId: string }) {
     }
     setBusy(true);
     try {
-      await addLabel(issueId, trimmed);
+      await addLabel.mutateAsync(trimmed);
     } catch {
       // SSE will update anyway
     } finally {
@@ -253,6 +252,10 @@ export default function IssueDetail({
   const { children } = useChildren(issueId);
   const { issue: parentIssue } = useIssue(issue?.parent ?? null);
   const epicStatuses = useEpicStatuses();
+  const closeIssue = useCloseIssue();
+  const updateIssue = useUpdateIssue();
+  const deleteIssue = useDeleteIssue();
+  const removeLabel = useRemoveLabel(issueId);
   const [pendingClose, setPendingClose] = useState(false);
   const [closeReason, setCloseReason] = useState('');
   const [actionPending, setActionPending] = useState(false);
@@ -279,13 +282,16 @@ export default function IssueDetail({
       return;
     }
     await handleAction(
-      () => updateIssue(issueId, { status: newStatus }),
+      () => updateIssue.mutateAsync({ id: issueId, data: { status: newStatus } }),
       `Marked ${newStatus.replace('_', ' ')}`,
     );
   }
 
   async function handleCloseConfirm() {
-    await handleAction(() => closeIssue(issueId, closeReason || undefined), 'Issue closed');
+    await handleAction(
+      () => closeIssue.mutateAsync({ id: issueId, reason: closeReason || undefined }),
+      'Issue closed',
+    );
     setPendingClose(false);
     setCloseReason('');
   }
@@ -306,9 +312,7 @@ export default function IssueDetail({
   async function handleDelete() {
     setConfirmDelete(false);
     setEditMenuOpen(false);
-    await handleAction(async () => {
-      await deleteIssue(issueId);
-    }, 'Issue deleted');
+    await handleAction(() => deleteIssue.mutateAsync(issueId), 'Issue deleted');
     onDelete?.();
   }
 
@@ -317,11 +321,14 @@ export default function IssueDetail({
       c: () =>
         canClaim &&
         !actionPending &&
-        handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed'),
+        handleAction(
+          () => updateIssue.mutateAsync({ id: issueId, data: { claim: true } }),
+          'Issue claimed',
+        ),
       e: () => issue && onEdit?.(issue),
       x: () => canClose && !pendingClose && setPendingClose(true),
     }),
-    [canClaim, actionPending, issueId, issue, onEdit, canClose, pendingClose],
+    [canClaim, actionPending, issueId, issue, onEdit, canClose, pendingClose, updateIssue],
   );
   useKeyboard(detailKeyBindings, !!issue && !pendingClose && !confirmDelete);
 
@@ -377,7 +384,10 @@ export default function IssueDetail({
                   className="btn btn-secondary"
                   disabled={actionPending}
                   onClick={() =>
-                    handleAction(() => updateIssue(issueId, { claim: true }), 'Issue claimed')
+                    handleAction(
+                      () => updateIssue.mutateAsync({ id: issueId, data: { claim: true } }),
+                      'Issue claimed',
+                    )
                   }
                 >
                   Claim
@@ -488,7 +498,7 @@ export default function IssueDetail({
                   key={label}
                   label={label}
                   onRemove={
-                    canClose ? () => handleAction(() => removeLabel(issueId, label), null) : null
+                    canClose ? () => handleAction(() => removeLabel.mutateAsync(label), null) : null
                   }
                 />
               ))}
