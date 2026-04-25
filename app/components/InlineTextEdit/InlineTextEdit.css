@@ -11,6 +11,11 @@
   @apply rounded-md text-[13px] leading-relaxed px-3.5 py-3 w-full resize-none min-h-[80px] outline-none;
 }
 
+.inline-text-edit-error {
+  color: var(--error, theme(colors.red.500));
+  @apply text-[12px] leading-snug m-0;
+}
+
 .inline-text-edit-actions {
   @apply flex gap-2;
 }

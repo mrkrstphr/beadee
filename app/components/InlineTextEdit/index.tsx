@@ -7,6 +7,7 @@ interface InlineTextEditProps {
   onSave: (value: string) => Promise<void>;
   placeholder?: string;
   className?: string;
+  minLength?: number;
 }
 
 export default function InlineTextEdit({
@@ -14,10 +15,12 @@ export default function InlineTextEdit({
   onSave,
   placeholder = 'Click to add…',
   className,
+  minLength,
 }: InlineTextEditProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   function startEditing() {
@@ -35,16 +38,24 @@ export default function InlineTextEdit({
 
   async function handleSave() {
     if (saving) return;
+    if (minLength && draft.trim().length < minLength) {
+      setError(`Must be at least ${minLength} characters`);
+      return;
+    }
     setSaving(true);
+    setError(null);
     try {
       await onSave(draft);
       setEditing(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Save failed');
     } finally {
       setSaving(false);
     }
   }
 
   function handleCancel() {
+    setError(null);
     setEditing(false);
   }
 
@@ -64,12 +75,14 @@ export default function InlineTextEdit({
           value={draft}
           onChange={(e) => {
             setDraft(e.target.value);
+            setError(null);
             autoResize();
           }}
           onKeyDown={handleKeyDown}
           disabled={saving}
           rows={4}
         />
+        {error && <p className="inline-text-edit-error">{error}</p>}
         <div className="inline-text-edit-actions">
           <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
             Save

@@ -558,15 +558,23 @@ export default function IssueDetail({
         <CollapsibleSection name="Description">
           <InlineTextEdit
             value={issue.description}
-            onSave={(v) => handleAction(() => updateIssue(issueId, { description: v }), null)}
+            onSave={(v) =>
+              handleAction(
+                () => updateIssue.mutateAsync({ id: issueId, data: { description: v } }),
+                null,
+              )
+            }
             placeholder="Click to add description…"
+            minLength={3}
           />
         </CollapsibleSection>
 
         <CollapsibleSection name="Notes">
           <InlineTextEdit
             value={issue.notes}
-            onSave={(v) => handleAction(() => updateIssue(issueId, { notes: v }), null)}
+            onSave={(v) =>
+              handleAction(() => updateIssue.mutateAsync({ id: issueId, data: { notes: v } }), null)
+            }
             placeholder="Click to add notes…"
           />
         </CollapsibleSection>
@@ -574,7 +582,12 @@ export default function IssueDetail({
         <CollapsibleSection name="Design">
           <InlineTextEdit
             value={issue.design}
-            onSave={(v) => handleAction(() => updateIssue(issueId, { design: v }), null)}
+            onSave={(v) =>
+              handleAction(
+                () => updateIssue.mutateAsync({ id: issueId, data: { design: v } }),
+                null,
+              )
+            }
             placeholder="Click to add design notes…"
           />
         </CollapsibleSection>
@@ -582,7 +595,12 @@ export default function IssueDetail({
         <CollapsibleSection name="Acceptance Criteria">
           <InlineTextEdit
             value={issue.acceptance_criteria}
-            onSave={(v) => handleAction(() => updateIssue(issueId, { acceptance: v }), null)}
+            onSave={(v) =>
+              handleAction(
+                () => updateIssue.mutateAsync({ id: issueId, data: { acceptance: v } }),
+                null,
+              )
+            }
             placeholder="Click to add acceptance criteria…"
           />
         </CollapsibleSection>
