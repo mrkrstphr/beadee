@@ -128,6 +128,7 @@ interface UseIssuesFilters {
   status?: string;
   type?: string;
   search?: string;
+  includeParentEpics?: boolean;
 }
 
 interface UseIssuesOptions {
@@ -173,6 +174,7 @@ export function useIssues(
   if (filters.status) params.set('status', filters.status);
   if (filters.type) params.set('type', filters.type);
   if (filters.search) params.set('search', filters.search);
+  if (filters.includeParentEpics) params.set('includeParentEpics', '1');
   const qs = params.toString();
   const url = qs ? `/issues?${qs}` : '/issues';
 
@@ -184,7 +186,13 @@ export function useIssues(
     dataUpdatedAt,
     refetch: rqRefetch,
   } = useQuery<Issue[]>({
-    queryKey: ['issues', filters.status ?? '', filters.type ?? '', filters.search ?? ''],
+    queryKey: [
+      'issues',
+      filters.status ?? '',
+      filters.type ?? '',
+      filters.search ?? '',
+      filters.includeParentEpics ? '1' : '',
+    ],
     queryFn: () => apiFetch<Issue[]>(url),
     placeholderData: (prev) => prev,
     notifyOnChangeProps: ['data', 'error', 'status', 'isFetching'],

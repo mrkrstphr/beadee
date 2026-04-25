@@ -160,7 +160,7 @@ export default function ListView({
   const listRef = useRef<HTMLDivElement>(null);
 
   const { issues, loading, error } = useIssues(
-    { status: statusFilter, type: typeFilter },
+    { status: statusFilter, type: typeFilter, includeParentEpics: groupByEpic },
     { onRefreshed },
   );
 
@@ -191,7 +191,19 @@ export default function ListView({
 
   const epicGroups = useMemo(() => {
     if (!groupByEpic) return null;
-    const epics = displayedIssues.filter((i) => i.issue_type === 'epic');
+    const issuesById = new Map(issues.map((i) => [i.id, i]));
+    const epicIds = new Set(
+      displayedIssues.filter((i) => i.issue_type === 'epic').map((i) => i.id),
+    );
+    // Include parent epics that were filtered out client-side (e.g. by hideClosed)
+    // but still have visible children.
+    for (const issue of displayedIssues) {
+      if (issue.parent && !epicIds.has(issue.parent)) {
+        const parent = issuesById.get(issue.parent);
+        if (parent?.issue_type === 'epic') epicIds.add(issue.parent);
+      }
+    }
+    const epics = [...epicIds].map((id) => issuesById.get(id)!).filter(Boolean);
     const byParent: Record<string, Issue[]> = {};
     for (const issue of displayedIssues) {
       if (issue.parent) {
@@ -199,12 +211,9 @@ export default function ListView({
         byParent[issue.parent].push(issue);
       }
     }
-    const epicIds = new Set(epics.map((e) => e.id));
     const orphans = displayedIssues.filter((i) => !epicIds.has(i.id) && !i.parent);
     const progress: Record<string, { done: number; total: number }> = {};
-    for (const epic of epics) {
-      progress[epic.id] = { done: 0, total: 0 };
-    }
+    for (const id of epicIds) progress[id] = { done: 0, total: 0 };
     for (const issue of issues) {
       if (issue.parent && progress[issue.parent]) {
         progress[issue.parent].total++;

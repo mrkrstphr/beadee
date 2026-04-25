@@ -7,6 +7,7 @@ export async function loader({ request }: { request: Request }) {
   const status = url.searchParams.get('status');
   const type = url.searchParams.get('type');
   const search = url.searchParams.get('search');
+  const includeParentEpics = url.searchParams.has('includeParentEpics');
   const cwd = process.cwd();
 
   suppressWatch();
@@ -23,6 +24,23 @@ export async function loader({ request }: { request: Request }) {
         i.description?.toLowerCase().includes(q) ||
         i.id?.toLowerCase().includes(q),
     );
+  }
+
+  // When grouping by epic, also include parent epics of matching issues so the
+  // epic header is visible even when the epic itself doesn't match the filter.
+  if (includeParentEpics && (status || type || search)) {
+    const resultIds = new Set(result.map((i) => i.id));
+    const extraEpics: Issue[] = [];
+    for (const issue of result) {
+      if (issue.parent && !resultIds.has(issue.parent)) {
+        const parentEpic = issues.find((i) => i.id === issue.parent && i.issue_type === 'epic');
+        if (parentEpic) {
+          extraEpics.push(parentEpic);
+          resultIds.add(issue.parent);
+        }
+      }
+    }
+    if (extraEpics.length > 0) result = [...result, ...extraEpics];
   }
 
   return Response.json(result);
