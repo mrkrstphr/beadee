@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import ResizableDivider from '../../components/ResizableDivider/index.jsx';
 import StatusIcon from '../../components/StatusIcon/index.jsx';
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
+import { useEpicStatuses } from '../../hooks/api/useEpicStatuses.js';
 import { useIssues } from '../../hooks/api/useIssues.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
@@ -163,6 +164,7 @@ export default function ListView({
     { status: statusFilter, type: typeFilter, includeParentEpics: groupByEpic },
     { onRefreshed },
   );
+  const epicStatuses = useEpicStatuses();
 
   useEffect(() => {
     const el = listRef.current;
@@ -213,15 +215,14 @@ export default function ListView({
     }
     const orphans = displayedIssues.filter((i) => !epicIds.has(i.id) && !i.parent);
     const progress: Record<string, { done: number; total: number }> = {};
-    for (const id of epicIds) progress[id] = { done: 0, total: 0 };
-    for (const issue of issues) {
-      if (issue.parent && progress[issue.parent]) {
-        progress[issue.parent].total++;
-        if (issue.status === 'closed') progress[issue.parent].done++;
-      }
+    for (const id of epicIds) {
+      const status = epicStatuses.get(id);
+      progress[id] = status
+        ? { done: status.closed_children, total: status.total_children }
+        : { done: 0, total: 0 };
     }
     return { epics, byParent, orphans, progress };
-  }, [displayedIssues, groupByEpic, issues]);
+  }, [displayedIssues, groupByEpic, issues, epicStatuses]);
 
   const visibleIssues = useMemo(() => {
     if (!epicGroups) return displayedIssues;
