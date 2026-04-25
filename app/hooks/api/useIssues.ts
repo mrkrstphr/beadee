@@ -154,6 +154,7 @@ export function useIssues(
     setupSSEInvalidation((event) => {
       if (event.affectsAll || event.affectsListView) {
         void queryClient.invalidateQueries({ queryKey: ['issues'] });
+        void queryClient.invalidateQueries({ queryKey: ['epicStatuses'] });
       }
       if (event.affectedIds?.length) {
         for (const id of event.affectedIds) {

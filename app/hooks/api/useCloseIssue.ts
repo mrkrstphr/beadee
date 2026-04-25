@@ -15,6 +15,7 @@ export function useCloseIssue() {
     onSuccess: (_data, { id }) => {
       void queryClient.invalidateQueries({ queryKey: ['issues'] });
       void queryClient.invalidateQueries({ queryKey: ['issue', id] });
+      void queryClient.invalidateQueries({ queryKey: ['epicStatuses'] });
     },
   });
 }

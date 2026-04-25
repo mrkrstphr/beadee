@@ -27,10 +27,13 @@ export function useUpdateIssue() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateIssueData }) => updateIssue(id, data),
-    onSuccess: (_result, { id }) => {
+    onSuccess: (_result, { id, data }) => {
       void queryClient.invalidateQueries({ queryKey: ['issues'] });
       void queryClient.invalidateQueries({ queryKey: ['issue', id] });
       void queryClient.invalidateQueries({ queryKey: ['children', id] });
+      if ('status' in data || 'parent' in data) {
+        void queryClient.invalidateQueries({ queryKey: ['epicStatuses'] });
+      }
     },
   });
 }
