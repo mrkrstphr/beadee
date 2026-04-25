@@ -348,6 +348,13 @@ export default function IssueDetail({
 
   const blockedBy = issue.dependencies?.filter((d) => d.dependency_type === 'blocks') ?? [];
 
+  const epicStatus: EpicStatus | undefined =
+    issue.issue_type === 'epic' ? epicStatuses.get(issue.id) : undefined;
+  const epicPct =
+    epicStatus && epicStatus.total_children > 0
+      ? Math.round((epicStatus.closed_children / epicStatus.total_children) * 100)
+      : null;
+
   return (
     <>
       {confirmDelete && (
@@ -583,24 +590,19 @@ export default function IssueDetail({
           </CollapsibleSection>
         )}
 
-        {issue.issue_type === 'epic' &&
-          (() => {
-            const status: EpicStatus | undefined = epicStatuses.get(issue.id);
-            if (!status || status.total_children === 0) return null;
-            const pct = Math.round((status.closed_children / status.total_children) * 100);
-            return (
-              <CollapsibleSection name="Progress">
-                <div className="epic-detail-progress">
-                  <div className="epic-detail-progress-track">
-                    <div className="epic-detail-progress-fill" style={{ width: `${pct}%` }} />
-                  </div>
-                  <span className="epic-detail-progress-label">
-                    {status.closed_children}/{status.total_children} children closed ({pct}%)
-                  </span>
-                </div>
-              </CollapsibleSection>
-            );
-          })()}
+        {epicStatus && epicPct !== null && (
+          <CollapsibleSection name="Progress">
+            <div className="epic-detail-progress">
+              <div className="epic-detail-progress-track">
+                <div className="epic-detail-progress-fill" style={{ width: `${epicPct}%` }} />
+              </div>
+              <span className="epic-detail-progress-label">
+                {epicStatus.closed_children}/{epicStatus.total_children} children closed ({epicPct}
+                %)
+              </span>
+            </div>
+          </CollapsibleSection>
+        )}
 
         {children.length > 0 && (
           <CollapsibleSection name="Children">
