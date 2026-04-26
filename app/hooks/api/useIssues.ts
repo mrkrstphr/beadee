@@ -72,7 +72,8 @@ function ensureSSE() {
   connect();
 
   fallbackInterval = setInterval(() => {
-    scheduleNotify({ type: 'change', affectsAll: true });
+    if (document.visibilityState === 'visible')
+      scheduleNotify({ type: 'change', affectsAll: true });
   }, FALLBACK_POLL_INTERVAL);
 
   visibilityListener = () => {

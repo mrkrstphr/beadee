@@ -107,7 +107,7 @@
 }
 
 .settings-toggle.on::after {
-  background: #fff;
+  @apply bg-white;
   transform: translateX(16px);
 }
 
