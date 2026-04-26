@@ -5,7 +5,7 @@ import { queryClient } from './queryClient';
 
 const themeScript = `
   try {
-    const t = localStorage.getItem('beadee-theme') || 'dark'
+    const t = localStorage.getItem('beadee-theme') || 'auto'
     document.documentElement.dataset.theme =
       t === 'auto'
         ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')

@@ -34,7 +34,7 @@
 .theme-card {
   background: var(--bg-surface);
   border: 2px solid var(--border);
-  @apply items-start rounded-[10px] cursor-pointer flex flex-col gap-1.5 p-3.5 relative text-left transition-[border-color,box-shadow] duration-150;
+  @apply items-start rounded-[10px] cursor-pointer flex flex-col gap-1.5 p-3.5 text-left transition-[border-color,box-shadow] duration-150;
 }
 
 .theme-card:hover {
@@ -46,14 +46,97 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
-.theme-card-swatch {
-  border: 1px solid var(--border);
-  @apply rounded-md block h-9 w-full;
+/* Mini macOS window preview */
+.theme-preview-window {
+  border: 1px solid;
+  @apply rounded-[7px] overflow-hidden w-full mb-0.5;
+}
+
+.theme-preview-titlebar {
+  border-bottom: 1px solid;
+  @apply flex items-center gap-[4px] px-[7px] h-[18px];
+}
+
+.theme-preview-traffic {
+  @apply rounded-full shrink-0;
+  width: 5px;
+  height: 5px;
+}
+
+.theme-preview-wintitle {
+  @apply text-[7px] font-medium ml-[5px] truncate;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.theme-preview-body {
+  @apply flex h-[58px];
+}
+
+.theme-preview-content {
+  @apply flex w-full h-full;
+}
+
+.theme-preview-sidebar {
+  border-right: 1px solid;
+  @apply flex flex-col justify-center gap-[5px] px-[6px] shrink-0;
+  width: 38px;
+}
+
+.theme-preview-item {
+  @apply flex items-center gap-[3px];
+}
+
+.theme-preview-item-dot {
+  @apply rounded-full shrink-0;
+  width: 4px;
+  height: 4px;
+}
+
+.theme-preview-item-line {
+  @apply rounded-full;
+  height: 3px;
+  width: 100%;
+  opacity: 0.45;
+}
+
+.theme-preview-main {
+  @apply flex flex-col justify-center gap-[5px] flex-1 px-[8px] py-[6px];
+}
+
+.theme-preview-title {
+  @apply rounded-full block;
+  height: 4px;
+  width: 60%;
+  opacity: 0.75;
+}
+
+.theme-preview-subtitle {
+  @apply rounded-full block;
+  height: 3px;
+  width: 40%;
+  opacity: 0.35;
+}
+
+.theme-preview-button {
+  @apply rounded-[3px] block;
+  width: 24px;
+  height: 7px;
+}
+.theme-preview-auto-divider {
+  @apply absolute inset-0 pointer-events-none;
+  background: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 0.5px),
+    rgba(128, 128, 128, 0.3) calc(50% - 0.5px),
+    rgba(128, 128, 128, 0.3) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
 }
 
 .theme-card-label {
   color: var(--text);
-  @apply text-[13px] font-semibold;
+  @apply text-[13px] font-semibold flex items-center justify-between gap-1 w-full;
 }
 
 .theme-card-desc {
@@ -63,7 +146,7 @@
 
 .theme-card-check {
   color: var(--accent);
-  @apply text-[13px] font-bold absolute right-3 top-3;
+  @apply shrink-0;
 }
 
 /* Toggle row */
