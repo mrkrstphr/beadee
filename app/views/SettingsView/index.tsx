@@ -15,6 +15,30 @@ type ThemeColors = {
   mono?: boolean;
 };
 
+const DARK_COLORS: ThemeColors = {
+  bg: '#0d1117',
+  bgSurface: '#161b22',
+  bgElevated: '#21262d',
+  border: '#30363d',
+  text: '#e6edf3',
+  textMuted: '#7d8590',
+  accent: '#58a6ff',
+  success: '#3fb950',
+  danger: '#f85149',
+};
+
+const LIGHT_COLORS: ThemeColors = {
+  bg: '#ffffff',
+  bgSurface: '#f6f8fa',
+  bgElevated: '#eaeef2',
+  border: '#d0d7de',
+  text: '#1f2328',
+  textMuted: '#656d76',
+  accent: '#0969da',
+  success: '#1a7f37',
+  danger: '#d1242f',
+};
+
 const THEMES: {
   id: string;
   label: string;
@@ -27,49 +51,19 @@ const THEMES: {
     label: 'Auto',
     desc: 'Follow OS preference',
     autoSplit: true,
-    colors: {
-      bg: '#0d1117',
-      bgSurface: '#161b22',
-      bgElevated: '#21262d',
-      border: '#30363d',
-      text: '#e6edf3',
-      textMuted: '#7d8590',
-      accent: '#58a6ff',
-      success: '#3fb950',
-      danger: '#f85149',
-    },
+    colors: DARK_COLORS,
   },
   {
     id: 'dark',
     label: 'Dark',
     desc: 'GitHub-style dark',
-    colors: {
-      bg: '#0d1117',
-      bgSurface: '#161b22',
-      bgElevated: '#21262d',
-      border: '#30363d',
-      text: '#e6edf3',
-      textMuted: '#7d8590',
-      accent: '#58a6ff',
-      success: '#3fb950',
-      danger: '#f85149',
-    },
+    colors: DARK_COLORS,
   },
   {
     id: 'light',
     label: 'Light',
     desc: 'Clean light mode',
-    colors: {
-      bg: '#ffffff',
-      bgSurface: '#f6f8fa',
-      bgElevated: '#eaeef2',
-      border: '#d0d7de',
-      text: '#1f2328',
-      textMuted: '#656d76',
-      accent: '#0969da',
-      success: '#1a7f37',
-      danger: '#d1242f',
-    },
+    colors: LIGHT_COLORS,
   },
   {
     id: 'dracula',
@@ -122,55 +116,35 @@ const THEMES: {
   },
 ];
 
-const LIGHT_COLORS: ThemeColors = {
-  bg: '#ffffff',
-  bgSurface: '#f6f8fa',
-  bgElevated: '#eaeef2',
-  border: '#d0d7de',
-  text: '#1f2328',
-  textMuted: '#656d76',
-  accent: '#0969da',
-  success: '#1a7f37',
-  danger: '#d1242f',
-};
-
-function ThemePreview({
-  colors,
-  autoSplit,
-  mono,
-}: {
-  colors: ThemeColors;
-  autoSplit?: boolean;
-  mono?: boolean;
-}) {
-  const fontStyle = mono ? { fontFamily: "'Courier New', Courier, monospace" } : {};
-
-  const renderContent = (c: ThemeColors, clipPath?: string) => (
+const renderContent = (c: ThemeColors, clipPath?: string) => (
+  <div
+    className="theme-preview-content"
+    style={clipPath ? { clipPath, position: 'absolute', inset: 0 } : undefined}
+  >
     <div
-      className="theme-preview-content"
-      style={clipPath ? { clipPath, position: 'absolute', inset: 0 } : undefined}
+      className="theme-preview-sidebar"
+      style={{ background: c.bgSurface, borderRightColor: c.border }}
     >
-      <div
-        className="theme-preview-sidebar"
-        style={{ background: c.bgSurface, borderRightColor: c.border }}
-      >
-        {[c.accent, c.textMuted, c.textMuted].map((dotColor, i) => (
-          <div key={i} className="theme-preview-item">
-            <span className="theme-preview-item-dot" style={{ background: dotColor }} />
-            <span
-              className="theme-preview-item-line"
-              style={{ background: i === 0 ? c.text : c.textMuted }}
-            />
-          </div>
-        ))}
-      </div>
-      <div className="theme-preview-main" style={{ background: c.bg }}>
-        <span className="theme-preview-title" style={{ background: c.text }} />
-        <span className="theme-preview-subtitle" style={{ background: c.textMuted }} />
-        <span className="theme-preview-button" style={{ background: c.accent }} />
-      </div>
+      {[c.accent, c.textMuted, c.textMuted].map((dotColor, i) => (
+        <div key={i} className="theme-preview-item">
+          <span className="theme-preview-item-dot" style={{ background: dotColor }} />
+          <span
+            className="theme-preview-item-line"
+            style={{ background: i === 0 ? c.text : c.textMuted }}
+          />
+        </div>
+      ))}
     </div>
-  );
+    <div className="theme-preview-main" style={{ background: c.bg }}>
+      <span className="theme-preview-title" style={{ background: c.text }} />
+      <span className="theme-preview-subtitle" style={{ background: c.textMuted }} />
+      <span className="theme-preview-button" style={{ background: c.accent }} />
+    </div>
+  </div>
+);
+
+function ThemePreview({ colors, autoSplit }: { colors: ThemeColors; autoSplit?: boolean }) {
+  const fontStyle = colors.mono ? { fontFamily: "'Courier New', Courier, monospace" } : {};
 
   return (
     <div className="theme-preview-window" style={{ borderColor: colors.border, ...fontStyle }}>
@@ -227,7 +201,7 @@ export default function SettingsView({ theme, onThemeChange }: SettingsViewProps
                 className={`theme-card ${t.id === theme ? 'active' : ''}`}
                 onClick={() => onThemeChange(t.id)}
               >
-                <ThemePreview colors={t.colors} autoSplit={t.autoSplit} mono={t.colors.mono} />
+                <ThemePreview colors={t.colors} autoSplit={t.autoSplit} />
                 <span className="theme-card-label">
                   {t.label}
                   {t.id === theme && (
