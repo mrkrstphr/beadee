@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
 import './SettingsView.css';
 
 const THEMES = [
@@ -16,6 +17,8 @@ interface SettingsViewProps {
 }
 
 export default function SettingsView({ theme, onThemeChange }: SettingsViewProps) {
+  const [refetchOnFocus, setRefetchOnFocus] = useLocalStorageState('beadee-refetch-on-focus', true);
+
   return (
     <div className="settings-view">
       <div className="settings-content">
@@ -51,10 +54,23 @@ export default function SettingsView({ theme, onThemeChange }: SettingsViewProps
         </section>
 
         <section className="settings-section">
-          <h3 className="settings-section-title">More settings coming soon</h3>
-          <p className="settings-section-desc">
-            Future options may include default filters, polling interval, and display density.
-          </p>
+          <h3 className="settings-section-title">Behavior</h3>
+
+          <label className="settings-toggle-row">
+            <span className="settings-toggle-label">
+              Reload on focus
+              <span className="settings-toggle-desc">
+                Refresh all data when the browser tab regains focus
+              </span>
+            </span>
+            <span className={`settings-toggle ${refetchOnFocus ? 'on' : ''}`} aria-hidden="true" />
+            <input
+              type="checkbox"
+              className="settings-toggle-input"
+              checked={refetchOnFocus}
+              onChange={(e) => setRefetchOnFocus(e.target.checked)}
+            />
+          </label>
         </section>
       </div>
     </div>
