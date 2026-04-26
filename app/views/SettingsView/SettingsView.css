@@ -66,6 +66,51 @@
   @apply text-[13px] font-bold absolute right-3 top-3;
 }
 
+/* Toggle row */
+.settings-toggle-row {
+  @apply flex items-center justify-between gap-4 cursor-pointer;
+}
+
+.settings-toggle-label {
+  color: var(--text);
+  @apply flex flex-col gap-0.5 text-[13px] font-medium;
+}
+
+.settings-toggle-desc {
+  color: var(--text-muted);
+  @apply text-[12px] font-normal;
+}
+
+.settings-toggle-input {
+  @apply sr-only;
+}
+
+.settings-toggle {
+  background: var(--border);
+  @apply relative inline-block shrink-0 rounded-full transition-colors duration-200 ease-in-out;
+  width: 36px;
+  height: 20px;
+}
+
+.settings-toggle::after {
+  background: var(--text-muted);
+  content: '';
+  @apply absolute rounded-full transition-[transform,background-color] duration-200 ease-in-out;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+}
+
+.settings-toggle.on {
+  background: var(--accent);
+}
+
+.settings-toggle.on::after {
+  background: #fff;
+  transform: translateX(16px);
+}
+
 /* ============================================================
    RESPONSIVE / MOBILE
    ============================================================ */

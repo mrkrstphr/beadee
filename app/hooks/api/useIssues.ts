@@ -44,7 +44,7 @@ function scheduleNotify(event: SSEEvent) {
 let sseInstance: EventSource | null = null;
 let fallbackInterval: ReturnType<typeof setInterval> | null = null;
 let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null;
-let globalVisibilityListener: (() => void) | null = null;
+let visibilityListener: (() => void) | null = null;
 
 const FALLBACK_POLL_INTERVAL = 300000;
 
@@ -72,15 +72,19 @@ function ensureSSE() {
   connect();
 
   fallbackInterval = setInterval(() => {
-    if (document.visibilityState === 'visible')
-      scheduleNotify({ type: 'change', affectsAll: true });
+    scheduleNotify({ type: 'change', affectsAll: true });
   }, FALLBACK_POLL_INTERVAL);
 
-  globalVisibilityListener = () => {
-    if (document.visibilityState === 'visible')
-      scheduleNotify({ type: 'change', affectsAll: true });
+  visibilityListener = () => {
+    if (document.visibilityState !== 'visible') return;
+    try {
+      if (localStorage.getItem('beadee-refetch-on-focus') === 'false') return;
+    } catch {
+      return;
+    }
+    scheduleNotify({ type: 'change', affectsAll: true });
   };
-  document.addEventListener('visibilitychange', globalVisibilityListener);
+  document.addEventListener('visibilitychange', visibilityListener);
 }
 
 function subscribeTick(fn: TickHandler): () => void {
@@ -98,13 +102,12 @@ if (import.meta.hot) {
     if (fallbackInterval) clearInterval(fallbackInterval);
     if (sseReconnectTimer) clearTimeout(sseReconnectTimer);
     if (notifyDebounceTimer) clearTimeout(notifyDebounceTimer);
-    if (globalVisibilityListener)
-      document.removeEventListener('visibilitychange', globalVisibilityListener);
+    if (visibilityListener) document.removeEventListener('visibilitychange', visibilityListener);
     fallbackInterval = null;
     sseReconnectTimer = null;
     notifyDebounceTimer = null;
     pendingEvent = null;
-    globalVisibilityListener = null;
+    visibilityListener = null;
   });
 }
 
