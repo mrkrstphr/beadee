@@ -18,7 +18,7 @@
 - **Rich filtering** — filter by status, type, priority, or full-text search
 - **Issue detail pane** — inline view of description, labels, children, and comments
 - **Real-time updates** — changes made via `bd` CLI reflect instantly via SSE
-- **Themes** — dark (default), light, dracula, synthwave, hacker, and auto
+- **Themes** — auto light/dark (default), light, dark, dracula, synthwave, and hacker
 
 <br />
 

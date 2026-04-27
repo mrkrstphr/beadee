@@ -38,7 +38,7 @@ export default function Layout() {
   const { id } = useParams();
 
   const [theme, setTheme] = useState(
-    () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-theme') : null) || 'dark',
+    () => (typeof window !== 'undefined' ? localStorage.getItem('beadee-theme') : null) || 'auto',
   );
   const [showModal, setShowModal] = useState(false);
   const [editingIssue, setEditingIssue] = useState<Issue | null>(null);
