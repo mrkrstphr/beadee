@@ -3,8 +3,7 @@ import { index, layout, route } from '@react-router/dev/routes';
 export default [
   layout('routes/_layout.tsx', [
     index('routes/_index.tsx'),
-    route('list', 'routes/list.tsx'),
-    route('list/:id', 'routes/listIssue.tsx'),
+    route('list/:id?', 'routes/list.tsx'),
     route('kanban', 'routes/kanban.tsx'),
     route('kanban/:id', 'routes/kanbanIssue.tsx'),
     route('settings', 'routes/settings.tsx'),
