@@ -29,11 +29,13 @@ export default function ResizableDivider({
 
       const onUp = () => {
         document.body.style.userSelect = '';
+        document.body.style.cursor = '';
         document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup', onUp);
       };
 
       document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'col-resize';
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup', onUp);
     },
