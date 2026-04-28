@@ -1,11 +1,15 @@
 import { DatabaseSync } from 'node:sqlite';
+import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 let db: DatabaseSync | null = null;
 
 function getDb(): DatabaseSync {
   if (!db) {
-    db = new DatabaseSync(join(process.cwd(), '.beads', 'beadee.db'));
+    // process.cwd() must stay inside getDb() — tests mock it per-case via vi.spyOn
+    const beadsDir = join(process.cwd(), '.beads');
+    mkdirSync(beadsDir, { recursive: true });
+    db = new DatabaseSync(join(beadsDir, 'beadee.db'));
     migrate(db);
   }
   return db;
