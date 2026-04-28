@@ -8,6 +8,7 @@ function getDb(): DatabaseSync {
     db = new DatabaseSync(join(process.cwd(), '.beads', 'beadee.db'));
     db.exec(`
       CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY);
+      INSERT OR IGNORE INTO schema_version (version) VALUES (0);
       CREATE TABLE IF NOT EXISTS prefs (key TEXT PRIMARY KEY, value TEXT NOT NULL);
     `);
     migrate(db);
@@ -16,15 +17,10 @@ function getDb(): DatabaseSync {
 }
 
 function migrate(database: DatabaseSync): void {
-  const row = database.prepare('SELECT version FROM schema_version').get() as
-    | { version: number }
-    | undefined;
-  const version = row?.version ?? 0;
-
-  // Add future migrations here as: if (version < N) { ... }
-
-  if (version < 1) {
-    database.prepare('INSERT OR REPLACE INTO schema_version VALUES (1)').run();
+  const row = database.prepare('SELECT version FROM schema_version').get() as { version: number };
+  // Add future migrations here as: if (version < N) { ...; database.prepare('UPDATE schema_version SET version = N').run(); }
+  if (row.version < 1) {
+    database.prepare('UPDATE schema_version SET version = 1').run();
   }
 }
 

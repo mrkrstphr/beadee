@@ -1,3 +1,4 @@
+import { useCallback, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '../../util/apiFetch.js';
 
@@ -11,6 +12,7 @@ function writePref(key: string, value: string): Promise<{ ok: boolean }> {
 
 export function usePref(key: string, defaultValue: number): [number, (value: number) => void] {
   const queryClient = useQueryClient();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: prefs } = useQuery({
     queryKey: ['prefs'],
@@ -20,16 +22,25 @@ export function usePref(key: string, defaultValue: number): [number, (value: num
 
   const { mutate } = useMutation({
     mutationFn: (value: number) => writePref(key, String(value)),
-    onMutate: (value) => {
-      queryClient.setQueryData<Record<string, string>>(['prefs'], (prev) => ({
-        ...prev,
-        [key]: String(value),
-      }));
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['prefs'] });
     },
   });
+
+  const setValue = useCallback(
+    (value: number) => {
+      queryClient.setQueryData<Record<string, string>>(['prefs'], (prev) => ({
+        ...(prev ?? {}),
+        [key]: String(value),
+      }));
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => mutate(value), 500);
+    },
+    [key, mutate, queryClient],
+  );
 
   const raw = prefs?.[key];
   const value = raw !== undefined ? Number(raw) : defaultValue;
 
-  return [Number.isFinite(value) ? value : defaultValue, mutate];
+  return [Number.isFinite(value) ? value : defaultValue, setValue];
 }
