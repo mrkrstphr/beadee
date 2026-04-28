@@ -10,7 +10,10 @@ function writePref(key: string, value: string): Promise<{ ok: boolean }> {
   return apiFetch(`/prefs/${key}`, { method: 'POST', body: JSON.stringify({ value }) });
 }
 
-export function usePref(key: string, defaultValue: number): [number, (value: number) => void] {
+export function usePref<T extends string | number>(
+  key: string,
+  defaultValue: T,
+): [T, (value: T) => void] {
   const queryClient = useQueryClient();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -21,7 +24,7 @@ export function usePref(key: string, defaultValue: number): [number, (value: num
   });
 
   const { mutate } = useMutation({
-    mutationFn: (value: number) => writePref(key, String(value)),
+    mutationFn: (value: T) => writePref(key, String(value)),
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ['prefs'] });
     },
@@ -35,7 +38,7 @@ export function usePref(key: string, defaultValue: number): [number, (value: num
   );
 
   const setValue = useCallback(
-    (value: number) => {
+    (value: T) => {
       queryClient.setQueryData<Record<string, string>>(['prefs'], (prev) => ({
         ...(prev ?? {}),
         [key]: String(value),
@@ -47,7 +50,12 @@ export function usePref(key: string, defaultValue: number): [number, (value: num
   );
 
   const raw = prefs?.[key];
-  const value = raw !== undefined ? Number(raw) : defaultValue;
+  if (raw === undefined) return [defaultValue, setValue];
 
-  return [Number.isFinite(value) ? value : defaultValue, setValue];
+  const value =
+    typeof defaultValue === 'number'
+      ? ((Number.isFinite(Number(raw)) ? Number(raw) : defaultValue) as T)
+      : (raw as T);
+
+  return [value, setValue];
 }
