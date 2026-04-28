@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '../../util/apiFetch.js';
 
@@ -26,6 +26,13 @@ export function usePref(key: string, defaultValue: number): [number, (value: num
       queryClient.invalidateQueries({ queryKey: ['prefs'] });
     },
   });
+
+  useEffect(
+    () => () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    },
+    [],
+  );
 
   const setValue = useCallback(
     (value: number) => {
