@@ -25,4 +25,6 @@ export default [
   route('api/update', 'routes/api/update.ts'),
   route('api/memories', 'routes/api/memories.ts'),
   route('api/epic-status', 'routes/api/epic-status.ts'),
+  route('api/prefs', 'routes/api/prefs.ts'),
+  route('api/prefs/:key', 'routes/api/pref.ts'),
 ];

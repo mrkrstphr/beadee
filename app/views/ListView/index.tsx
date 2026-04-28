@@ -5,6 +5,7 @@ import StatusIcon from '../../components/StatusIcon/index.jsx';
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
 import { useEpicStatuses } from '../../hooks/api/useEpicStatuses.js';
 import { useIssues } from '../../hooks/api/useIssues.js';
+import { usePref } from '../../hooks/api/usePrefs.js';
 import { useKeyboard } from '../../hooks/useKeyboard.js';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState.js';
 import type { DetailPanelComponent } from '../../components/DetailPanel/index.js';
@@ -155,8 +156,7 @@ export default function ListView({
     [],
   );
   const collapsedEpics = useMemo(() => new Set(collapsedEpicIds), [collapsedEpicIds]);
-  const [rawPanelWidth, setListPanelWidth] = useLocalStorageState('beadee-list-panel-width', 320);
-  const listPanelWidth = Number(rawPanelWidth) || 320;
+  const [listPanelWidth, setListPanelWidth] = usePref('beadee-list-panel-width', 320);
 
   const listRef = useRef<HTMLDivElement>(null);
 

@@ -49,6 +49,7 @@ function ensureWatcher(): void {
     const watcher = watch(beadsDir, { recursive: true }, (_event, filename) => {
       if (!filename) return;
       if (filename.includes('lock') || filename.endsWith('.log')) return;
+      if (filename.startsWith('beadee.db')) return;
       if (Date.now() < suppressWatchUntil) return;
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => broadcast(), 200);
