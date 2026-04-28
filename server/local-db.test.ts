@@ -43,4 +43,14 @@ describe('setPref / getPrefs', () => {
     setPref('beadee-other-pref', 'dark');
     expect(getPrefs()).toEqual({ 'beadee-list-panel-width': '400', 'beadee-other-pref': 'dark' });
   });
+
+  it('survives a second open of the same db file', async () => {
+    const { setPref } = await import('./local-db.js');
+    setPref('beadee-list-panel-width', '400');
+
+    // Simulate a second process open by resetting the module singleton
+    vi.resetModules();
+    const { getPrefs } = await import('./local-db.js');
+    expect(getPrefs()).toEqual({ 'beadee-list-panel-width': '400' });
+  });
 });

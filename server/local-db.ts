@@ -6,23 +6,19 @@ let db: DatabaseSync | null = null;
 function getDb(): DatabaseSync {
   if (!db) {
     db = new DatabaseSync(join(process.cwd(), '.beads', 'beadee.db'));
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY);
-      INSERT OR IGNORE INTO schema_version (version) VALUES (0);
-    `);
     migrate(db);
   }
   return db;
 }
 
 function migrate(database: DatabaseSync): void {
-  const row = database.prepare('SELECT version FROM schema_version').get() as { version: number };
-  let version = row.version;
+  const { user_version: version } = database.prepare('PRAGMA user_version').get() as {
+    user_version: number;
+  };
 
   if (version < 1) {
     database.exec('CREATE TABLE prefs (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
-    database.prepare('UPDATE schema_version SET version = 1').run();
-    version = 1;
+    database.exec('PRAGMA user_version = 1');
   }
 }
 
