@@ -1,0 +1,17 @@
+{
+  "name": "beadee",
+  "short_name": "beadee",
+  "description": "A dark-themed task tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#111827",
+  "background_color": "#111827",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
