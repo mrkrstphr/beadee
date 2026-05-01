@@ -1,7 +1,7 @@
 {
   "name": "beadee",
   "short_name": "beadee",
-  "description": "A dark-themed task tracker",
+  "description": "A web GUI for the beads issue tracker.",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#111827",
