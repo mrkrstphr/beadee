@@ -4,8 +4,8 @@
   "description": "A dark-themed task tracker",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
+  "theme_color": "#111827",
+  "background_color": "#111827",
   "icons": [
     {
       "src": "/apple-touch-icon.png",
