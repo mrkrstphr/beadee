@@ -1,5 +1,9 @@
 export function semverGt(a: string, b: string): boolean {
-  const strip = (v: string) => v.replace(/^v/, '').split('.').map(Number);
+  const strip = (v: string) =>
+    v
+      .replace(/^v/, '')
+      .split('.')
+      .map((s) => parseInt(s, 10));
   const pa = strip(a);
   const pb = strip(b);
   for (let i = 0; i < 3; i++) {

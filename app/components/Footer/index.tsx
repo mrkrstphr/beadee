@@ -27,8 +27,8 @@ function getCached(): UpdateInfo | null {
     const { data, ts } = JSON.parse(raw) as CacheEntry;
     if (Date.now() - ts > CACHE_TTL) return null;
     if (!Array.isArray(data.releases)) return null;
-    // Re-validate against the current running version in case we updated since caching
-    if (data.latestVersion && !semverGt(data.latestVersion, version)) return null;
+    // Invalidate only if the cached update notice no longer applies (user upgraded since caching)
+    if (data.hasUpdate && data.latestVersion && !semverGt(data.latestVersion, version)) return null;
     return data;
   } catch {
     return null;

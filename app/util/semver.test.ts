@@ -35,4 +35,9 @@ describe('semverGt', () => {
     expect(semverGt('1.1', '1.0.9')).toBe(true);
     expect(semverGt('1.0', '1.0.0')).toBe(false);
   });
+
+  it('handles pre-release suffixes', () => {
+    expect(semverGt('1.0.1-beta', '1.0.0')).toBe(true);
+    expect(semverGt('1.0.0-beta', '1.0.0')).toBe(false);
+  });
 });
