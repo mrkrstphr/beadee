@@ -4,8 +4,8 @@
   "description": "A web GUI for the beads issue tracker.",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#111827",
-  "background_color": "#111827",
+  "theme_color": "#58a6ff",
+  "background_color": "#58a6ff",
   "icons": [
     {
       "src": "/apple-touch-icon.png",
