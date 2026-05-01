@@ -11,6 +11,7 @@ function getDb(): DatabaseSync {
     mkdirSync(beadsDir, { recursive: true });
     db = new DatabaseSync(join(beadsDir, 'beadee.db'));
     migrate(db);
+    process.once('beforeExit', () => db?.close());
   }
   return db;
 }
