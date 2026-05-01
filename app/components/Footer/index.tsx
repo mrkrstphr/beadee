@@ -2,6 +2,7 @@ import { Rocket } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { version } from '../../../package.json';
 import type { ReleaseEntry } from '../../routes/api.update.js';
+import { semverGt } from '../../util/semver.js';
 import UpdateDialog from '../UpdateDialog.jsx';
 import './Footer.css';
 
@@ -26,6 +27,8 @@ function getCached(): UpdateInfo | null {
     const { data, ts } = JSON.parse(raw) as CacheEntry;
     if (Date.now() - ts > CACHE_TTL) return null;
     if (!Array.isArray(data.releases)) return null;
+    // Re-validate against the current running version in case we updated since caching
+    if (data.latestVersion && !semverGt(data.latestVersion, version)) return null;
     return data;
   } catch {
     return null;

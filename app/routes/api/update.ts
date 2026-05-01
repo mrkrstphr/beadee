@@ -1,4 +1,5 @@
 import { version as currentVersion } from '../../../package.json';
+import { semverGt } from '../../util/semver.js';
 
 interface NpmPackageInfo {
   version: string;
@@ -18,16 +19,6 @@ export interface ReleaseEntry {
 
 function stripV(v: string): string {
   return v.replace(/^v/, '');
-}
-
-function semverGt(a: string, b: string): boolean {
-  const pa = stripV(a).split('.').map(Number);
-  const pb = stripV(b).split('.').map(Number);
-  for (let i = 0; i < 3; i++) {
-    if ((pa[i] || 0) > (pb[i] || 0)) return true;
-    if ((pa[i] || 0) < (pb[i] || 0)) return false;
-  }
-  return false;
 }
 
 export async function loader() {
