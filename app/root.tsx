@@ -3,13 +3,35 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 import './index.css';
 import { queryClient } from './queryClient';
 
+const THEME_COLORS: Record<string, string> = {
+  light: '#0969da',
+  dark: '#58a6ff',
+  dracula: '#bd93f9',
+  synthwave: '#f72585',
+  hacker: '#00ff41',
+};
+
+export function applyThemeColor(theme: string) {
+  const resolved =
+    theme === 'auto'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+      : theme;
+  const color = THEME_COLORS[resolved] ?? THEME_COLORS.light;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
+}
+
 const themeScript = `
   try {
+    const THEME_COLORS = ${JSON.stringify(THEME_COLORS)};
     const t = localStorage.getItem('beadee-theme') || 'auto'
-    document.documentElement.dataset.theme =
-      t === 'auto'
-        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        : t
+    const resolved = t === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : t
+    document.documentElement.dataset.theme = resolved
+    const color = THEME_COLORS[resolved] || THEME_COLORS.light
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color)
   } catch(e) {}
 `;
 

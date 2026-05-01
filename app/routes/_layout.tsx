@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { applyThemeColor } from '../root.js';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import Header from '../components/Header/index.jsx';
@@ -23,6 +24,7 @@ function applyTheme(theme: string) {
   } else {
     document.documentElement.dataset.theme = theme;
   }
+  applyThemeColor(theme);
 }
 
 export interface LayoutOutletContext {
