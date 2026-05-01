@@ -21,8 +21,8 @@ export default function Root() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>beadee</title>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="theme-color" content="#0969da" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" />
         <link rel="manifest" href="/manifest.json" />
         <Meta />
         <Links />
