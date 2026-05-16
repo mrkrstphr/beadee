@@ -1,5 +1,5 @@
 import { Check, ChevronDown, Copy, Ghost, Trash2, User, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PRIORITY_LABEL, TYPE_SHORT } from '../../constants.js';
 import { useAddLabel } from '../../hooks/api/useAddLabel.js';
 import { useChildren } from '../../hooks/api/useChildren.js';
@@ -28,6 +28,13 @@ function formatDate(iso: string | null | undefined): string | null {
     month: 'short',
     day: 'numeric',
   });
+}
+
+function formatMetaValue(v: unknown): string {
+  if (v === null || v === undefined) return '—';
+  if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+  if (typeof v === 'string' || typeof v === 'number') return String(v);
+  return JSON.stringify(v);
 }
 
 function DepChip({ dep, onSelect }: { dep: Dependency | Issue; onSelect: (id: string) => void }) {
@@ -461,39 +468,35 @@ export default function IssueDetail({
           )}
         </div>
 
-        {((issue.estimated_minutes != null && issue.estimated_minutes > 0) ||
-          issue.due_at ||
-          issue.created_at ||
-          issue.closed_at) && (
-          <div className="detail-kv-wrap">
-            <dl className="detail-kv">
-              {issue.estimated_minutes != null && issue.estimated_minutes > 0 && (
-                <>
-                  <dt>Estimate</dt>
-                  <dd>{issue.estimated_minutes} min</dd>
-                </>
-              )}
-              {issue.due_at && (
-                <>
-                  <dt>Due</dt>
-                  <dd>{formatDate(issue.due_at)}</dd>
-                </>
-              )}
-              {issue.created_at && (
-                <>
-                  <dt>Created</dt>
-                  <dd>{formatDate(issue.created_at)}</dd>
-                </>
-              )}
-              {issue.closed_at && (
-                <>
-                  <dt>Closed</dt>
-                  <dd>{formatDate(issue.closed_at)}</dd>
-                </>
-              )}
-            </dl>
-          </div>
-        )}
+        {(() => {
+          const pairs: Array<[string, React.ReactNode]> = [];
+          if (issue.estimated_minutes != null && issue.estimated_minutes > 0)
+            pairs.push(['Estimate', `${issue.estimated_minutes} min`]);
+          if (issue.due_at) pairs.push(['Due', formatDate(issue.due_at)]);
+          if (issue.created_at) pairs.push(['Created', formatDate(issue.created_at)]);
+          if (issue.closed_at) pairs.push(['Closed', formatDate(issue.closed_at)]);
+          for (const [k, v] of Object.entries(issue.metadata ?? {}))
+            pairs.push([k.replaceAll('_', ' '), formatMetaValue(v)]);
+          if (pairs.length === 0) return null;
+          return (
+            <div className="detail-kv-wrap">
+              <dl className="detail-kv">
+                {pairs.map(([k, v], i) => (
+                  <React.Fragment key={i}>
+                    <dt>{k}</dt>
+                    <dd>{v}</dd>
+                  </React.Fragment>
+                ))}
+                {pairs.length % 2 !== 0 && (
+                  <>
+                    <dt />
+                    <dd />
+                  </>
+                )}
+              </dl>
+            </div>
+          );
+        })()}
         {issue.status === 'closed' && issue.close_reason && issue.close_reason !== 'Closed' && (
           <div className="detail-close-reason">
             <span className="detail-close-reason-label">Close reason</span>
