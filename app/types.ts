@@ -56,6 +56,7 @@ export interface Issue {
   dependencies?: Dependency[];
   closed_at?: string | null;
   close_reason?: string | null;
+  metadata?: Record<string, unknown> | null;
 }
 
 export interface LabelItem {
