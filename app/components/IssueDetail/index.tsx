@@ -362,6 +362,15 @@ export default function IssueDetail({
       ? Math.round((epicStatus.closed_children / epicStatus.total_children) * 100)
       : null;
 
+  const kvPairs: Array<[string, React.ReactNode]> = [];
+  if (issue.estimated_minutes != null && issue.estimated_minutes > 0)
+    kvPairs.push(['Estimate', `${issue.estimated_minutes} min`]);
+  if (issue.due_at) kvPairs.push(['Due', formatDate(issue.due_at)]);
+  if (issue.created_at) kvPairs.push(['Created', formatDate(issue.created_at)]);
+  if (issue.closed_at) kvPairs.push(['Closed', formatDate(issue.closed_at)]);
+  for (const [k, v] of Object.entries(issue.metadata ?? {}))
+    kvPairs.push([k.replaceAll('_', ' '), formatMetaValue(v)]);
+
   return (
     <>
       {confirmDelete && (
@@ -468,35 +477,24 @@ export default function IssueDetail({
           )}
         </div>
 
-        {(() => {
-          const pairs: Array<[string, React.ReactNode]> = [];
-          if (issue.estimated_minutes != null && issue.estimated_minutes > 0)
-            pairs.push(['Estimate', `${issue.estimated_minutes} min`]);
-          if (issue.due_at) pairs.push(['Due', formatDate(issue.due_at)]);
-          if (issue.created_at) pairs.push(['Created', formatDate(issue.created_at)]);
-          if (issue.closed_at) pairs.push(['Closed', formatDate(issue.closed_at)]);
-          for (const [k, v] of Object.entries(issue.metadata ?? {}))
-            pairs.push([k.replaceAll('_', ' '), formatMetaValue(v)]);
-          if (pairs.length === 0) return null;
-          return (
-            <div className="detail-kv-wrap">
-              <dl className="detail-kv">
-                {pairs.map(([k, v], i) => (
-                  <React.Fragment key={i}>
-                    <dt>{k}</dt>
-                    <dd>{v}</dd>
-                  </React.Fragment>
-                ))}
-                {pairs.length % 2 !== 0 && (
-                  <>
-                    <dt />
-                    <dd />
-                  </>
-                )}
-              </dl>
-            </div>
-          );
-        })()}
+        {kvPairs.length > 0 && (
+          <div className="detail-kv-wrap">
+            <dl className="detail-kv">
+              {kvPairs.map(([k, v]) => (
+                <React.Fragment key={k}>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </React.Fragment>
+              ))}
+              {kvPairs.length % 2 !== 0 && (
+                <>
+                  <dt />
+                  <dd />
+                </>
+              )}
+            </dl>
+          </div>
+        )}
         {issue.status === 'closed' && issue.close_reason && issue.close_reason !== 'Closed' && (
           <div className="detail-close-reason">
             <span className="detail-close-reason-label">Close reason</span>
