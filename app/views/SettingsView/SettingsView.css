@@ -74,7 +74,7 @@
 }
 
 .theme-preview-content {
-  @apply flex w-full h-full;
+  @apply flex size-full;
 }
 
 .theme-preview-sidebar {

@@ -125,13 +125,14 @@ const renderContent = (c: ThemeColors, clipPath?: string) => (
       className="theme-preview-sidebar"
       style={{ background: c.bgSurface, borderRightColor: c.border }}
     >
-      {[c.accent, c.textMuted, c.textMuted].map((dotColor, i) => (
-        <div key={i} className="theme-preview-item">
-          <span className="theme-preview-item-dot" style={{ background: dotColor }} />
-          <span
-            className="theme-preview-item-line"
-            style={{ background: i === 0 ? c.text : c.textMuted }}
-          />
+      {[
+        { key: 'active', dot: c.accent, line: c.text },
+        { key: 'inactive-1', dot: c.textMuted, line: c.textMuted },
+        { key: 'inactive-2', dot: c.textMuted, line: c.textMuted },
+      ].map(({ key, dot, line }) => (
+        <div key={key} className="theme-preview-item">
+          <span className="theme-preview-item-dot" style={{ background: dot }} />
+          <span className="theme-preview-item-line" style={{ background: line }} />
         </div>
       ))}
     </div>

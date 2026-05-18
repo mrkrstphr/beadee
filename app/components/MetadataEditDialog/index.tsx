@@ -23,24 +23,24 @@ export default function MetadataEditDialog({
   onClose,
   onSaved,
 }: MetadataEditDialogProps) {
-  const nextId = useRef(0);
+  const nextIdRef = useRef(Object.keys(existing).length);
   const [rows, setRows] = useState<Row[]>(() =>
-    Object.entries(existing).map(([key, value]) => ({ id: nextId.current++, key, value })),
+    Object.entries(existing).map(([key, value], i) => ({ id: i, key, value })),
   );
   const [error, setError] = useState<string | null>(null);
   const updateIssue = useUpdateIssue();
-  const pendingFocus = useRef(false);
+  const pendingFocusRef = useRef(false);
   const lastKeyRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!pendingFocus.current) return;
-    pendingFocus.current = false;
+    if (!pendingFocusRef.current) return;
+    pendingFocusRef.current = false;
     lastKeyRef.current?.focus();
   }, [rows.length]);
 
   function addRow() {
-    pendingFocus.current = true;
-    setRows((r) => [...r, { id: nextId.current++, key: '', value: '' }]);
+    pendingFocusRef.current = true;
+    setRows((r) => [...r, { id: nextIdRef.current++, key: '', value: '' }]);
   }
 
   function removeRow(id: number) {
