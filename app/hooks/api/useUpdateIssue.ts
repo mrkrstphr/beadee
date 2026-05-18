@@ -17,6 +17,8 @@ export interface UpdateIssueData {
   parent?: string;
   labels?: string[];
   claim?: boolean;
+  metadata?: Record<string, string>;
+  metadataUnset?: string[];
 }
 
 function updateIssue(id: string, data: UpdateIssueData): Promise<Issue> {

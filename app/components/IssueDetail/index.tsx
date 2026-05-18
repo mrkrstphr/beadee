@@ -17,6 +17,7 @@ import CollapsibleSection from '../CollapsibleSection/index.jsx';
 import CommentThread from '../CommentThread/index.jsx';
 import ConfirmDialog from '../ConfirmDialog.jsx';
 import InlineTextEdit from '../InlineTextEdit/index.jsx';
+import MetadataEditDialog from '../MetadataEditDialog/index.js';
 import StatusIcon from '../StatusIcon/index.jsx';
 import './IssueDetail.css';
 const ALL_STATUSES = ['open', 'in_progress', 'blocked', 'deferred', 'pinned', 'closed'];
@@ -268,6 +269,7 @@ export default function IssueDetail({
   const [actionPending, setActionPending] = useState(false);
   const [editMenuOpen, setEditMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [editingMeta, setEditingMeta] = useState(false);
   const editMenuRef = useRef<HTMLDivElement>(null);
 
   async function handleAction(fn: () => Promise<unknown>, successMsg: string | null) {
@@ -368,8 +370,13 @@ export default function IssueDetail({
   if (issue.due_at) kvPairs.push(['Due', formatDate(issue.due_at)]);
   if (issue.created_at) kvPairs.push(['Created', formatDate(issue.created_at)]);
   if (issue.closed_at) kvPairs.push(['Closed', formatDate(issue.closed_at)]);
-  for (const [k, v] of Object.entries(issue.metadata ?? {}))
-    kvPairs.push([k.replaceAll('_', ' '), formatMetaValue(v)]);
+
+  const metaPairs: Array<[string, React.ReactNode]> = [];
+  const metaRecord: Record<string, string> = {};
+  for (const [k, v] of Object.entries(issue.metadata ?? {})) {
+    metaPairs.push([k.replaceAll('_', ' '), formatMetaValue(v)]);
+    metaRecord[k] = v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+  }
 
   return (
     <>
@@ -380,6 +387,14 @@ export default function IssueDetail({
           confirmLabel="Delete"
           onConfirm={handleDelete}
           onCancel={() => setConfirmDelete(false)}
+        />
+      )}
+      {editingMeta && (
+        <MetadataEditDialog
+          issueId={issueId}
+          existing={metaRecord}
+          onClose={() => setEditingMeta(false)}
+          onSaved={() => toast('Metadata saved', 'success')}
         />
       )}
       <div className="issue-detail">
@@ -494,6 +509,33 @@ export default function IssueDetail({
               )}
             </dl>
           </div>
+        )}
+
+        <div className="detail-section-header">
+          <span className="detail-section-title">Metadata</span>
+          <button className="detail-section-edit" onClick={() => setEditingMeta(true)}>
+            Edit
+          </button>
+        </div>
+        {metaPairs.length > 0 ? (
+          <div className="detail-kv-wrap detail-kv-wrap-meta">
+            <dl className="detail-kv">
+              {metaPairs.map(([k, v]) => (
+                <React.Fragment key={k}>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </React.Fragment>
+              ))}
+              {metaPairs.length % 2 !== 0 && (
+                <>
+                  <dt />
+                  <dd />
+                </>
+              )}
+            </dl>
+          </div>
+        ) : (
+          <p className="detail-meta-empty">No metadata</p>
         )}
         {issue.status === 'closed' && issue.close_reason && issue.close_reason !== 'Closed' && (
           <div className="detail-close-reason">

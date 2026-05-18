@@ -151,6 +151,37 @@
   @apply rounded-lg mb-5 overflow-hidden shrink-0;
 }
 
+.detail-kv-wrap-meta {
+  @apply mt-2;
+}
+
+.detail-section-header {
+  @apply flex items-center justify-between mb-0;
+}
+
+.detail-section-title {
+  color: var(--text-muted);
+  @apply text-[12px] font-semibold tracking-[0.04em] uppercase;
+}
+
+.detail-section-edit {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  @apply text-[12px] px-1 py-0.5 rounded transition-colors;
+}
+
+.detail-section-edit:hover {
+  color: var(--text);
+  background: var(--bg-elevated);
+}
+
+.detail-meta-empty {
+  color: var(--text-muted);
+  @apply text-[13px] mt-1.5 mb-5;
+}
+
 /* Desktop: two side-by-side key/value pairs per row */
 .detail-kv {
   @apply grid text-[13px] leading-[1.4] m-0 p-0;

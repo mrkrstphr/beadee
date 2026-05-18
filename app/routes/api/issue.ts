@@ -56,6 +56,8 @@ export async function action({
     parent?: string;
     labels?: string[];
     claim?: boolean;
+    metadata?: Record<string, string>;
+    metadataUnset?: string[];
   };
 
   if (Object.keys(body).length === 0) {
@@ -86,6 +88,16 @@ export async function action({
     if (body.external_ref !== undefined) args.push(`--external-ref=${body.external_ref}`);
     if (body.parent !== undefined) args.push(`--parent=${body.parent}`);
     if (Array.isArray(body.labels)) args.push(`--set-labels=${body.labels.join(',')}`);
+    if (body.metadata) {
+      for (const [k, v] of Object.entries(body.metadata)) {
+        args.push(`--set-metadata=${k}=${v}`);
+      }
+    }
+    if (Array.isArray(body.metadataUnset)) {
+      for (const k of body.metadataUnset) {
+        args.push(`--unset-metadata=${k}`);
+      }
+    }
   }
 
   const result = (await bdRun(args, process.cwd())) as Issue | Issue[];

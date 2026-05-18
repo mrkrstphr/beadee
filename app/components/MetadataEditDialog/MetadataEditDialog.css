@@ -1,0 +1,57 @@
+@reference "tailwindcss";
+
+.meta-edit-body {
+  @apply flex flex-col gap-3 overflow-y-auto p-5;
+}
+
+.meta-edit-rows {
+  @apply flex flex-col gap-2;
+}
+
+.meta-edit-row {
+  @apply flex gap-2 items-center;
+}
+
+.meta-edit-key,
+.meta-edit-val {
+  flex: 1;
+  min-width: 0;
+}
+
+.meta-edit-col-spacer {
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.meta-edit-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  @apply flex items-center justify-center rounded p-1 transition-colors;
+  flex-shrink: 0;
+}
+
+.meta-edit-remove:hover {
+  background: var(--bg-elevated);
+  color: var(--danger);
+}
+
+.meta-edit-add {
+  color: var(--text-muted);
+  @apply text-[13px] self-start mt-1;
+}
+
+.meta-edit-add:hover {
+  color: var(--text);
+}
+
+.meta-edit-footer {
+  border-top: 1px solid var(--border);
+  @apply flex gap-2 justify-end px-5 py-4;
+}
+
+.meta-edit-empty {
+  color: var(--text-muted);
+  @apply text-[13px] py-1;
+}
