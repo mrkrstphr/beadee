@@ -8,7 +8,7 @@
   background: var(--bg-surface);
   border: 1px solid var(--accent);
   color: var(--text);
-  @apply rounded-md text-[13px] leading-relaxed px-3.5 py-3 w-full resize-none min-h-[80px] outline-none;
+  @apply rounded-md text-[13px] leading-relaxed px-3.5 py-3 w-full resize-y min-h-[80px] outline-none;
 }
 
 .inline-text-edit-error {

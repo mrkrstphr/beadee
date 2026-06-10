@@ -29,13 +29,6 @@ export default function InlineTextEdit({
     requestAnimationFrame(() => textareaRef.current?.focus());
   }
 
-  function autoResize() {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
-  }
-
   async function handleSave() {
     if (saving) return;
     if (minLength && draft.trim().length < minLength) {
@@ -76,7 +69,6 @@ export default function InlineTextEdit({
           onChange={(e) => {
             setDraft(e.target.value);
             setError(null);
-            autoResize();
           }}
           onKeyDown={handleKeyDown}
           disabled={saving}
